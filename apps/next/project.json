@@ -41,10 +41,19 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "apps/next/app/**/*.{ts,tsx}",
-          "apps/next/components/**/*.{ts,tsx}",
-          "apps/next/lib/**/*.{ts,tsx}"
-        ]
+          "apps/next/**/*.{ts,tsx}",
+          "!apps/next/.next/**/*",
+          "!apps/next/out/**/*",
+          "!apps/next/node_modules/**/*"
+        ],
+        "maxWarnings": 0,
+        "fix": true,
+        "cache": true,
+        "format": "stylish",
+        "quiet": false,
+        "force": false,
+        "flatConfig": true,
+        "overrideConfigFile": "eslint.config.mjs"
       }
     },
     "test": {

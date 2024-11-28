@@ -16,17 +16,11 @@
         "name": "next"
       }
     ],
-    "types": [
-      "node"
-    ],
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
+    "types": ["node"],
+    "typeRoots": ["../../node_modules/@types"],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -37,14 +31,14 @@
     "next-env.d.ts",
     "css.d.ts",
     ".next/types/**/*.ts",
-    "../../dist/apps/next/.next/types/**/*.ts"
+    "../../dist/apps/next/.next/types/**/*.ts",
+    ".storybook/**/*",
+    "specs/**/*"
   ],
   "exclude": [
     "node_modules",
+    "jest.config.ts",
     "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "**/*.spec.tsx",
-    "**/*.test.tsx",
-    "**/*.stories.tsx"
+    "src/**/*.test.ts"
   ]
 }
