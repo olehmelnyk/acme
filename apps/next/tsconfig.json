@@ -17,32 +17,34 @@
       }
     ],
     "types": [
-      "node",
-      "vitest",
-      "@testing-library/jest-dom"
+      "node"
+    ],
+    "typeRoots": [
+      "../../node_modules/@types"
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    "css.d.ts",
+    ".next/types/**/*.ts",
+    "../../dist/apps/next/.next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts",
-    "**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
     "**/*.spec.tsx",
     "**/*.test.tsx",
-    "**/*.stories.tsx",
-    "**/*.stories.ts",
-    ".next",
-    "coverage"
+    "**/*.stories.tsx"
   ]
 }

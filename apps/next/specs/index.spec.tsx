@@ -1,5 +1,7 @@
+/// <reference types="vitest" />
 import React from 'react';
 import { render } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import Page from '../app/page';
 
 describe('Page', () => {

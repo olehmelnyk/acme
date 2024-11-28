@@ -3,17 +3,20 @@
   "compilerOptions": {
     "outDir": "",
     "module": "commonjs",
-    "types": ["vitest/globals", "node", "@testing-library/jest-dom"],
+    "types": ["node"],
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "jsx": "react"
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.d.ts"
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.d.ts",
+    "../vitest.setup.ts"
   ]
 }
