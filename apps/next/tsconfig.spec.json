@@ -1,21 +1,19 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "outDir": "",
     "module": "commonjs",
-    "types": ["jest", "node"],
+    "types": ["vitest/globals", "node", "@testing-library/jest-dom"],
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
     "jsx": "react"
   },
   "include": [
-    "jest.config.ts",
-    "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/*.test.tsx",
     "src/**/*.spec.tsx",
-    "src/**/*.test.js",
-    "src/**/*.spec.js",
-    "src/**/*.test.jsx",
-    "src/**/*.spec.jsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
     "src/**/*.d.ts"
   ]
 }

@@ -8,13 +8,15 @@
       "!{projectRoot}/eslint.config.js",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s"
+      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/tsconfig.storybook.json"
     ],
     "sharedGlobals": []
   },
-  "nxCloudId": "6747b8d516a73d0f654fb81f",
+  "nxCloudId": "6747bfc28c812b1382d5e61a",
   "plugins": [
     {
       "plugin": "@nx/next/plugin",
@@ -38,15 +40,48 @@
       }
     },
     {
-      "plugin": "@nx/jest/plugin",
+      "plugin": "@nx/vite/plugin",
       "options": {
         "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/storybook/plugin",
+      "options": {
+        "buildStorybookTargetName": "build-storybook",
+        "serveStorybookTargetName": "storybook",
+        "testStorybookTargetName": "test-storybook",
+        "configFolder": ".storybook"
       }
     }
   ],
   "targetDefaults": {
     "e2e-ci--**/*": {
       "dependsOn": ["^build"]
+    },
+    "test:coverage": {
+      "outputs": ["{projectRoot}/coverage"],
+      "cache": true
+    },
+    "build-storybook": {
+      "outputs": ["{projectRoot}/dist/storybook"],
+      "cache": true
+    },
+    "test": {
+      "cache": true
+    },
+    "test:watch": {
+      "cache": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "e2e": {
+      "inputs": ["default", "^production"]
+    },
+    "test": {
+      "inputs": ["default", "^production"]
     }
   },
   "generators": {
@@ -56,5 +91,6 @@
         "linter": "eslint"
       }
     }
-  }
+  },
+  "defaultBase": "main"
 }

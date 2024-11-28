@@ -1,0 +1,11 @@
+# Next.js build output
+.next
+out
+dist
+
+# Config files
+*.config.js
+*.config.ts
+
+# Node modules
+node_modules

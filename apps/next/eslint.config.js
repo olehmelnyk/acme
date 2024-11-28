@@ -1,22 +1,30 @@
-const { FlatCompat } = require('@eslint/eslintrc');
 const js = require('@eslint/js');
-const { fixupConfigRules } = require('@eslint/compat');
 const nx = require('@nx/eslint-plugin');
-const baseConfig = require('../../eslint.config.js');
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
+const nextPlugin = require('@next/eslint-plugin-next');
 
 module.exports = [
-  ...fixupConfigRules(compat.extends('next')),
-
-  ...fixupConfigRules(compat.extends('next/core-web-vitals')),
-
-  ...baseConfig,
+  ...nx.configs['flat/base'],
+  ...nx.configs['flat/typescript'],
+  ...nx.configs['flat/javascript'],
   ...nx.configs['flat/react-typescript'],
   {
-    ignores: ['.next/**/*'],
+    files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      '@next/next': nextPlugin
+    },
+    rules: {
+      '@next/next/no-html-link-for-pages': ['error', 'apps/next/app'],
+      '@next/next/no-img-element': 'error',
+      '@next/next/no-sync-scripts': 'error'
+    }
   },
+  {
+    ignores: [
+      '.next/**/*',
+      'out/**/*',
+      'dist/**/*',
+      'node_modules/**/*',
+      '.next/types/**/*'
+    ]
+  }
 ];
