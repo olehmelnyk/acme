@@ -1,7 +1,7 @@
 {
-  "name": "next",
+  "name": "web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/next",
+  "sourceRoot": "apps/web",
   "projectType": "application",
   "targets": {
     "build": {
@@ -9,11 +9,11 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/next"
+        "outputPath": "dist/apps/web"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/next"
+          "outputPath": "apps/web"
         },
         "production": {}
       }
@@ -22,16 +22,16 @@
       "executor": "@nx/next:server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "next:build",
+        "buildTarget": "web:build",
         "dev": true
       },
       "configurations": {
         "development": {
-          "buildTarget": "next:build:development",
+          "buildTarget": "web:build:development",
           "dev": true
         },
         "production": {
-          "buildTarget": "next:build:production",
+          "buildTarget": "web:build:production",
           "dev": false
         }
       }
@@ -41,10 +41,10 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "apps/next/**/*.{ts,tsx}",
-          "!apps/next/.next/**/*",
-          "!apps/next/out/**/*",
-          "!apps/next/node_modules/**/*"
+          "apps/web/**/*.{ts,tsx}",
+          "!apps/web/.next/**/*",
+          "!apps/web/out/**/*",
+          "!apps/web/node_modules/**/*"
         ],
         "maxWarnings": 0,
         "fix": true,
@@ -58,18 +58,18 @@
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["{workspaceRoot}/coverage/apps/next"],
+      "outputs": ["{workspaceRoot}/coverage/apps/web"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/next",
-        "config": "apps/next/vite.config.ts"
+        "reportsDirectory": "../../coverage/apps/web",
+        "config": "apps/web/vite.config.ts"
       }
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",
       "options": {
         "port": 4400,
-        "configDir": "apps/next/.storybook"
+        "configDir": "apps/web/.storybook"
       },
       "configurations": {
         "ci": {
@@ -81,8 +81,8 @@
       "executor": "@nx/storybook:build",
       "outputs": ["{options.outputDir}"],
       "options": {
-        "outputDir": "dist/storybook/next",
-        "configDir": "apps/next/.storybook"
+        "outputDir": "dist/storybook/web",
+        "configDir": "apps/web/.storybook"
       },
       "configurations": {
         "ci": {
