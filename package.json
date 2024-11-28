@@ -1,8 +1,24 @@
 {
   "name": "@acme/source",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
+  "keywords": [
+    "nx",
+    "nextjs",
+    "playwright",
+    "vitest",
+    "storybook",
+    "bun",
+    "shadcn",
+    "tailwind"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.0.0",
   "scripts": {
+    "preinstall": "npx only-allow bun",
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",

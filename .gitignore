@@ -8,6 +8,12 @@ tmp
 # dependencies
 node_modules
 
+# Package manager locks (only allow bun.lockb)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store
+
 # IDEs and editors
 /.idea
 .project
