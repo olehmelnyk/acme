@@ -1,0 +1,11 @@
+echo "🔍 Running pre-push checks..."
+
+# Check if we're on a protected branch
+echo "🔒 Checking branch protection..."
+./tools/scripts/check-protected-branch.sh || exit 1
+
+# Run branch naming check
+echo "📝 Checking branch name..."
+bun branch-naming-check || exit 1
+
+echo "✅ Pre-push checks passed!"

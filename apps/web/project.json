@@ -41,19 +41,16 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
-          "apps/web/**/*.{ts,tsx}",
-          "!apps/web/.next/**/*",
-          "!apps/web/out/**/*",
-          "!apps/web/node_modules/**/*"
+          "apps/web/src/**/*.{ts,tsx,js,jsx}",
+          "apps/web/.storybook/**/*.{ts,tsx,js,jsx}"
         ],
-        "maxWarnings": 0,
-        "fix": true,
-        "cache": true,
         "format": "stylish",
         "quiet": false,
         "force": false,
-        "flatConfig": true,
-        "overrideConfigFile": "eslint.config.mjs"
+        "fix": true,
+        "cache": true,
+        "cacheLocation": "node_modules/.cache/eslint",
+        "maxWarnings": 0
       }
     },
     "test": {
@@ -62,7 +59,9 @@
       "options": {
         "passWithNoTests": true,
         "reportsDirectory": "../../coverage/apps/web",
-        "config": "apps/web/vite.config.ts"
+        "config": "apps/web/vite.config.ts",
+        "threads": true,
+        "watch": false
       }
     },
     "storybook": {

@@ -20,8 +20,8 @@ rm -rf tmp
 
 # Remove Next.js specific directories
 echo "Removing Next.js build cache..."
-rm -rf apps/next/.next
-rm -rf apps/next/node_modules
+rm -rf apps/web/.next
+rm -rf apps/web/node_modules
 
 # Remove test coverage and cache
 echo "Removing test coverage and cache..."

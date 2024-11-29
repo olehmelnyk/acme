@@ -1,0 +1,5 @@
+module.exports = {
+  pattern: "^(feat|fix|hotfix|release|support)/ACME-\\d+-[a-zA-Z0-9/_-]+$",
+  errorMsg: "Branch name must follow pattern: <type>/<ticket>-<description> where type is one of: feat, fix, hotfix, release, support",
+  protected: ["dev", "stage", "main"]
+}

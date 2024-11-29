@@ -1,0 +1,95 @@
+echo "🔄 Running post-checkout checks..."
+
+# Get the previous and current branch names
+PREV_HEAD=$1
+NEW_HEAD=$2
+BRANCH_SWITCH=$3
+
+# Only run if this is a branch checkout (not file checkout)
+if [ $BRANCH_SWITCH -eq 1 ]; then
+  # Get current and previous branch names for better messages
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  PREV_BRANCH=$(git name-rev --name-only $PREV_HEAD)
+  
+  echo "📝 Switched from $PREV_BRANCH to $CURRENT_BRANCH"
+
+  # Check if current branch is protected
+  PROTECTED_BRANCHES=$(node -p "require('./.branchnaming').protected.join('|')")
+  if echo "$CURRENT_BRANCH" | grep -E "^($PROTECTED_BRANCHES)$" > /dev/null; then
+    echo "⚠️  Warning: You are on protected branch '$CURRENT_BRANCH'"
+    echo "Be careful with any changes and follow the proper review process"
+  fi
+
+  # Check if branch is up to date with main
+  echo "🔄 Fetching latest changes..."
+  git fetch origin main --quiet
+  
+  BEHIND_COUNT=$(git rev-list --count HEAD..origin/main)
+  AHEAD_COUNT=$(git rev-list --count origin/main..HEAD)
+  
+  if [ $BEHIND_COUNT -gt 0 ]; then
+    echo "⚠️  Warning: Current branch is $BEHIND_COUNT commits behind main"
+    
+    # Ask if user wants to pull changes
+    echo -n "Would you like to pull latest changes from main? [y/N] "
+    read -r answer
+    if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+      echo "🔄 Pulling latest changes..."
+      if git pull origin main; then
+        echo "✅ Successfully pulled changes from main"
+      else
+        echo "❌ Failed to pull changes. Please resolve conflicts manually"
+      fi
+    else
+      echo "⏭️  Skipping pull..."
+    fi
+  fi
+  
+  if [ $AHEAD_COUNT -gt 0 ]; then
+    echo "ℹ️  Your branch is $AHEAD_COUNT commits ahead of main"
+  fi
+
+  # Check for stale branches
+  BRANCH_AGE=$(git log -1 --format=%ct)
+  CURRENT_TIME=$(date +%s)
+  DAYS_OLD=$(( ($CURRENT_TIME - $BRANCH_AGE) / 86400 ))
+  if [ $DAYS_OLD -gt 14 ]; then
+    echo "⚠️  Warning: This branch is $DAYS_OLD days old"
+    echo "Consider rebasing with main or cleaning up if work is complete"
+  fi
+
+  # Check for package lock changes
+  if git diff --name-only $PREV_HEAD $NEW_HEAD | grep -q "bun.lockb"; then
+    echo "📦 Lock file changes detected. Installing dependencies..."
+    bun install
+  else
+    # Check if node_modules exists and bun.lockb was modified
+    if [ ! -d "node_modules" ] || [ ! -f "bun.lockb" ]; then
+      echo "📦 Node modules missing or lock file not found. Installing dependencies..."
+      bun install
+    fi
+  fi
+
+  # Check for new environment variables
+  if git diff --name-only $PREV_HEAD $NEW_HEAD | grep -q "\.env\.example$"; then
+    echo "🔐 Environment variable changes detected"
+    echo "Please review .env.example for any new required variables"
+  fi
+
+  # Run security checks
+  echo "🔒 Running security checks..."
+  ./tools/scripts/security-check.sh
+
+  # Check workspace status
+  echo "📊 Workspace Status:"
+  echo "- Branch: $CURRENT_BRANCH"
+  echo "- Last Commit: $(git log -1 --format=%s)"
+  echo "- Modified Files: $(git status --porcelain | wc -l | xargs)"
+  
+  # Suggest cleanup if there are untracked files
+  if [ "$(git status --porcelain | grep '^??' | wc -l)" -gt 0 ]; then
+    echo "⚠️  You have untracked files. Consider cleaning up with 'git clean -f'"
+  fi
+fi
+
+echo "✅ Post-checkout checks completed!"

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": false,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["**/*"],
+  "exclude": ["node_modules", "tmp"]
+}

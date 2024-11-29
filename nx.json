@@ -8,6 +8,7 @@
       "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
@@ -68,6 +69,11 @@
       "cache": true
     },
     "test": {
+      "inputs": ["default", "^production"],
+      "executor": "@nx/vite:test",
+      "options": {
+        "passWithNoTests": true
+      },
       "cache": true
     },
     "test:watch": {
@@ -80,8 +86,10 @@
     "e2e": {
       "inputs": ["default", "^production"]
     },
-    "test": {
-      "inputs": ["default", "^production"]
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "generators": {

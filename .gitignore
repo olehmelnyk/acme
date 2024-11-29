@@ -53,3 +53,4 @@ out
 
 
 storybook-static
+vite.config.*.timestamp*

@@ -5,7 +5,8 @@ Welcome to the ACME project! This guide will help you get started with the devel
 ## Prerequisites
 
 Ensure you have the following installed:
-- Node.js (v18 or later)
+
+- Node.js (v20 or later)
 - Bun (v1.0 or later)
 - Git
 - VS Code (recommended)
@@ -42,6 +43,7 @@ code .env.local
 ```
 
 Required environment variables:
+
 - `OPENAI_API_KEY`: For AI-assisted development
 - `DATABASE_URL`: Database connection string
 - `AUTH_SECRET`: Authentication secret
@@ -79,7 +81,7 @@ acme/
 
 ```bash
 # Create a new feature branch
-git checkout -b feature/your-feature-name
+git checkout -b feat/ACME-123-your-feature-name
 
 # Generate feature scaffold
 bun run create:feature
@@ -129,11 +131,13 @@ bun typecheck
 ### Creating New Components
 
 1. Run component generator:
+
 ```bash
 bun run create:component
 ```
 
 2. Follow the prompts:
+
    - Select component type
    - Enter component name
    - Choose features
@@ -143,11 +147,13 @@ bun run create:component
 ### Adding New Features
 
 1. Run feature generator:
+
 ```bash
 bun run create:feature
 ```
 
 2. Follow the prompts:
+
    - Enter feature name
    - Provide description
    - Select options
@@ -175,6 +181,7 @@ bun test:coverage
 ### Documentation
 
 1. Project documentation:
+
    - `/docs`: General documentation
    - `/specs`: Technical specifications
    - `/apps/*/docs`: Application-specific docs
@@ -187,6 +194,7 @@ bun test:coverage
 ### Tools and Resources
 
 1. Development tools:
+
    - VS Code with recommended extensions
    - Chrome DevTools
    - React DevTools
@@ -200,6 +208,7 @@ bun test:coverage
 ### Support Channels
 
 1. Internal:
+
    - Team chat
    - Code reviews
    - Documentation
@@ -214,11 +223,13 @@ bun test:coverage
 ### Code Style
 
 1. Follow TypeScript best practices:
+
    - Use proper types
    - Avoid `any`
    - Document complex types
 
 2. Follow React best practices:
+
    - Functional components
    - Hooks for state
    - Proper prop types
@@ -231,12 +242,14 @@ bun test:coverage
 ### Git Workflow
 
 1. Branch naming:
+
    - `feature/*`: New features
    - `fix/*`: Bug fixes
    - `docs/*`: Documentation
    - `refactor/*`: Code refactoring
 
 2. Commit messages:
+
    - Clear and descriptive
    - Reference issues
    - Follow conventions
@@ -251,11 +264,13 @@ bun test:coverage
 ### Common Issues
 
 1. Build failures:
+
    - Check Node.js version
    - Clear cache: `bun clean`
    - Rebuild: `bun rebuild`
 
 2. Test failures:
+
    - Check test environment
    - Update snapshots
    - Check dependencies
@@ -268,11 +283,13 @@ bun test:coverage
 ### Getting Unstuck
 
 1. Check documentation:
+
    - Project docs
    - Tool docs
    - Error messages
 
 2. Ask for help:
+
    - Team chat
    - Code reviews
    - Stack Overflow
@@ -285,11 +302,13 @@ bun test:coverage
 ## Next Steps
 
 1. Review documentation:
+
    - Architecture overview
    - Coding standards
    - Testing guide
 
 2. Set up tools:
+
    - Configure editor
    - Install extensions
    - Set up debugging
@@ -302,11 +321,13 @@ bun test:coverage
 ## Additional Resources
 
 1. Learning materials:
+
    - TypeScript handbook
    - React documentation
    - Testing guides
 
 2. Tool documentation:
+
    - Next.js docs
    - Tailwind docs
    - Storybook tutorials

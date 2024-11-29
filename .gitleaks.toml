@@ -1,0 +1,13 @@
+[allowlist]
+paths = [
+    '''dist/''',
+    '''node_modules/''',
+    '''.next/'''
+]
+
+# Known false positives
+regexes = [
+    '''previewModeSigningKey''',
+    '''previewModeEncryptionKey''',
+    '''encryptionKey'''
+]

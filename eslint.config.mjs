@@ -44,7 +44,7 @@ export default [
     },
     settings: {
       next: {
-        rootDir: 'apps/next',
+        rootDir: 'apps/web',
       },
       jsx: true,
     },
@@ -53,7 +53,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
 
       // Next.js specific rules
-      '@next/next/no-html-link-for-pages': ['error', 'apps/next/app'],
+      '@next/next/no-html-link-for-pages': ['error', 'apps/web/app'],
       '@next/next/no-img-element': 'error',
       '@next/next/no-sync-scripts': 'error',
 

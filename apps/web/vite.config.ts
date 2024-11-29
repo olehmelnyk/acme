@@ -1,30 +1,28 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import { mergeConfig, defineConfig as defineViteConfig } from 'vite';
+import { defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
-export default defineConfig({
+const viteConfig = defineViteConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/web',
-
   plugins: [react(), nxViteTsPaths()],
-
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
-
-  test: {
-    globals: true,
-    cache: {
-      dir: '../../node_modules/.vitest'
-    },
-    environment: 'jsdom',
-    include: ['app/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    reporters: ['default'],
-    coverage: {
-      reportsDirectory: '../../coverage/apps/web',
-      provider: 'v8'
-    }
-  }
 });
+
+export default mergeConfig(
+  viteConfig,
+  defineVitestConfig({
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      setupFiles: ['../../vitest.setup.mts'],
+      reporters: ['default'],
+      coverage: {
+        reportsDirectory: '../../coverage/apps/web',
+        provider: 'v8'
+      }
+    }
+  })
+);

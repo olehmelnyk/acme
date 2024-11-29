@@ -117,29 +117,37 @@
 
 ## Security Tools
 
-### 1. Development
+### 1. Development Security
 
-- SonarQube
 - ESLint security rules
-- Bun dependency updates
-- Git secrets
-- SAST tools
+- Trivy for vulnerability scanning
+- Gitleaks for secret detection
+- Git hooks for pre-commit checks
+- Environment variable checks
 
-### 2. Testing
+### 2. Dependency Security
 
-- OWASP ZAP
-- Burp Suite
-- Penetration testing
-- Security scanning
-- Dependency checking
+- Trivy for dependency scanning
+- Snyk for dependency monitoring (optional)
+- Bun for package management
+- Regular dependency updates
+- Version pinning
 
-### 3. Monitoring
+### 3. Code Analysis
 
-- Sentry
-- Datadog Security
-- Log analysis
-- Alerts system
-- Audit logging
+- Static code analysis with ESLint
+- Type checking with TypeScript
+- Nx for monorepo management
+- Code review process
+- Security-focused testing
+
+### 4. Infrastructure Security
+
+- Secure configuration scanning with Trivy
+- Container scanning (if using containers)
+- Cloud security best practices
+- Infrastructure as Code scanning
+- Regular security updates
 
 ## Compliance
 

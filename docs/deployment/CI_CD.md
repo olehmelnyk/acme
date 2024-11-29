@@ -3,6 +3,7 @@
 ## Overview
 
 Our CI/CD pipeline automates:
+
 - Code quality checks
 - Testing
 - Security scanning
@@ -20,12 +21,12 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.x'
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -35,22 +36,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Lint
         run: npm run lint
-      
+
       - name: Type check
         run: npm run type-check
-      
+
       - name: Format check
         run: npm run format:check
 
@@ -72,25 +73,25 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run unit tests
         run: npm run test:unit
-      
+
       - name: Run integration tests
         run: npm run test:integration
-      
+
       - name: Run E2E tests
         run: npm run test:e2e
 
@@ -100,13 +101,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Run SAST
         uses: github/codeql-action/analyze@v2
-      
+
       - name: Run dependency scan
         run: npm audit
-      
+
       - name: Run container scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -123,17 +124,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      
+
       - name: Login to Container Registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -152,7 +153,7 @@ jobs:
     environment:
       name: staging
       url: https://staging.example.com
-    
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -160,7 +161,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-      
+
       - name: Update ECS service
         run: |
           aws ecs update-service \
@@ -181,7 +182,7 @@ jobs:
     environment:
       name: production
       url: https://example.com
-    
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -189,7 +190,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-      
+
       - name: Update ECS service
         run: |
           aws ecs update-service \
@@ -209,7 +210,7 @@ jobs:
 ```dockerfile
 # Dockerfile
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -220,7 +221,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -255,37 +256,37 @@ spec:
         app: api
     spec:
       containers:
-      - name: api
-        image: ghcr.io/org/api:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: api-secrets
-              key: database-url
-        resources:
-          limits:
-            cpu: "1"
-            memory: "1Gi"
-          requests:
-            cpu: "500m"
-            memory: "512Mi"
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 15
-          periodSeconds: 20
+        - name: api
+          image: ghcr.io/org/api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: database-url
+          resources:
+            limits:
+              cpu: '1'
+              memory: '1Gi'
+            requests:
+              cpu: '500m'
+              memory: '512Mi'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
 ```
 
 ## Deployment Strategies
@@ -296,33 +297,33 @@ spec:
 // scripts/deploy/blue-green.ts
 import { ECS } from 'aws-sdk';
 
-async function blueGreenDeploy(
-  cluster: string,
-  service: string,
-  taskDefinition: string
-): Promise<void> {
+async function blueGreenDeploy(cluster: string, service: string, taskDefinition: string): Promise<void> {
   const ecs = new ECS();
-  
+
   // Update service with new task definition
-  await ecs.updateService({
-    cluster,
-    service,
-    taskDefinition,
-    deploymentConfiguration: {
-      deploymentCircuitBreaker: {
-        enable: true,
-        rollback: true,
+  await ecs
+    .updateService({
+      cluster,
+      service,
+      taskDefinition,
+      deploymentConfiguration: {
+        deploymentCircuitBreaker: {
+          enable: true,
+          rollback: true,
+        },
+        maximumPercent: 200,
+        minimumHealthyPercent: 100,
       },
-      maximumPercent: 200,
-      minimumHealthyPercent: 100,
-    },
-  }).promise();
-  
+    })
+    .promise();
+
   // Wait for deployment to complete
-  await ecs.waitFor('servicesStable', {
-    cluster,
-    services: [service],
-  }).promise();
+  await ecs
+    .waitFor('servicesStable', {
+      cluster,
+      services: [service],
+    })
+    .promise();
 }
 ```
 
@@ -336,17 +337,17 @@ metadata:
   name: api
 spec:
   hosts:
-  - api.example.com
+    - api.example.com
   http:
-  - route:
-    - destination:
-        host: api
-        subset: v1
-      weight: 90
-    - destination:
-        host: api
-        subset: v2
-      weight: 10
+    - route:
+        - destination:
+            host: api
+            subset: v1
+          weight: 90
+        - destination:
+            host: api
+            subset: v2
+          weight: 10
 ```
 
 ## Monitoring and Rollback
@@ -380,19 +381,12 @@ export const rollbackCount = new Counter({
 
 ```typescript
 // scripts/deploy/rollback.ts
-async function autoRollback(
-  metrics: DeploymentMetrics,
-  thresholds: Thresholds
-): Promise<void> {
-  if (
-    metrics.errorRate > thresholds.errorRate ||
-    metrics.latency > thresholds.latency ||
-    metrics.cpuUsage > thresholds.cpuUsage
-  ) {
+async function autoRollback(metrics: DeploymentMetrics, thresholds: Thresholds): Promise<void> {
+  if (metrics.errorRate > thresholds.errorRate || metrics.latency > thresholds.latency || metrics.cpuUsage > thresholds.cpuUsage) {
     console.log('Metrics exceeded thresholds, initiating rollback');
-    
+
     await rollbackDeployment();
-    
+
     rollbackCount.inc({ environment: process.env.NODE_ENV });
   }
 }
@@ -430,11 +424,7 @@ async function autoRollback(
 module.exports = {
   maxWorkers: '50%',
   testMatch: ['**/__tests__/**/*.test.[jt]s?(x)'],
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/test/**',
-  ],
+  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts', '!src/test/**'],
   coverageThreshold: {
     global: {
       branches: 80,
@@ -449,6 +439,7 @@ module.exports = {
 ## Best Practices
 
 1. **Environment Management**
+
    ```yaml
    # .github/workflows/environments.yml
    environments:
@@ -458,7 +449,7 @@ module.exports = {
        protection_rules:
          - required_reviewers: 1
          - wait_timer: 30
-     
+
      production:
        deployment_branch: main
        url: https://example.com
@@ -468,6 +459,7 @@ module.exports = {
    ```
 
 2. **Secret Management**
+
    ```yaml
    # .github/workflows/secrets.yml
    - name: Configure secrets
@@ -495,12 +487,14 @@ module.exports = {
 ## Deployment Checklist
 
 1. **Pre-deployment**
+
    - [ ] All tests passing
    - [ ] Security scans passed
    - [ ] Dependencies up to date
    - [ ] Documentation updated
 
 2. **Deployment**
+
    - [ ] Database migrations ready
    - [ ] Environment variables configured
    - [ ] Backup strategy in place

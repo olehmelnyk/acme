@@ -1,0 +1,104 @@
+echo "🔍 Running pre-commit checks..."
+
+# Check if we're on a protected branch
+echo "🔒 Checking branch protection..."
+./tools/scripts/check-protected-branch.sh || exit 1
+
+# Check branch naming convention
+echo "📝 Checking branch name..."
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+BRANCH_PATTERN=$(node -p "require('./.branchnaming').pattern")
+if ! echo "$BRANCH_NAME" | grep -E "$BRANCH_PATTERN" > /dev/null; then
+  ERROR_MSG=$(node -p "require('./.branchnaming').errorMsg")
+  echo "❌ Invalid branch name: $BRANCH_NAME"
+  echo "ℹ️  $ERROR_MSG"
+  exit 1
+fi
+
+# Check for large files
+echo "📦 Checking for large files..."
+MAX_FILE_SIZE=10485760 # 10MB
+git diff --cached --name-only | while read -r file; do
+  if [ -f "$file" ]; then
+    size=$(stat -f%z "$file")
+    if [ "$size" -gt $MAX_FILE_SIZE ]; then
+      echo "❌ File $file is too large ($size bytes > $MAX_FILE_SIZE bytes)"
+      exit 1
+    fi
+  fi
+done
+
+# Check for secrets in staged files
+echo "👀 Checking for secrets..."
+STAGED_FILES=$(git diff --cached --name-only)
+if [ -n "$STAGED_FILES" ]; then
+  # Create a list of files to check
+  TEMP_FILE=$(mktemp)
+  for file in $STAGED_FILES; do
+    if [ -f "$file" ]; then
+      git show ":$file" > "$file.tmp"
+      echo "$file.tmp" >> "$TEMP_FILE"
+    fi
+  done
+
+  # Run secretlint on staged files
+  if ! bun secretlint $(cat "$TEMP_FILE"); then
+    echo "❌ Potential secrets found in staged files!"
+    # Cleanup temporary files
+    while read -r tmpfile; do
+      rm -f "$tmpfile"
+    done < "$TEMP_FILE"
+    rm -f "$TEMP_FILE"
+    exit 1
+  fi
+
+  # Cleanup temporary files
+  while read -r tmpfile; do
+    rm -f "$tmpfile"
+  done < "$TEMP_FILE"
+  rm -f "$TEMP_FILE"
+fi
+
+# Check for merge conflicts
+echo "🔍 Checking for merge conflicts..."
+if git diff --cached --name-only | xargs grep -l '^<<<<<<< ' > /dev/null; then
+  echo "❌ Merge conflicts found in staged files"
+  exit 1
+fi
+
+# Run lint-staged
+echo "🎨 Running lint-staged..."
+bun lint-staged || exit 1
+
+# Run type checking with auto-fix
+echo "📝 Running type check..."
+if ! bun nx affected --target=typecheck; then
+  echo "🔧 Attempting to fix type errors..."
+  if ! bun run fix:types; then
+    echo "❌ Could not automatically fix all type errors"
+    echo "Please fix the remaining type errors manually"
+    exit 1
+  fi
+  # Stage fixed files
+  git add $(git diff --name-only)
+fi
+
+# Run tests for affected files
+echo "🧪 Running tests for affected files..."
+if ! bun nx affected --target=test; then
+  echo "❌ Tests failed"
+  exit 1
+fi
+
+# Run build to ensure everything compiles
+echo "🏗️  Running build check..."
+if ! bun nx affected --target=build; then
+  echo "❌ Build failed"
+  exit 1
+fi
+
+# Run security checks
+echo "🔒 Running security checks..."
+./tools/scripts/security-check.sh || exit 1
+
+echo "✅ All pre-commit checks passed!"
