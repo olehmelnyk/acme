@@ -126,3 +126,11 @@ This project follows a strict layered architecture with feature-sliced design in
    - Optimistic updates
 
 Remember to always refer to the architecture documentation when making changes or additions to the codebase.
+
+- After making changes to the stack, update configs or file/folder structure - don't forget to update docs.
+
+- "+" is the alias for "continue"
+- dont forget we are using bun, not npm
+- dont forget bun does not have bun audit command
+
+- when I ask to "commit" staged - I want you to generate a commit message baased on changes in staged that also follows our commit conventions
