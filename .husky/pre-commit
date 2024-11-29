@@ -42,7 +42,7 @@ if [ -n "$STAGED_FILES" ]; then
   done
 
   # Run secretlint on staged files
-  if ! bun secretlint $(cat "$TEMP_FILE"); then
+  if ! bun x secretlint --secretlintrc .secretlintrc.json $(cat "$TEMP_FILE"); then
     echo "❌ Potential secrets found in staged files!"
     # Cleanup temporary files
     while read -r tmpfile; do
