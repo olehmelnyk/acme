@@ -1,0 +1,712 @@
+[
+  {
+    "name": "@acme/workspace",
+    "version": "0.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "next",
+    "version": "^15.0.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {
+      "docsUrl": "https://nextjs.org/docs",
+      "fetchDocs": true,
+      "searchDocs": true
+    },
+    "docsUrl": "https://nextjs.org",
+    "lastFetched": "2024-11-30T03:59:21.070Z"
+  },
+  {
+    "name": "react",
+    "version": "18.3.1",
+    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "react-dom",
+    "version": "18.3.1",
+    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@commitlint/cli",
+    "version": "^19.6.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@commitlint/config-conventional",
+    "version": "^19.6.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@eslint/compat",
+    "version": "^1.2.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@eslint/eslintrc",
+    "version": "^3.2.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@eslint/js",
+    "version": "^9.15.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@next/eslint-plugin-next",
+    "version": "^15.0.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/devkit",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/eslint",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/eslint-plugin",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/js",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/next",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/playwright",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/storybook",
+    "version": "^20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/vite",
+    "version": "^20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/web",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@nx/workspace",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@playwright/test",
+    "version": "^1.49.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@secretlint/config-loader",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@secretlint/core",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@secretlint/formatter",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@secretlint/node",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@secretlint/secretlint-rule-preset-recommend",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/addon-essentials",
+    "version": "^8.4.5",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/addon-interactions",
+    "version": "^8.4.5",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/core-server",
+    "version": "^8.4.5",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/nextjs",
+    "version": "^8.4.5",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/test-runner",
+    "version": "^0.13.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@storybook/testing-library",
+    "version": "^0.2.2",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@swc-node/register",
+    "version": "~1.9.2",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@swc/core",
+    "version": "~1.5.29",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@swc/helpers",
+    "version": "~0.5.15",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@tailwindcss/forms",
+    "version": "^0.5.9",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@tailwindcss/typography",
+    "version": "^0.5.15",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@testing-library/jest-dom",
+    "version": "^6.1.5",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@testing-library/react",
+    "version": "^14.1.2",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/inquirer",
+    "version": "^9.0.7",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/node",
+    "version": "20.11.24",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/react",
+    "version": "npm:types-react@rc",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/react-dom",
+    "version": "npm:types-react-dom@rc",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/testing-library__jest-dom",
+    "version": "^6.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@typescript-eslint/eslint-plugin",
+    "version": "^8.16.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@typescript-eslint/parser",
+    "version": "^8.16.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@vitejs/plugin-react",
+    "version": "^4.3.4",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@vitest/coverage-v8",
+    "version": "^2.1.6",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@vitest/ui",
+    "version": "^2.1.6",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "autoprefixer",
+    "version": "^10.4.20",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "branch-naming-check",
+    "version": "^1.0.2",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "chalk",
+    "version": "^5.3.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "commander",
+    "version": "^12.1.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint",
+    "version": "^9.15.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-config-next",
+    "version": "^15.0.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-config-prettier",
+    "version": "^9.1.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-import",
+    "version": "2.31.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-jsx-a11y",
+    "version": "6.10.1",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-playwright",
+    "version": "^1.8.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-react",
+    "version": "7.35.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-react-hooks",
+    "version": "5.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "eslint-plugin-storybook",
+    "version": "^0.11.1",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "husky",
+    "version": "^9.1.7",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "inquirer",
+    "version": "^12.1.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "jsdom",
+    "version": "^25.0.1",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "lint-staged",
+    "version": "^15.2.10",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "nx",
+    "version": "20.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "openai",
+    "version": "^4.73.1",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "postcss",
+    "version": "^8.4.49",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "prettier",
+    "version": "^2.8.8",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "secretlint",
+    "version": "^9.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "snyk",
+    "version": "^1.1294.2",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "tailwindcss",
+    "version": "^3.4.15",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "tslib",
+    "version": "^2.3.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "typescript",
+    "version": "~5.5.4",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "typescript-eslint",
+    "version": "^8.16.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "vite",
+    "version": "^5.0.0",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "vite-tsconfig-paths",
+    "version": "^5.1.3",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "vitest",
+    "version": "^2.1.6",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "zod",
+    "version": "^3.23.8",
+    "path": "/Users/ov.melnyk/acme/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "docs-fetcher",
+    "version": "1.0.0",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "fs-extra",
+    "version": "^11.1.1",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "minimatch",
+    "version": "^9.0.3",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "playwright",
+    "version": "^1.40.0",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@types/fs-extra",
+    "version": "^11.0.4",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "bun-types",
+    "version": "latest",
+    "path": "/Users/ov.melnyk/acme/tools/docs-fetcher/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "@acme/web",
+    "version": "1.0.0",
+    "path": "/Users/ov.melnyk/acme/apps/web/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  },
+  {
+    "name": "sharp",
+    "version": "0.33.5",
+    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "fetch": true,
+    "searchAttempted": true,
+    "config": {}
+  }
+]

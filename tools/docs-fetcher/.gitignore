@@ -1,0 +1,9 @@
+# Docs fetcher
+cache/
+
+# Dependencies
+node_modules/
+docs/
+
+# Environment
+.DS_Store
