@@ -1,97 +1,130 @@
 # Documentation Fetcher
 
-A generic documentation fetcher that can download and cache documentation from various third-party libraries and frameworks.
+A tool for automatically fetching and caching documentation from various sources. Built with TypeScript and Bun.
 
 ## Features
 
-- Written in TypeScript with full type safety
-- Uses native `fetch` for simple HTTP requests
-- Uses Playwright for JavaScript-rendered content
-- Project-specific caching with version tracking
-- Automatic update detection based on version changes or cache age
-- Configurable for different documentation sources
-- Caches documentation locally for offline access
-- Respects rate limiting with configurable delays
+- Automatically discovers packages in your project
+- Fetches documentation from official sources
+- Maintains documentation structure and order
+- Supports multiple documentation formats and sources
+- Configurable fetching behavior per package
+- Offline access to documentation
+- Smart URL discovery and validation
+- Configurable rate limiting and retry logic
+- Clean documentation updates (removes old files)
 
-## Setup
+## Prerequisites
 
-1. Install dependencies:
+- [Bun](https://bun.sh) installed
+- Node.js 18+ (for Playwright)
+
+## Installation
+
 ```bash
+# Install dependencies
 bun install
 ```
 
-2. Run the script with a specific documentation source:
+## Usage
+
 ```bash
-bun start payload           # fetches Payload CMS docs
-bun start nextjs           # fetches Next.js docs
-bun start payload --force  # force update even if cache is fresh
+# Fetch documentation for a specific package
+bun run fetch <package-name>
+
+# Options:
+#   --force        Force refresh even if already fetched
+#   --limit=<n>    Limit the number of pages to fetch (default: 15)
 ```
 
-If no source is specified, it defaults to 'payload'.
+## Configuration
 
-## Available Documentation Sources
-
-- `payload`: Payload CMS documentation
-- `nextjs`: Next.js documentation
-
-## Cache Management
-
-The script automatically manages documentation cache:
-- Creates project-specific subfolders in the `cache` directory
-- Tracks version information and last fetch date in `meta.json`
-- Automatically checks for updates based on:
-  - Cache age (older than 7 days)
-  - Version changes (if version information is available)
-- Provides force update option with `--force` flag
-
-## Adding New Documentation Sources
-
-Add new configurations to the `config.ts` file:
+The tool can be configured through `fetch-config.ts`:
 
 ```typescript
-export const configs: Record<string, DocsConfig> = {
-  your_source: {
-    baseUrl: 'https://your-docs-site.com',
-    startPath: '/docs',
-    selector: 'a[href^="/docs"]',
-    urlFilter: (url: string) => url.startsWith('/docs'),
-    projectName: 'your-project-name',
-    versionSelector: '.version-element' // Optional
-  }
-};
+{
+  // Root directory to scan for packages
+  rootDir: string;
+  
+  // Patterns to scan for package.json files
+  scanPaths: string[];
+  
+  // Paths to exclude from scanning
+  excludePaths: string[];
+  
+  // Directory to store cached documentation
+  cacheDir: string;
+  
+  // Maximum number of pages to fetch per package
+  limit: number;
+  
+  // Maximum depth of links to follow
+  maxDepth: number;
+  
+  // Delay between requests in milliseconds
+  delay: number;
+}
 ```
 
-## Configuration Options
+## Documentation Structure
 
-- `baseUrl`: The base URL of the documentation site
-- `startPath`: The starting path for documentation
-- `selector`: CSS selector for finding documentation links
-- `urlFilter`: Function to filter valid documentation URLs
-- `projectName`: Name of the project (used for cache subfolder)
-- `versionSelector`: CSS selector for version information (optional)
-- `cacheDir`: Directory to store cached files (default: './cache')
-- `delay`: Delay between requests in milliseconds (default: 500)
+Documentation is stored in a structured format:
 
-## Cache Structure
-
-The cached files are organized by project:
 ```
 cache/
-├── payload/
-│   ├── meta.json
-│   ├── docs/index.html
-│   └── docs/getting-started/what-is-payload.html
-├── nextjs/
-│   ├── meta.json
-│   ├── docs/index.html
-│   └── docs/getting-started/installation.html
+  package-name/
+    001-getting-started/
+      001-introduction.html
+      001-introduction.meta.json
+      002-installation.html
+      002-installation.meta.json
+    002-features/
+      001-routing.html
+      001-routing.meta.json
 ```
 
-## Notes
+Each HTML file has an accompanying metadata file containing:
+- Original URL
+- Fetch timestamp
+- Title
+- Category
+- Path segments
 
-- Built with Bun for fast execution
-- Uses TypeScript for better type safety and developer experience
-- The script uses Playwright for better handling of modern JavaScript-based documentation sites
-- Includes built-in rate limiting to avoid overwhelming documentation servers
-- HTML content is saved as-is, including styles and scripts
-- Cache directory is ignored by git to avoid committing large documentation files
+## Project Structure
+
+```
+docs-fetcher/
+├── index.ts           # Main entry point
+├── config.ts          # Configuration handling
+├── fetcher.ts         # Documentation fetching logic
+├── utils.ts           # Utility functions
+├── package.json       # Project dependencies
+├── tsconfig.json      # TypeScript configuration
+├── fetch-config.ts    # Fetch configuration
+└── cache/             # Cached documentation
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## Development
+
+```bash
+# Run tests
+bun test
+
+# Build the project
+bun run build
+
+# Format code
+bun run format
+```
+
+## License
+
+MIT
