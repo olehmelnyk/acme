@@ -1,6 +1,11 @@
 import nx from '@nx/eslint-plugin';
 import typescript from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default [
   {
@@ -28,8 +33,8 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: ['./tsconfig.base.json', './apps/*/tsconfig.json'],
-        tsconfigRootDir: process.cwd()
+        project: ['./tsconfig.base.json', './apps/*/tsconfig.json', './tools/*/tsconfig.json'],
+        tsconfigRootDir: __dirname,
       }
     },
     rules: {

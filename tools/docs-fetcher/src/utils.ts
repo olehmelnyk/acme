@@ -29,13 +29,13 @@ export async function findPackages(
   
   for (const pattern of patterns) {
     const files = await new Promise<string[]>((resolve, reject) => {
-      glob(pattern, {
+      glob.glob(pattern, {
         ignore: excludePaths.map(p => path.join(rootDir, p)),
         absolute: true,
         nodir: true,
         follow: true,
         cwd: rootDir
-      }, (err, matches) => {
+      }, (err: Error | null, matches: string[]) => {
         if (err) reject(err);
         else resolve(matches);
       });

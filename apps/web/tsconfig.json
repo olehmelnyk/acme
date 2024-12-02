@@ -16,14 +16,20 @@
         "name": "next"
       }
     ],
-    "types": ["node"]
+    "types": [
+      "vitest",
+      "node"
+    ]
   },
   "include": [
-    ".storybook/**/*.js",
-    ".storybook/**/*.jsx",
+    "**/*.d.ts",
+    ".next/types/**/*.ts",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
-    "next-env.d.ts",
+    "app/**/*.js",
+    "app/**/*.jsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
     "src/**/*.ts",
@@ -31,15 +37,6 @@
     "../../dist/apps/web/.next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "jest.config.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.tsx",
-    "templates/**/*",
-    "app/**/*",
-    "specs/**/*",
-    "dist"
+    "node_modules"
   ]
 }

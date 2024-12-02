@@ -1,6 +1,8 @@
 import type { StorybookConfig } from '@storybook/nextjs';
+import { mergeConfig } from 'vite';
+import type { InlineConfig } from 'vite';
 
-const config: StorybookConfig = {
+const config = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
@@ -12,22 +14,25 @@ const config: StorybookConfig = {
     options: {},
   },
 
-  async viteFinal(config) {
-    const { mergeConfig } = await import('vite');
-    return mergeConfig(config, {
-      build: {
-        target: 'esnext',
+  core: {
+    builder: {
+      name: '@storybook/builder-vite',
+      options: {
+        viteConfigPath: 'apps/web/vite.config.mts',
       },
-    });
+    },
+    disableTelemetry: true,
   },
 
-  docs: {},
+  docs: {
+    autodocs: true,
+  },
 
   typescript: {
     reactDocgen: 'react-docgen',
     check: false,
-  }
-};
+  },
+} satisfies StorybookConfig;
 
 export default config;
 
