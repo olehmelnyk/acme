@@ -63,7 +63,7 @@ export class DirectoryManager {
     category: string,
     title: string,
     content: string,
-    metadata: any,
+    metadata: Record<string, unknown>,
     sectionNumber: number,
     pageNumber: number
   ): Promise<string> {

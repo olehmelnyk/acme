@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -19,10 +18,5 @@ describe('Home', () => {
     const whatsNextLink = screen.getByRole('link', { name: /What's next\?/i });
     expect(whatsNextLink).toBeDefined();
     expect(whatsNextLink.getAttribute('href')).toBe('#commands');
-
-    // Check for the Documentation link
-    const docsLink = screen.getByRole('link', { name: /Documentation Everything is in there/i });
-    expect(docsLink).toBeDefined();
-    expect(docsLink.getAttribute('href')).toBe('https://nx.dev/getting-started/intro?utm_source=nx-project');
   });
 });

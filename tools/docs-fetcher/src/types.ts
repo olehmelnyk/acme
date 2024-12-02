@@ -1,6 +1,4 @@
 import { DocsConfig } from './config';
-import { DirectoryManager } from './directory-manager';
-import { UrlManager } from './url-manager';
 import { Browser, BrowserContext, Page } from 'playwright';
 
 export interface PackageDocsConfig {

@@ -1,8 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { glob } from 'glob';
-import { PackageDocsConfig } from './types';
-import { Page } from 'playwright';
+import * as glob from 'glob';
 
 export interface PackageInfo {
   name: string;
@@ -30,12 +28,17 @@ export async function findPackages(
   console.log(`Scanning for packages in ${rootDir} with patterns:`, patterns);
   
   for (const pattern of patterns) {
-    const files = await glob(pattern, {
-      ignore: excludePaths.map(p => path.join(rootDir, p)),
-      absolute: true,
-      nodir: true,
-      follow: true,
-      cwd: rootDir
+    const files = await new Promise<string[]>((resolve, reject) => {
+      glob.glob(pattern, {
+        ignore: excludePaths.map(p => path.join(rootDir, p)),
+        absolute: true,
+        nodir: true,
+        follow: true,
+        cwd: rootDir
+      }, (err: Error | null, matches: string[]) => {
+        if (err) reject(err);
+        else resolve(matches);
+      });
     });
     
     console.log(`Found ${files.length} package.json files for pattern ${pattern}`);
@@ -129,7 +132,7 @@ export async function searchDocsUrl(packageName: string): Promise<string | undef
     const possibleUrls = [
       data.homepage,
       data.repository?.url,
-      ...(data.maintainers?.map((m: any) => m.url) || []),
+      ...(data.maintainers?.map((m: { url: string }) => m.url) || []),
       data.bugs?.url
     ].filter(Boolean);
     
@@ -175,19 +178,18 @@ export function isValidDocsUrl(url: string): boolean {
   }
 }
 
-export function extractLinksFromHtml(html: string, page: Page): Array<[string, string]> {
+export function extractLinksFromHtml(html: string): Array<[string, string]> {
   const links: Array<[string, string]> = [];
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
   
-  const anchors = doc.querySelectorAll('a[href]');
-  for (const anchor of anchors) {
+  Array.from(doc.querySelectorAll('a[href]')).forEach(anchor => {
     const href = anchor.getAttribute('href');
     const text = anchor.textContent?.trim() || '';
     if (href) {
       links.push([href, text]);
     }
-  }
+  });
   
   return links;
 }

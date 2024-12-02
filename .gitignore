@@ -54,3 +54,14 @@ out
 
 storybook-static
 vite.config.*.timestamp*
+
+# Temporary files
+*.tmp
+
+# TypeScript incremental compilation cache
+*.tsbuildinfo
+
+# Coverage directories
+coverage/
+apps/*/coverage/
+apps/*/html/

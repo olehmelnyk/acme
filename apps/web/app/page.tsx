@@ -7,7 +7,7 @@ export default function Index() {
    * Note: The corresponding styles are in the ./index.css file.
    */
   return (
-    <div className={styles.page}>
+    <div className={styles['page']} data-testid="page-container">
       <div className="wrapper">
         <div className="container">
           <div id="welcome">
@@ -17,7 +17,7 @@ export default function Index() {
             </h1>
           </div>
 
-          <div id="hero" className="rounded">
+          <div id="hero" className="rounded" data-testid="hero">
             <div className="text-container">
               <h2>
                 <svg
@@ -50,7 +50,7 @@ export default function Index() {
           </div>
 
           <div id="middle-content">
-            <div id="learning-materials" className="rounded shadow">
+            <div id="learning-materials" className="rounded shadow" data-testid="learning-materials">
               <h2>Learning materials</h2>
               <a
                 href="https://nx.dev/getting-started/intro?utm_source=nx-project"
@@ -239,6 +239,7 @@ export default function Index() {
             <div id="other-links">
               <a
                 id="nx-console"
+                data-testid="nx-console"
                 className="button-pill rounded shadow"
                 href="https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console&utm_source=nx-project"
                 target="_blank"
@@ -292,7 +293,7 @@ export default function Index() {
                   </span>
                 </span>
               </a>
-              <div id="nx-cloud" className="rounded shadow">
+              <div id="nx-cloud" className="rounded shadow" data-testid="nx-cloud">
                 <div>
                   <svg
                     id="nx-cloud-logo"
@@ -301,6 +302,7 @@ export default function Index() {
                     stroke="currentColor"
                     fill="transparent"
                     viewBox="0 0 24 24"
+                    data-testid="nx-cloud-logo"
                   >
                     <path
                       strokeWidth="2"
@@ -353,7 +355,7 @@ export default function Index() {
             </div>
           </div>
 
-          <div id="commands" className="rounded shadow">
+          <div id="commands" className="rounded shadow" data-testid="commands">
             <h2>Next steps</h2>
             <p>Here are some things you can do with Nx:</p>
             <details>

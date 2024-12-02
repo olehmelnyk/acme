@@ -2,26 +2,49 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "target": "es2022",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
-    "declaration": false,
     "moduleResolution": "bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2020",
-    "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": {},
+    "paths": {
+      "@acme/web": ["apps/web/src/index.ts"],
+      "@acme/web/*": ["apps/web/src/*", "apps/web/app/*"],
+      "@acme/web-e2e": ["apps/web-e2e/src/index.ts"],
+      "@acme/docs-fetcher": ["tools/docs-fetcher/src/index.ts"]
+    },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "typeRoots": ["./node_modules/@types"],
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "types": ["node"]
   },
+  "include": [
+    "apps/*/src/**/*",
+    "apps/*/app/**/*",
+    "tools/*/src/**/*",
+    "apps/*/.storybook/**/*"
+  ],
   "exclude": [
     "node_modules",
     "tmp",
@@ -31,5 +54,8 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "dist"
+  ],
+  "sharedGlobals": [
+    "{workspaceRoot}/.github/workflows/ci.yml"
   ]
 }

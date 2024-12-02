@@ -6,6 +6,6 @@ echo "🔒 Checking branch protection..."
 
 # Run branch naming check
 echo "📝 Checking branch name..."
-bun branch-naming-check || exit 1
+bun ./tools/scripts/branch-naming-check.ts || exit 1
 
 echo "✅ Pre-push checks passed!"

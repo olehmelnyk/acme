@@ -1,10 +1,10 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 echo "🔒 Running security checks..."
 
 # Function to check if a tool is installed
 check_security_tool() {
-    if ! command -v "$1" &> /dev/null; then
+    if ! command -v $1 > /dev/null 2>&1; then
         echo "⚠️ $1 not found."
         echo "Run './tools/scripts/setup-security-tools.sh' to install required security tools"
         missing_tools=1
@@ -23,7 +23,7 @@ fi
 
 # Check for environment variables
 echo "🔐 Checking for exposed environment variables..."
-if git grep -l "process.env" -- "*.{js,ts,tsx}"; then
+if git grep -l "process.env" -- "*.js" "*.ts" "*.tsx"; then
   echo "⚠️  Warning: Found potential environment variable usage. Please ensure they are properly secured."
 fi
 
@@ -36,7 +36,7 @@ if ! trivy fs --scanners vuln,secret,misconfig . --severity HIGH,CRITICAL; then
 fi
 
 # Run snyk test if available (optional)
-if command -v snyk &> /dev/null; then
+if command -v snyk > /dev/null 2>&1; then
     echo "🛡️ Running Snyk security test..."
     if ! snyk test --severity-threshold=high; then
         echo "😩 Snyk test failed. This is optional - you can configure Snyk later."

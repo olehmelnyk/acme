@@ -1,18 +1,22 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "module": "ES2022",
+    "target": "ES2022",
     "moduleResolution": "bundler",
-    "types": ["bun-types"],
-    "strict": true,
+    "outDir": "../../dist/tools/docs-fetcher",
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": ".",
-    "declaration": true,
-    "sourceMap": true
+    "strict": true,
+    "types": ["node"]
   },
-  "include": ["*.ts"],
-  "exclude": ["node_modules", "dist", "docs"]
+  "files": [],
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

@@ -1,13 +1,36 @@
 import type { StorybookConfig } from '@storybook/nextjs';
 
-const config: StorybookConfig = {
-  stories: ['../**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+const config = {
+  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+  ],
   framework: {
     name: '@storybook/nextjs',
     options: {},
   },
-};
+
+  core: {
+    builder: {
+      name: '@storybook/builder-vite',
+      options: {
+        viteConfigPath: 'apps/web/vite.config.ts',
+      },
+    },
+    disableTelemetry: true,
+  },
+
+  docs: {
+    autodocs: true,
+  },
+
+  typescript: {
+    reactDocgen: 'react-docgen',
+    check: false,
+  },
+} satisfies StorybookConfig;
 
 export default config;
 
