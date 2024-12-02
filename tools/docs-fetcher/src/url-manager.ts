@@ -44,7 +44,7 @@ export class UrlManager {
         normalized = normalized.slice(0, -1);
       }
       return normalized;
-    } catch (error) {
+    } catch {
       console.warn(`Invalid URL: ${url}`);
       return '';
     }
@@ -93,7 +93,6 @@ export class UrlManager {
       this.isDocumentationPath(normalized)
     ) {
       // Add to queue in order based on URL structure
-      const urlPath = this.getUrlPath(normalized);
       const currentUrls = [...this.urlQueue];
       
       // Sort URLs to maintain documentation structure order
@@ -134,8 +133,8 @@ export class UrlManager {
       path = path.replace(/\/+$/, '');
       
       return path;
-    } catch (error) {
-      console.error(`Failed to parse URL: ${url}`, error);
+    } catch {
+      console.error(`Failed to parse URL: ${url}`);
       return '';
     }
   }

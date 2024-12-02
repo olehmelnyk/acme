@@ -3,7 +3,6 @@ import { DocsFetcher } from './index';
 import { FETCH_CONFIG } from './fetch-config';
 import { searchDocsUrl } from './utils';
 import * as fs from 'fs-extra';
-import * as path from 'path';
 
 async function main() {
   // Get package name from command line args

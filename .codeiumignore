@@ -1,0 +1,2 @@
+# it's like .gitignore, but for Codium/Windsurf AI. 
+# It looks at .gitignore files first, but then we can also enable/disable some files/folders for AI only

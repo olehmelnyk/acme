@@ -57,7 +57,7 @@ export class DocsFetcher {
       await fs.writeFile(mainFile, content);
 
       // Save CSS and modify references
-      const styles = await page.$$eval('link[rel="stylesheet"]', links => 
+      const styles = await page.$$eval('link[rel="stylesheet"]', (links: HTMLLinkElement[]) => 
         links.map(link => ({ href: link.href, path: link.getAttribute('href') }))
       );
 
@@ -72,7 +72,7 @@ export class DocsFetcher {
       }
 
       // Save images
-      const images = await page.$$eval('img', imgs => 
+      const images = await page.$$eval('img', (imgs: HTMLImageElement[]) => 
         imgs.map(img => ({ src: img.src, path: img.getAttribute('src') }))
       );
 
@@ -84,8 +84,9 @@ export class DocsFetcher {
             const imgPath = path.join(pkgCacheDir, 'images', path.basename(image.path));
             await fs.ensureDir(path.dirname(imgPath));
             await fs.writeFile(imgPath, imgBuffer);
-          } catch (error) {
-            console.warn(`Failed to download image ${image.src}: ${error.message}`);
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.warn(`Failed to download image ${image.src}: ${errorMessage}`);
           }
         }
       }
@@ -106,10 +107,10 @@ export class DocsFetcher {
         success: true,
         files: ['index.html']
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message || 'Unknown error occurred while fetching documentation'
+        error: error instanceof Error ? error.message : 'Unknown error occurred while fetching documentation'
       };
     }
   }

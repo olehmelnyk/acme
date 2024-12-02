@@ -37,20 +37,11 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "executor": "nx:run-commands",
+      "outputs": [],
       "options": {
-        "lintFilePatterns": [
-          "apps/web/src/**/*.{ts,tsx,js,jsx}",
-          "apps/web/.storybook/**/*.{ts,tsx,js,jsx}"
-        ],
-        "format": "stylish",
-        "quiet": false,
-        "force": false,
-        "fix": true,
-        "cache": true,
-        "cacheLocation": "node_modules/.cache/eslint",
-        "maxWarnings": 0
+        "command": "eslint -c ../../eslint.config.mjs \"./src/**/*.{ts,tsx,js,jsx}\" \"./.storybook/**/*.{ts,tsx,js,jsx}\"",
+        "cwd": "apps/web"
       }
     },
     "test": {

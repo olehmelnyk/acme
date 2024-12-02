@@ -1,8 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { glob } from 'glob';
-import { PackageDocsConfig } from './types';
-import { Page } from 'playwright';
 
 export interface PackageInfo {
   name: string;
@@ -129,7 +127,7 @@ export async function searchDocsUrl(packageName: string): Promise<string | undef
     const possibleUrls = [
       data.homepage,
       data.repository?.url,
-      ...(data.maintainers?.map((m: any) => m.url) || []),
+      ...(data.maintainers?.map((m: { url: string }) => m.url) || []),
       data.bugs?.url
     ].filter(Boolean);
     
@@ -175,19 +173,18 @@ export function isValidDocsUrl(url: string): boolean {
   }
 }
 
-export function extractLinksFromHtml(html: string, page: Page): Array<[string, string]> {
+export function extractLinksFromHtml(html: string): Array<[string, string]> {
   const links: Array<[string, string]> = [];
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
   
-  const anchors = doc.querySelectorAll('a[href]');
-  for (const anchor of anchors) {
+  Array.from(doc.querySelectorAll('a[href]')).forEach(anchor => {
     const href = anchor.getAttribute('href');
     const text = anchor.textContent?.trim() || '';
     if (href) {
       links.push([href, text]);
     }
-  }
+  });
   
   return links;
 }
