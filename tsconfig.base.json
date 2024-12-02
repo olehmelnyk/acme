@@ -54,5 +54,8 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "dist"
+  ],
+  "sharedGlobals": [
+    "{workspaceRoot}/.github/workflows/ci.yml"
   ]
 }

@@ -60,3 +60,8 @@ vite.config.*.timestamp*
 
 # TypeScript incremental compilation cache
 *.tsbuildinfo
+
+# Coverage directories
+coverage/
+apps/*/coverage/
+apps/*/html/

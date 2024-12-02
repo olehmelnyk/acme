@@ -16,19 +16,26 @@
         "name": "next"
       }
     ],
-    "types": ["node", "vitest"],
+    "types": ["node", "vitest", "@testing-library/jest-dom"],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "baseUrl": "."
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    "**/*.json",
     ".next/types/**/*.ts",
     "../../dist/apps/web/.next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist", ".next", "coverage"]
+  "exclude": [
+    "node_modules",
+    "jest.config.ts",
+    ".next",
+    ".storybook",
+    "coverage"
+  ]
 }

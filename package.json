@@ -31,7 +31,7 @@
     "security:check": "./tools/scripts/security-check.sh",
     "commit": "git-cz",
     "generate:changelog": "bun run tools/hooks/generate-changelog.ts",
-    "check:branch": "branch-naming-check",
+    "check:branch": "bun ./tools/scripts/branch-naming-check.ts",
     "secretlint": "secretlint",
     "fix:types": "bun run tools/scripts/fix-types.ts"
   },

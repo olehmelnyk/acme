@@ -16,7 +16,7 @@ const config = {
     builder: {
       name: '@storybook/builder-vite',
       options: {
-        viteConfigPath: 'apps/web/vite.config.mts',
+        viteConfigPath: 'apps/web/vite.config.ts',
       },
     },
     disableTelemetry: true,

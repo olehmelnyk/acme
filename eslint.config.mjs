@@ -8,10 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const project = [
-  './tsconfig.base.json',
-  './apps/*/tsconfig.json',
-  './apps/*/.storybook/tsconfig.json',
-  './tools/*/tsconfig.json'
+  resolve(__dirname, './tsconfig.base.json'),
+  resolve(__dirname, './apps/*/tsconfig.json'),
+  resolve(__dirname, './apps/*/.storybook/tsconfig.json'),
+  resolve(__dirname, './tools/*/tsconfig.json')
 ];
 
 export default [
