@@ -40,7 +40,7 @@
       "executor": "nx:run-commands",
       "outputs": [],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs \"./src/**/*.{ts,tsx,js,jsx}\" \"./.storybook/**/*.{ts,tsx,js,jsx}\"",
+        "command": "eslint -c ../../eslint.config.mjs \"./app/**/*.{ts,tsx,js,jsx}\" \"./src/**/*.{ts,tsx,js,jsx}\" \"./.storybook/**/*.{ts,tsx,js,jsx}\"",
         "cwd": "apps/web"
       }
     },

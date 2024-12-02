@@ -10,17 +10,24 @@ export default defineConfig({
 
   plugins: [react(), nxViteTsPaths()],
 
+  css: {
+    modules: {
+      localsConvention: 'camelCase',
+      generateScopedName: '[name]__[local]___[hash:base64:5]'
+    }
+  },
+
   test: {
     globals: true,
-    cache: {
-      dir: '../../node_modules/.vitest'
-    },
     environment: 'jsdom',
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}', 'app/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     reporters: ['default'],
+    setupFiles: ['./vitest.setup.ts'],
     coverage: {
-      reportsDirectory: '../../coverage/apps/web',
-      provider: 'v8'
+      provider: 'v8',
+      enabled: true,
+      reporter: ['text', 'html'],
+      reportsDirectory: '../../coverage/apps/web'
     }
   }
 });

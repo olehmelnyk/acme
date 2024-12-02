@@ -16,27 +16,19 @@
         "name": "next"
       }
     ],
-    "types": [
-      "vitest",
-      "node"
-    ]
+    "types": ["node", "vitest"],
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": [
-    "**/*.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.json",
     ".next/types/**/*.ts",
-    ".storybook/**/*.ts",
-    ".storybook/**/*.tsx",
-    "app/**/*.js",
-    "app/**/*.jsx",
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
     "../../dist/apps/web/.next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules", "dist", ".next", "coverage"]
 }

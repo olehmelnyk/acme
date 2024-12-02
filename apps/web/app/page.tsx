@@ -7,7 +7,7 @@ export default function Index() {
    * Note: The corresponding styles are in the ./index.css file.
    */
   return (
-    <div className={styles.page}>
+    <div className={styles['page']}>
       <div className="wrapper">
         <div className="container">
           <div id="welcome">

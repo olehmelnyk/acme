@@ -2,10 +2,17 @@ import nx from '@nx/eslint-plugin';
 import typescript from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, resolve } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const project = [
+  './tsconfig.base.json',
+  './apps/*/tsconfig.json',
+  './apps/*/.storybook/tsconfig.json',
+  './tools/*/tsconfig.json'
+];
 
 export default [
   {
@@ -23,7 +30,7 @@ export default [
     ]
   },
   {
-    files: ['**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx'],
     plugins: {
       '@typescript-eslint': typescript,
       '@nx': nx
@@ -33,8 +40,18 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: ['./tsconfig.base.json', './apps/*/tsconfig.json', './tools/*/tsconfig.json'],
-        tsconfigRootDir: __dirname,
+        project,
+        tsconfigRootDir: __dirname
+      }
+    },
+    settings: {
+      'import/parsers': {
+        '@typescript-eslint/parser': ['.ts', '.tsx']
+      },
+      'import/resolver': {
+        typescript: {
+          project
+        }
       }
     },
     rules: {

@@ -1,6 +1,4 @@
 import type { StorybookConfig } from '@storybook/nextjs';
-import { mergeConfig } from 'vite';
-import type { InlineConfig } from 'vite';
 
 const config = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],

@@ -29,6 +29,7 @@
     "baseUrl": ".",
     "paths": {
       "@acme/web": ["apps/web/src/index.ts"],
+      "@acme/web/*": ["apps/web/src/*", "apps/web/app/*"],
       "@acme/web-e2e": ["apps/web-e2e/src/index.ts"],
       "@acme/docs-fetcher": ["tools/docs-fetcher/src/index.ts"]
     },
@@ -38,7 +39,12 @@
     "allowSyntheticDefaultImports": true,
     "types": ["node"]
   },
-  "include": ["apps/*/src/**/*", "tools/*/src/**/*", "apps/*/.storybook/**/*"],
+  "include": [
+    "apps/*/src/**/*",
+    "apps/*/app/**/*",
+    "tools/*/src/**/*",
+    "apps/*/.storybook/**/*"
+  ],
   "exclude": [
     "node_modules",
     "tmp",

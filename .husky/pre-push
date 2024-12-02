@@ -6,6 +6,8 @@ echo "🔒 Checking branch protection..."
 
 # Run branch naming check
 echo "📝 Checking branch name..."
-bun branch-naming-check || exit 1
+branch_pattern="^(feat|fix|hotfix|release|support)/ACME-\\d+-[a-zA-Z0-9/_-]+$"
+example_branch="feat/ACME-123-feature-description"
+bun branch-naming-check "$branch_pattern" "$example_branch" || exit 1
 
 echo "✅ Pre-push checks passed!"
