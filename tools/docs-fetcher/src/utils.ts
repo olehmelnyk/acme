@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { glob } from 'glob';
+import * as glob from 'glob';
 
 export interface PackageInfo {
   name: string;
@@ -28,12 +28,17 @@ export async function findPackages(
   console.log(`Scanning for packages in ${rootDir} with patterns:`, patterns);
   
   for (const pattern of patterns) {
-    const files = await glob(pattern, {
-      ignore: excludePaths.map(p => path.join(rootDir, p)),
-      absolute: true,
-      nodir: true,
-      follow: true,
-      cwd: rootDir
+    const files = await new Promise<string[]>((resolve, reject) => {
+      glob(pattern, {
+        ignore: excludePaths.map(p => path.join(rootDir, p)),
+        absolute: true,
+        nodir: true,
+        follow: true,
+        cwd: rootDir
+      }, (err, matches) => {
+        if (err) reject(err);
+        else resolve(matches);
+      });
     });
     
     console.log(`Found ${files.length} package.json files for pattern ${pattern}`);

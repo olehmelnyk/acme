@@ -8,6 +8,25 @@ const viteConfig = defineViteConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/web',
   plugins: [react(), nxViteTsPaths()],
+  build: {
+    target: 'esnext',
+    modulePreload: {
+      polyfill: false,
+    },
+    rollupOptions: {
+      output: {
+        format: 'es',
+      },
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+      supported: {
+        'top-level-await': true,
+      },
+    },
+  },
 });
 
 export default mergeConfig(

@@ -1,37 +1,33 @@
 import type { StorybookConfig } from '@storybook/nextjs';
-import { mergeConfig } from 'vite';
-import type { UserConfig as ViteConfig } from 'vite';
 
-const config = {
-  stories: ['../**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+const config: StorybookConfig = {
+  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+  ],
   framework: {
     name: '@storybook/nextjs',
-    options: {
-      builder: {
-        useSWC: true,
-      },
-    },
+    options: {},
   },
-  core: {
-    disableTelemetry: true,
-  },
-  // @ts-expect-error - viteFinal is not in StorybookConfig type but is supported
-  async viteFinal(config: ViteConfig) {
+
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
     return mergeConfig(config, {
       build: {
-        modulePreload: true,
         target: 'esnext',
-      },
-      optimizeDeps: {
-        force: true,
-      },
-      resolve: {
-        extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
       },
     });
   },
-} satisfies Partial<StorybookConfig>;
+
+  docs: {},
+
+  typescript: {
+    reactDocgen: 'react-docgen',
+    check: false,
+  }
+};
 
 export default config;
 
