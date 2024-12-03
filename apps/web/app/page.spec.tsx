@@ -17,4 +17,12 @@ describe('Home', () => {
     expect(whatsNextLink).toBeDefined();
     expect(whatsNextLink.getAttribute('href')).toBe('#commands');
   });
+
+  it('should have learning materials section with link', () => {
+    render(<Home />);
+    const link = screen.getByRole('link', { name: /Learning materials/i });
+    expect(link).toHaveAttribute('href', 'https://nx.dev/getting-started/intro?utm_source=nx-project');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });
