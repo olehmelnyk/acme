@@ -32,7 +32,8 @@ export default [
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
+        project: ['./apps/web-e2e/tsconfig.json']
       }
     },
     rules: {

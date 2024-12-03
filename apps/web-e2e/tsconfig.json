@@ -3,20 +3,14 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "../../dist/out-tsc",
-    "module": "esnext",
-    "target": "es2016",
-    "lib": ["es2016", "dom"],
-    "types": ["node"],
-    "sourceMap": false,
+    "module": "commonjs",
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "incremental": true
+    "moduleResolution": "node",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "playwright.config.ts"]
 }

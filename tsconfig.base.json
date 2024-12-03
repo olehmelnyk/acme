@@ -28,16 +28,16 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
+      "@acme/docs-fetcher": ["tools/docs-fetcher/src/index.ts"],
       "@acme/web": ["apps/web/src/index.ts"],
-      "@acme/web/*": ["apps/web/src/*", "apps/web/app/*"],
       "@acme/web-e2e": ["apps/web-e2e/src/index.ts"],
-      "@acme/docs-fetcher": ["tools/docs-fetcher/src/index.ts"]
+      "@acme/web/*": ["apps/web/src/*", "apps/web/app/*"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "typeRoots": ["./node_modules/@types"],
     "allowSyntheticDefaultImports": true,
-    "types": ["node"]
+    "types": ["node", "playwright"]
   },
   "include": [
     "apps/*/src/**/*",
@@ -55,7 +55,5 @@
     "**/*.test.tsx",
     "dist"
   ],
-  "sharedGlobals": [
-    "{workspaceRoot}/.github/workflows/ci.yml"
-  ]
+  "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
 }

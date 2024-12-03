@@ -3,9 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/web-e2e/src",
   "projectType": "application",
-  "tags": [],
-  "implicitDependencies": ["web"],
-  "// targets": "to see all targets run: nx show project web-e2e --web",
   "targets": {
     "e2e": {
       "executor": "@nx/playwright:playwright",
@@ -15,10 +12,19 @@
       }
     },
     "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/web-e2e/**/*.{ts,tsx}"]
+      }
+    },
+    "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd /Users/ov.melnyk/acme && bunx eslint apps/web-e2e/src/**/*.ts --config eslint.config.mjs"
+        "command": "tsc --noEmit -p apps/web-e2e/tsconfig.json"
       }
     }
-  }
+  },
+  "implicitDependencies": ["web"],
+  "tags": []
 }
