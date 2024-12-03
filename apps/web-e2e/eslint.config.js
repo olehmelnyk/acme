@@ -1,13 +1,17 @@
-const playwright = require('eslint-plugin-playwright');
 const baseConfig = require('../../eslint.config.js');
+const playwright = require('eslint-plugin-playwright');
 
+/** @type {import('@eslint/eslintrc').FlatConfig[]} */
 module.exports = [
-  playwright.configs['flat/recommended'],
-
   ...baseConfig,
   {
-    files: ['**/*.ts', '**/*.js'],
-    // Override or add rules here
-    rules: {},
-  },
+    files: ['e2e/**/*.{ts,tsx}'],
+    plugins: {
+      playwright: playwright
+    },
+    rules: {
+      'playwright/no-skipped-test': 'error',
+      'playwright/no-focused-test': 'error'
+    }
+  }
 ];

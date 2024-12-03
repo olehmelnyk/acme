@@ -26,7 +26,7 @@ export default defineConfig({
   webServer: {
     command: 'bun next dev',
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env['CI'],
     timeout: 120000,
     cwd: join(workspaceRoot, 'apps/web'),
     env: {

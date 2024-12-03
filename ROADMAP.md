@@ -45,7 +45,7 @@
         - [ ] Antropic / Claude
     - [ ] Audio / video chat (?)
     - [ ] File sharing (?)
-    - [ ] Chatnot integration (Telegram, Discord, Slack, etc.)
+    - [ ] Chatbot integration (Telegram, Discord, Slack, etc.)
 - [ ] Knowledge Base / FAQ / Support (?)
 - [ ] AI / Chatbot (?)
 - [ ] Job Board / Recruiting / Freelance (?)
@@ -66,6 +66,10 @@
 
 ## Long-term Goals
 - [ ] Implement Disaster Recovery
+- [ ] Recovery Time Objective (RTO)
+- [ ] Recovery Point Objective (RPO)
+- [ ] Backup strategies
+- [ ] Failover procedures
 
 ## Success Metrics
 - Build Time: < 2 minutes

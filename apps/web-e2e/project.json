@@ -1,7 +1,7 @@
 {
   "name": "web-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/web-e2e/src",
+  "sourceRoot": "apps/web-e2e/e2e",
   "projectType": "application",
   "targets": {
     "e2e": {
@@ -21,7 +21,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --noEmit -p apps/web-e2e/tsconfig.json"
+        "command": "tsc -p apps/web-e2e/tsconfig.json --noEmit"
       }
     }
   },
