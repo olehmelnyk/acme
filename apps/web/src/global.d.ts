@@ -1,5 +1,5 @@
-/// <reference types="vitest" />
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="vitest/globals" />
+import '@testing-library/jest-dom';
 
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string

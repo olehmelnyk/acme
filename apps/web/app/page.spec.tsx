@@ -1,5 +1,3 @@
-import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import Home from './page';
@@ -18,5 +16,13 @@ describe('Home', () => {
     const whatsNextLink = screen.getByRole('link', { name: /What's next\?/i });
     expect(whatsNextLink).toBeDefined();
     expect(whatsNextLink.getAttribute('href')).toBe('#commands');
+  });
+
+  it('should have learning materials section with link', () => {
+    render(<Home />);
+    const link = screen.getByRole('link', { name: /Learning materials/i });
+    expect(link).toHaveAttribute('href', 'https://nx.dev/getting-started/intro?utm_source=nx-project');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });

@@ -4,11 +4,13 @@
     "allowJs": true,
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "target": "es2016",
-    "types": ["cypress", "node"],
-    "sourceMap": false,
-    "noEmit": true
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "cypress.config.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts", "playwright.config.ts"]
 }
