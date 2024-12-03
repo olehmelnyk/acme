@@ -40,7 +40,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "bunx eslint apps/web/**/*.{ts,tsx} --config eslint.config.mjs"
+        "command": "bunx eslint \"apps/web/**/*.{ts,tsx}\" \"apps/web/*.{ts,tsx}\" --config eslint.config.mjs"
       }
     },
     "test": {
