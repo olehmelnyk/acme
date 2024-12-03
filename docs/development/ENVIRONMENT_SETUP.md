@@ -99,6 +99,42 @@
 - `bun storybook`: Start Storybook
 - `bun build-storybook`: Build static Storybook
 
+## Build Outputs and Generated Files
+
+All build outputs and generated files are stored in the `.output` directory at the root of the project. This includes:
+
+- Build artifacts (production and development builds)
+- Test coverage reports
+- Storybook static builds
+- ESLint outputs
+- Playwright test results
+- TypeScript type checking outputs
+
+### Managing Build Outputs
+
+1. **Location**: All outputs are stored in `.output/<project-type>/<project-name>/<output-type>`
+   - Example: `.output/apps/web/dist` for the web app's production build
+   - Example: `.output/apps/web-e2e/playwright` for E2E test results
+
+2. **Cleaning Up**:
+   ```bash
+   # Clean all outputs
+   bun run cleanup
+
+   # Clean and reinstall dependencies
+   bun run cleanup --reinstall
+   ```
+
+3. **CI/CD Integration**:
+   - Use `.output` directory for all artifact paths in CI/CD pipelines
+   - Cache the `.output` directory between pipeline runs when appropriate
+   - Clear the cache when dependencies change
+
+4. **Development Best Practices**:
+   - Never commit the `.output` directory to version control
+   - Use the cleanup script before switching branches
+   - Run cleanup with reinstall after major dependency updates
+
 ## Docker Services
 
 ```yaml

@@ -323,6 +323,56 @@ These commands will:
    - Automation tools
    - Workflow management
 
+## Build Output Structure
+
+All build outputs, test results, and generated files are organized under the `.output` directory in the root:
+
+```
+.output/
+├── apps/
+│   ├── web/
+│   │   ├── dist/           # Production build
+│   │   ├── dev/            # Development build
+│   │   ├── coverage/       # Test coverage
+│   │   ├── storybook/      # Storybook static build
+│   │   └── lint/           # ESLint output
+│   └── web-e2e/
+│       ├── playwright/     # Playwright test results
+│       │   ├── html-report/
+│       │   └── results.xml
+│       ├── lint/           # ESLint output
+│       └── types/          # TypeScript checking output
+└── packages/               # (for future package outputs)
+```
+
+This structure ensures:
+- All generated files are in one centralized location
+- Clear separation between different types of outputs
+- Easy cleanup of all generated files
+- Prevention of source directory clutter
+- Consistent structure across all projects
+- Better CI/CD integration with predictable paths
+
+### Cleanup Script
+
+The project includes a cleanup script to manage generated files and caches:
+
+```bash
+# Basic cleanup
+bun run cleanup
+
+# Cleanup and reinstall dependencies
+bun run cleanup --reinstall
+```
+
+The cleanup script handles:
+- Build outputs (`.output` directory)
+- Build caches (`.next`, `dist`, etc.)
+- Test coverage directories
+- Node modules and package manager files
+- Nx cache
+- Any stray output directories
+
 ## Development Stack
 
 - **Runtime & Package Management**: Bun
