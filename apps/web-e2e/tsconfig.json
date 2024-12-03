@@ -3,12 +3,20 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es2016",
-    "types": ["cypress", "node"],
+    "lib": ["es2016", "dom"],
+    "types": ["node"],
     "sourceMap": false,
-    "noEmit": true
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "cypress.config.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts", "playwright.config.ts"]
 }

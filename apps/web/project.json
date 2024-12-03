@@ -23,7 +23,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "web:build",
-        "dev": true
+        "dev": true,
+        "port": 3000
       },
       "configurations": {
         "development": {
@@ -38,10 +39,8 @@
     },
     "lint": {
       "executor": "nx:run-commands",
-      "outputs": [],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs \"./app/**/*.{ts,tsx,js,jsx}\" \"./src/**/*.{ts,tsx,js,jsx}\" \"./.storybook/**/*.{ts,tsx,js,jsx}\"",
-        "cwd": "apps/web"
+        "command": "bunx eslint apps/web/**/*.{ts,tsx} --config eslint.config.mjs"
       }
     },
     "test": {
@@ -49,10 +48,7 @@
       "outputs": ["{workspaceRoot}/coverage/apps/web"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/web",
-        "config": "apps/web/vite.config.ts",
-        "threads": true,
-        "watch": false
+        "reportsDirectory": "../../coverage/apps/web"
       }
     },
     "storybook": {
