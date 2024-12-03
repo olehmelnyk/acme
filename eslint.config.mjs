@@ -2,18 +2,12 @@ import nx from '@nx/eslint-plugin';
 import typescript from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const project = [
-  resolve(__dirname, './tsconfig.base.json'),
-  resolve(__dirname, './apps/*/tsconfig.json'),
-  resolve(__dirname, './apps/*/.storybook/tsconfig.json'),
-  resolve(__dirname, './tools/*/tsconfig.json')
-];
-
+/** @type {import('@eslint/eslintrc').FlatConfig[]} */
 export default [
   {
     ignores: [
@@ -30,7 +24,29 @@ export default [
     ]
   },
   {
+    files: ['**/e2e/**/*.ts', '**/e2e/**/*.tsx', '**/web-e2e/**/*.ts', '**/web-e2e/**/*.tsx'],
+    plugins: {
+      '@typescript-eslint': typescript
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', { 
+        'argsIgnorePattern': '^_',
+        'varsIgnorePattern': '^_',
+        'ignoreRestSiblings': true 
+      }]
+    }
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['**/e2e/**/*.ts', '**/e2e/**/*.tsx', '**/web-e2e/**/*.ts', '**/web-e2e/**/*.tsx'],
     plugins: {
       '@typescript-eslint': typescript,
       '@nx': nx
@@ -40,29 +56,21 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project,
+        EXPERIMENTAL_useProjectService: true,
+        project: true,
         tsconfigRootDir: __dirname
       }
     },
-    settings: {
-      'import/parsers': {
-        '@typescript-eslint/parser': ['.ts', '.tsx']
-      },
-      'import/resolver': {
-        typescript: {
-          project
-        }
-      }
-    },
     rules: {
-      ...typescript.configs['recommended'].rules,
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { 
+        'argsIgnorePattern': '^_',
+        'varsIgnorePattern': '^_',
+        'ignoreRestSiblings': true 
+      }],
       '@nx/enforce-module-boundaries': [
         'error',
         {
-          allowCircularSelfDependency: true,
           enforceBuildableLibDependency: true,
           allow: [],
           depConstraints: [

@@ -16,10 +16,8 @@
     },
     "lint": {
       "executor": "nx:run-commands",
-      "outputs": [],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs \"./src/**/*.{ts,tsx,js,jsx}\"",
-        "cwd": "apps/web-e2e"
+        "command": "cd /Users/ov.melnyk/acme && bunx eslint apps/web-e2e/src/**/*.ts --config eslint.config.mjs"
       }
     }
   }

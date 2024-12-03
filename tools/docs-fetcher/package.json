@@ -1,9 +1,11 @@
 {
-  "name": "docs-fetcher",
-  "version": "1.0.0",
+  "name": "@acme/docs-fetcher",
+  "version": "0.0.1",
   "description": "Generic documentation fetcher for third-party libraries",
-  "module": "index.ts",
+  "module": "./src/index.js",
   "type": "module",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
   "scripts": {
     "start": "bun run cli.ts",
     "fetch": "bun run cli.ts",
@@ -13,7 +15,8 @@
   "dependencies": {
     "fs-extra": "^11.1.1",
     "minimatch": "^9.0.3",
-    "playwright": "^1.40.0"
+    "playwright": "^1.40.0",
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

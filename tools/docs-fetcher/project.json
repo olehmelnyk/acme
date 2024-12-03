@@ -2,21 +2,31 @@
   "name": "docs-fetcher",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "tools/docs-fetcher/src",
-  "projectType": "application",
+  "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "nx:run-commands",
-      "outputs": [],
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs ./src/*.ts",
-        "cwd": "tools/docs-fetcher"
+        "outputPath": "dist/tools/docs-fetcher",
+        "main": "tools/docs-fetcher/src/index.ts",
+        "tsConfig": "tools/docs-fetcher/tsconfig.json",
+        "assets": ["tools/docs-fetcher/*.md"],
+        "generatePackageJson": true
       }
     },
-    "typecheck": {
+    "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --noEmit",
-        "cwd": "tools/docs-fetcher"
+        "command": "bunx eslint tools/docs-fetcher/src/**/*.ts --config eslint.config.mjs"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "passWithNoTests": true,
+        "reportsDirectory": "../../coverage/tools/docs-fetcher"
       }
     }
   },
