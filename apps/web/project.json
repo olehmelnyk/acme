@@ -9,11 +9,11 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/web"
+        "outputPath": ".output/apps/web/dist"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/web"
+          "outputPath": ".output/apps/web/dev"
         },
         "production": {}
       }
@@ -37,43 +37,47 @@
         }
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
+    "export": {
+      "executor": "@nx/next:export",
       "options": {
-        "command": "bunx eslint \"apps/web/**/*.{ts,tsx}\" \"apps/web/*.{ts,tsx}\" --config eslint.config.mjs"
+        "buildTarget": "web:build:production"
       }
     },
     "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{workspaceRoot}/coverage/apps/web"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/.output/apps/web/coverage"],
       "options": {
-        "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/web"
+        "jestConfig": "apps/web/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/web/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",
       "options": {
         "port": 4400,
-        "configDir": "apps/web/.storybook"
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
+        "configDir": "apps/web/.storybook",
+        "outputDir": ".output/apps/web/storybook"
       }
     },
     "build-storybook": {
       "executor": "@nx/storybook:build",
       "outputs": ["{options.outputDir}"],
       "options": {
-        "outputDir": "dist/storybook/web",
+        "outputDir": ".output/apps/web/storybook",
         "configDir": "apps/web/.storybook"
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
       }
     }
   },

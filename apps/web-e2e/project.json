@@ -6,7 +6,7 @@
   "targets": {
     "e2e": {
       "executor": "@nx/playwright:playwright",
-      "outputs": ["{workspaceRoot}/dist/.playwright/apps/web-e2e"],
+      "outputs": ["{workspaceRoot}/.output/apps/web-e2e/playwright"],
       "options": {
         "config": "apps/web-e2e/playwright.config.ts"
       },
@@ -14,13 +14,14 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": ["{workspaceRoot}/.output/apps/web-e2e/lint"],
       "options": {
         "lintFilePatterns": ["apps/web-e2e/**/*.{ts,tsx}"]
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/.output/apps/web-e2e/types"],
       "options": {
         "command": "tsc -p apps/web-e2e/tsconfig.json --noEmit"
       }
