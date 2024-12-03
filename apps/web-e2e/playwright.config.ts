@@ -1,9 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { workspaceRoot } from '@nx/devkit';
+import { join } from 'path';
 
-// For CI, you may want to set BASE_URL to the deployed application.
 const baseURL = process.env['BASE_URL'] || 'http://localhost:3000';
 
 /**
@@ -24,12 +23,17 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  //   cwd: workspaceRoot,
-  // },
+  webServer: {
+    command: 'bun next dev',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    cwd: join(workspaceRoot, 'apps/web'),
+    env: {
+      PORT: '3000',
+      NODE_ENV: 'development'
+    }
+  },
   projects: [
     {
       name: 'chromium',
