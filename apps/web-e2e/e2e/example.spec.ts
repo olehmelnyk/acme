@@ -1,15 +1,25 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Example test suite', () => {
-  test('has title', async ({ page }) => {
-    await page.goto('/');
+test.describe('Page Navigation', () => {
+  test('home page has correct title', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await expect(page).toHaveTitle('Acme Web App');
+    await expect(page).toHaveTitle(/Acme/i);
     
-    // Expect a title "to contain" a substring.
-    await expect(page).toHaveTitle(/Acme/);
+    const title = await page.title();
+    expect(title).toBeTruthy();
+    expect(title.length).toBeGreaterThan(0);
+    expect(title.toLowerCase()).toContain('acme');
+  });
+
+  test('404 page shows correct title', async ({ page }) => {
+    const response = await page.goto('/404', { waitUntil: 'networkidle' });
+    expect(response?.status()).toBe(404);
+    await expect(page).toHaveTitle('404: This page could not be found.');
   });
 
   test('has accessible heading', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'networkidle' });
 
     // Test heading presence and accessibility
     const heading = page.getByRole('heading', { name: /welcome/i, level: 1 });

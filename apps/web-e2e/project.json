@@ -9,7 +9,8 @@
       "outputs": ["{workspaceRoot}/dist/.playwright/apps/web-e2e"],
       "options": {
         "config": "apps/web-e2e/playwright.config.ts"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
