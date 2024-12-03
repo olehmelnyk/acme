@@ -139,5 +139,4 @@ Example: "feat(auth): Add OAuth2 authentication support"
 - stop creating .eslintrc.json - we are using eslint.comfig.mjs
 - stop using npm instead of bun
 - stop using jest instead of vitest
-- stop using .eslintrc.json instead of eslint.config.mjs
 - before commiting - check if all changes are still necessary or some was just temporary and not relevant anymore; make sure commit mesaage follows commit conventions and reflects changes
