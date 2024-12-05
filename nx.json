@@ -18,7 +18,8 @@
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "inputs": ["production", "^production"],
+      "cache": true
     },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
@@ -35,11 +36,13 @@
         "{workspaceRoot}/.eslintrc.json",
         "{workspaceRoot}/eslint.config.*"
       ],
-      "outputs": ["{projectRoot}/artifacts/lint"]
+      "outputs": ["{projectRoot}/artifacts/lint"],
+      "cache": true
     },
     "e2e": {
       "inputs": ["default", "^production"],
-      "outputs": ["{workspaceRoot}/artifacts/{projectRoot}/e2e"]
+      "outputs": ["{workspaceRoot}/artifacts/{projectRoot}/e2e"],
+      "cache": true
     },
     "build-storybook": {
       "inputs": ["default", "^production", "{workspaceRoot}/.storybook/**/*"],
@@ -103,6 +106,13 @@
       "plugin": "@nx/js",
       "options": {
         "lockfilePackageManager": "bun"
+      }
+    },
+    {
+      "plugin": "@nx/next/plugin",
+      "options": {
+        "buildable": true,
+        "strict": true
       }
     }
   ],

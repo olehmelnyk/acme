@@ -190,6 +190,9 @@ jobs:
         run: |
           rm -rf artifacts/apps/web
           rm -rf .next
+          rm -rf .nx/cache
+          bun nx reset
+          
       - name: Build
         run: |
           # Configure Git for nx affected
@@ -203,8 +206,11 @@ jobs:
           fi
           PARALLEL_JOBS=$((CORES - 1))
           
+          # Ensure project graph is valid
+          bun nx graph --file=project-graph.json
+          
           # Run affected builds with verbose logging
-          bun nx affected -t build --parallel=$PARALLEL_JOBS --verbose
+          bun nx affected -t build --parallel=$PARALLEL_JOBS --verbose --skip-nx-cache
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
           SKIP_SECURITY_CHECKS: true
