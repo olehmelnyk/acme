@@ -191,17 +191,19 @@ jobs:
           # Install dependencies first
           bun install
           
-          # Clean NX cache and regenerate project graph
+          # Clean NX cache
           bun nx reset
           
-          # Generate project graph with dependencies installed
-          bun nx graph --file=project-graph.json
+          # Create empty workspace.json if it doesn't exist
+          echo '{"version": 2, "projects": {}}' > workspace.json
           
-          # Build web project
-          bun nx build web --skip-nx-cache
+          # Build web project directly with next
+          cd apps/web
+          bun run build
+          cd ../..
           
-          # Then build remaining affected projects
-          bun nx affected -t build --skip-nx-cache --exclude=web
+          # Run affected builds for other projects
+          bun nx affected -t build --exclude=web
 
   e2e:
     needs: [setup, build]
