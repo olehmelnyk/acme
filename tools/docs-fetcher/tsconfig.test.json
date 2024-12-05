@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../artifacts/docs-fetcher/test",
+    "outDir": "../../artifacts/tools/docs-fetcher/test",
     "rootDir": ".",
     "types": ["node", "@playwright/test"]
   },

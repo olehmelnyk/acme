@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../artifacts/web-e2e",
+    "outDir": "../../artifacts/apps/web-e2e",
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2019",

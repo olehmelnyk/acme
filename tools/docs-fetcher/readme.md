@@ -151,7 +151,7 @@ This tool is specifically designed for AI agents to:
 
 The tool can be configured through environment variables or command line arguments:
 
-- `CACHE_DIR`: Directory for storing documentation (default: ./artifacts/docs-fetcher/cache)
+- `CACHE_DIR`: Directory for storing documentation (default: ./artifacts/tools/docs-fetcher/cache)
 - `MAX_PAGES`: Maximum pages to download per package
 - `UPDATE_INTERVAL`: How often to check for doc updates
 - `ALLOWED_DOMAINS`: List of allowed documentation domains
