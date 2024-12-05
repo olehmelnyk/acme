@@ -1,8 +1,28 @@
 # Caching Strategy
 
-This document outlines our multi-level caching architecture and implementation patterns.
+## Overview
 
-## Caching Architecture
+This document outlines our multi-level caching architecture and implementation patterns. The system employs a comprehensive caching strategy across multiple layers to optimize performance, reduce latency, and minimize database load while ensuring data consistency and freshness.
+
+## Components
+
+Our caching architecture consists of four main layers:
+
+### Client Layer
+- Browser Cache
+- Memory Cache
+- Local Storage
+
+### CDN Layer
+- Content Delivery Network
+
+### Application Layer
+- Application Cache
+- Query Cache
+
+### Database Layer
+- Redis Cache
+- Database Cache
 
 ```mermaid
 graph TD
@@ -33,39 +53,86 @@ graph TD
     Redis --> DBCache
 ```
 
-## Cache Levels
+## Interactions
 
-### 1. Browser Cache
+The caching system operates through the following interaction patterns:
+
+1. **Cache Lookup Flow**
+   - Check browser cache first
+   - Fall back to CDN if not found
+   - Query application cache next
+   - Finally check database cache
+   - Fetch from source if all caches miss
+
+2. **Cache Update Flow**
+   - Update database cache first
+   - Propagate to application cache
+   - Invalidate CDN cache if needed
+   - Signal client to refresh
+
+3. **Cache Invalidation Flow**
+   - Receive invalidation event
+   - Clear affected cache layers
+   - Trigger recomputation if needed
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant N as CDN
+    participant A as App Cache
+    participant D as DB Cache
+    
+    C->>C: Check browser cache
+    C->>N: Cache miss
+    N->>A: CDN miss
+    A->>D: App cache miss
+    D->>D: DB cache lookup
+    D-->>A: Update app cache
+    A-->>N: Update CDN
+    N-->>C: Serve response
+```
+
+## Implementation Details
+
+### Technical Stack
+- Browser: Service Workers, LocalStorage
+- CDN: CloudFront/Cloudflare
+- Application: React Query
+- Database: Redis, PostgreSQL
+
+### Cache Levels
+
+#### 1. Browser Cache
 
 - Static assets
 - API responses
 - PWA cache storage
 - Service worker cache
 
-### 2. CDN Cache
+#### 2. CDN Cache
 
 - Static files
 - Images and media
 - API responses
 - Generated content
 
-### 3. Application Cache
+#### 3. Application Cache
 
 - Query results
 - Computed values
 - Session data
 - Frequently accessed data
 
-### 4. Database Cache
+#### 4. Database Cache
 
 - Query results
 - Materialized views
 - Computed aggregations
 - Frequently accessed records
 
-## Implementation Patterns
+### Implementation Patterns
 
-### Browser Caching
+#### Browser Caching
 
 ```typescript
 // Service Worker Cache
@@ -77,7 +144,7 @@ self.addEventListener('install', (event) => {
 });
 ```
 
-### Application Caching
+#### Application Caching
 
 ```typescript
 // Query Cache

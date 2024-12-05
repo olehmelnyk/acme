@@ -1,8 +1,22 @@
 # Database Schema Architecture
 
-This diagram illustrates our database schema and relationships.
+This document outlines our database schema design, relationships, and implementation details.
 
-## Schema Diagram
+## Overview
+
+Our database architecture is designed to support a multi-tenant system with user management, organization structures, and flexible team hierarchies. The schema implements proper relationships, constraints, and security measures to ensure data integrity and efficient access patterns.
+
+## Components
+
+The database schema consists of these primary components:
+
+### Core Entities
+- Users and Profiles
+- Organizations
+- Teams
+- User-Organization Relationships
+
+### Schema Diagram
 
 ```mermaid
 erDiagram
@@ -49,26 +63,19 @@ erDiagram
     Organization ||--o{ Team : has
 ```
 
-## Description
+## Interactions
 
-Our database schema is designed with these key entities:
+The database components interact through the following relationships and operations:
 
-1. **User Management**
+1. User Management Flow:
+   - User creation triggers profile creation
+   - Profile updates maintain user references
+   - User deletion cascades to related entities
 
-   - Users and their profiles
-   - Authentication data
-   - User preferences
-
-2. **Organization Structure**
-
-   - Organizations and teams
-   - Member relationships
-   - Role assignments
-
-3. **Relationships**
-   - One-to-one: User-Profile
-   - One-to-many: Org-Teams
-   - Many-to-many: Users-Organizations
+2. Organization Management:
+   - Organization creation with initial admin user
+   - Team creation within organization context
+   - Member addition with role assignment
 
 ## Implementation Details
 
@@ -77,3 +84,9 @@ Our database schema is designed with these key entities:
 - Includes audit logging
 - Supports soft deletes
 - Maintains referential integrity
+
+## Related Documentation
+
+- [Data Flow](./data-flow.md)
+- [Data Protection](./data-protection.md)
+- [Caching Strategy](./caching.md)

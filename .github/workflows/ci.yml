@@ -188,22 +188,19 @@ jobs:
           main-branch-name: 'main'
       - name: Build
         run: |
-          # Install dependencies first
-          bun install
+          # Configure Git for nx affected
+          git fetch origin main:main || git fetch origin master:main
           
-          # Clean NX cache
-          bun nx reset
+          # Calculate optimal parallel jobs (cores - 1)
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            CORES=$(nproc)
+          else
+            CORES=$(sysctl -n hw.ncpu)
+          fi
+          PARALLEL_JOBS=$((CORES - 1))
           
-          # Create empty workspace.json if it doesn't exist
-          echo '{"version": 2, "projects": {}}' > workspace.json
-          
-          # Build web project directly with next
-          cd apps/web
-          bun run build
-          cd ../..
-          
-          # Run affected builds for other projects
-          bun nx affected -t build --exclude=web
+          # Run affected builds
+          bun nx affected -t build --parallel=$PARALLEL_JOBS
 
   e2e:
     needs: [setup, build]

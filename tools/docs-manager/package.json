@@ -12,7 +12,9 @@
     "xref": "bun src/scripts/docs-xref.ts",
     "xref:check": "bun src/scripts/docs-xref.ts --check",
     "cleanup": "bun src/cli/cleanup.ts",
-    "cleanup:all": "bun src/cli/cleanup.ts --all"
+    "cleanup:all": "bun src/cli/cleanup.ts --all",
+    "validate": "bun src/cli/validate-diagrams.ts",
+    "index": "bun src/cli/generate-index.ts"
   },
   "dependencies": {
     "chalk": "^5.3.0",

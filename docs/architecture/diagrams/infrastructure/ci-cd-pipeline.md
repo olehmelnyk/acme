@@ -1,109 +1,133 @@
 # CI/CD Pipeline Architecture
 
-This diagram illustrates our continuous integration and continuous deployment pipeline, including testing, security scanning, and deployment stages.
+This document outlines our Continuous Integration and Continuous Deployment (CI/CD) pipeline architecture, detailing how code changes flow from development to production.
+
+## Overview
+
+Our CI/CD pipeline is built on GitHub Actions, providing automated testing, building, and deployment processes across our monorepo. The pipeline ensures code quality, maintains security standards, and enables rapid, reliable deployments.
+
+## Components
+
+- **Source Control**: GitHub repository and branch management
+- **CI Pipeline**: Automated testing and validation
+- **CD Pipeline**: Automated build and deployment
+- **Quality Gates**: Code quality and security checks
 
 ```mermaid
-graph LR
-    subgraph "Source"
-        PR[Pull Request]
-        Push[Push to Main]
+graph TB
+    subgraph "CI/CD Pipeline"
+        subgraph "Source Control"
+            PR[Pull Request]
+            Branch[Branch]
+            Merge[Merge]
+        end
+
+        subgraph "CI Process"
+            Lint[Lint]
+            Test[Test]
+            Build[Build]
+            Docs[Documentation]
+        end
+
+        subgraph "Quality Gates"
+            CodeQuality[Code Quality]
+            Security[Security Scan]
+            Coverage[Test Coverage]
+        end
+
+        subgraph "CD Process"
+            Stage[Staging]
+            Canary[Canary]
+            Prod[Production]
+        end
     end
 
-    subgraph "CI Pipeline"
-        Lint[Lint]
-        Test[Test]
-        Build[Build]
-        Scan[Security Scan]
-        Perf[Performance Test]
-    end
+    PR --> Branch
+    Branch --> Lint
+    Lint --> Test
+    Test --> Build
+    Build --> Docs
 
-    subgraph "CD Pipeline"
-        Deploy1[Deploy to Dev]
-        Deploy2[Deploy to Staging]
-        Deploy3[Deploy to Prod]
-    end
+    Build --> CodeQuality
+    CodeQuality --> Security
+    Security --> Coverage
 
-    subgraph "Post-Deploy"
-        Smoke[Smoke Tests]
-        Monitor[Monitoring]
-        Rollback[Auto-Rollback]
-    end
-
-    PR-->Lint
-    Push-->Lint
-
-    Lint-->Test
-    Test-->Build
-    Build-->Scan
-    Scan-->Perf
-
-    Perf-->Deploy1
-    Deploy1-->Smoke
-    Smoke-->Deploy2
-    Deploy2-->Deploy3
-
-    Deploy3-->Monitor
-    Monitor-->Rollback
-    Rollback-.->Deploy2
+    Coverage --> Stage
+    Stage --> Canary
+    Canary --> Prod
+    
+    Merge --> Branch
 ```
 
-## Pipeline Stages
+## Interactions
 
-### Source Control
+The pipeline components interact in a defined sequence:
 
-- Pull request validation
-- Branch protection
-- Code review enforcement
-- Automated checks
+1. Code commit triggers CI pipeline
+2. Quality gates validate changes
+3. Successful validation triggers deployment
+4. Deployment proceeds through environments
 
-### CI Pipeline
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant CI as CI Pipeline
+    participant QA as Quality Gates
+    participant CD as CD Pipeline
 
-- Code linting
-- Unit and integration tests
-- Build process
-- Security scanning
-- Performance testing
-
-### CD Pipeline
-
-- Development deployment
-- Staging deployment
-- Production deployment
-- Environment configuration
-
-### Post-Deployment
-
-- Smoke testing
-- Monitoring
-- Auto-rollback
-- Health checks
+    Dev->>CI: Push Code
+    CI->>QA: Run Checks
+    QA-->>CI: Quality Report
+    CI->>CD: Deploy
+    CD-->>Dev: Deployment Status
+```
 
 ## Implementation Details
 
-### Automation
+### Technical Stack
 
-- Automated testing
-- Automated deployments
-- Automated rollbacks
-- Automated monitoring
+- GitHub Actions: CI/CD platform
+- Jest/Vitest: Testing framework
+- ESLint: Code quality
+- SonarQube: Code analysis
+- Docker: Containerization
 
-### Security
+### Key Configurations
 
-- Security scanning
-- Dependency checking
-- Vulnerability assessment
-- Compliance checks
+```yaml
+# ci.yml
+name: CI Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-### Monitoring
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun test
+```
 
-- Performance monitoring
-- Error tracking
-- Log aggregation
-- Metrics collection
+### Error Handling
 
-### Rollback Strategy
+- **Build Failures**: Immediate notification and blocking of deployment
+- **Test Failures**: Detailed test reports and failure analysis
+- **Deployment Issues**: Automatic rollback capabilities
 
-- Automated rollbacks
-- Version control
-- State management
-- Data migration
+### Performance Considerations
+
+- **Parallel Execution**: Run independent jobs concurrently
+- **Caching**: Cache dependencies and build artifacts
+- **Selective Testing**: Only test affected packages
+- **Incremental Builds**: Optimize build time
+
+## Related Documentation
+
+- [Workspace Architecture](../system/workspace-architecture.md)
+- [Dependencies Management](./dependencies.md)
+- [Build Optimization](./build-optimization.md)

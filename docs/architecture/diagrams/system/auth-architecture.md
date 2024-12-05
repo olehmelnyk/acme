@@ -178,3 +178,136 @@ graph TB
    - Security guides
    - API documentation
    - Compliance docs
+
+## Authentication Architecture
+
+This document outlines the authentication system architecture, detailing how user authentication and session management are implemented across our applications.
+
+### Overview
+
+Our authentication architecture implements a secure, scalable OAuth2-based system with JWT tokens for session management. It provides single sign-on capabilities across our applications while maintaining strict security standards and user privacy.
+
+### Components
+
+- **Identity Provider**: OAuth2/OpenID Connect service
+- **Auth Service**: Authentication and token management
+- **Session Manager**: User session handling
+- **Security Layer**: Access control and protection
+
+```mermaid
+graph TB
+    subgraph "Authentication System"
+        subgraph "Frontend"
+            Client[Client App]
+            AuthUI[Auth UI]
+        end
+
+        subgraph "Auth Service"
+            OAuth[OAuth Handler]
+            JWT[JWT Service]
+            Session[Session Manager]
+        end
+
+        subgraph "Identity Provider"
+            IDP[Identity Provider]
+            UserDB[User Database]
+            Roles[Role Manager]
+        end
+
+        subgraph "Security"
+            Access[Access Control]
+            Audit[Audit Log]
+            MFA[MFA Service]
+        end
+    end
+
+    Client --> AuthUI
+    AuthUI --> OAuth
+    OAuth --> IDP
+    IDP --> UserDB
+    IDP --> Roles
+    OAuth --> JWT
+    JWT --> Session
+    Session --> Access
+    Access --> Audit
+    IDP --> MFA
+```
+
+### Interactions
+
+The authentication flow follows these key interactions:
+
+1. User initiates authentication
+2. OAuth2 flow handles authorization
+3. JWT tokens manage sessions
+4. Access control enforces permissions
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant Auth
+    participant IDP
+    participant API
+
+    User->>Client: Login Request
+    Client->>Auth: Initiate OAuth
+    Auth->>IDP: Authenticate
+    IDP-->>Auth: Auth Code
+    Auth->>IDP: Token Request
+    IDP-->>Auth: JWT Token
+    Auth-->>Client: Set Session
+    Client->>API: Authenticated Request
+```
+
+### Implementation Details
+
+#### Technical Stack
+
+- OAuth2/OpenID Connect: Authentication protocol
+- JWT: Token management
+- Redis: Session storage
+- PostgreSQL: User data storage
+- Passport.js: Authentication middleware
+
+#### Key Configurations
+
+```typescript
+// auth.config.ts
+export const authConfig = {
+  oauth: {
+    clientId: process.env.OAUTH_CLIENT_ID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    callbackUrl: '/auth/callback',
+    scope: ['openid', 'profile', 'email']
+  },
+  jwt: {
+    expiresIn: '1h',
+    algorithm: 'RS256'
+  },
+  session: {
+    store: 'redis',
+    ttl: 86400
+  }
+};
+```
+
+#### Error Handling
+
+- **Authentication Failures**: Clear error messages and recovery flows
+- **Token Expiration**: Automatic refresh mechanisms
+- **Invalid Sessions**: Graceful session termination
+- **Rate Limiting**: Prevent brute force attacks
+
+#### Performance Considerations
+
+- **Token Caching**: Reduce authentication overhead
+- **Session Distribution**: Scale across multiple nodes
+- **Connection Pooling**: Optimize database connections
+- **Request Throttling**: Prevent DoS attacks
+
+## Related Documentation
+
+- [Security Architecture](../security/security-layers.md)
+- [OAuth2 Flow](../security/oauth2-flow.md)
+- [Authorization](../security/authorization.md)

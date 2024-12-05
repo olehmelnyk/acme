@@ -1,6 +1,33 @@
 # Service Mesh Architecture
 
-This diagram illustrates our service mesh architecture using Istio for managing microservice communication.
+## Overview
+
+This document outlines our service mesh architecture using Istio for managing microservice communication. The architecture provides advanced traffic management, security, and observability features while maintaining operational simplicity and reliability across our microservices ecosystem.
+
+## Components
+
+Our service mesh architecture consists of four main component groups:
+
+### Control Plane Components
+- Istiod (Control Plane Core)
+- Pilot (Service Discovery)
+- Citadel (Security)
+- Configuration Management
+
+### Data Plane Components
+- Envoy Proxies (Sidecars)
+- Traffic Management
+- Observability Tools
+
+### Service Communication
+- Routing Mechanisms
+- Resilience Patterns
+- Security Policies
+
+### Monitoring Infrastructure
+- Telemetry Collection
+- Alerting System
+- Debugging Tools
 
 ## Service Mesh Architecture Diagram
 
@@ -121,6 +148,134 @@ graph TB
     AlertRules --> ServiceGraph
     Notification --> TrafficFlow
     Escalation --> HealthCheck
+```
+
+## Interactions
+
+The service mesh operates through the following interaction patterns:
+
+1. **Service Discovery Flow**
+   - Services register with control plane
+   - Pilot distributes configuration
+   - Sidecars receive updates
+   - Traffic routing updated
+
+2. **Request Flow**
+   - Request enters through ingress
+   - Sidecar applies policies
+   - Service processes request
+   - Response flows through mesh
+
+3. **Security Flow**
+   - Certificates distributed
+   - mTLS established
+   - Authentication verified
+   - Authorization enforced
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant I as Ingress
+    participant S as Sidecar
+    participant M as Microservice
+    
+    C->>I: Request
+    I->>S: Route
+    S->>S: Apply Policies
+    S->>M: Forward
+    M->>S: Response
+    S->>I: Return
+    I->>C: Complete
+```
+
+## Implementation Details
+
+### Technical Stack
+- Service Mesh: Istio
+- Proxy: Envoy
+- Monitoring: Prometheus/Grafana/Kiali
+- Security: Citadel/SPIFFE
+
+### Configuration Examples
+
+#### Virtual Service
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews-route
+spec:
+  hosts:
+  - reviews
+  http:
+  - match:
+    - headers:
+        end-user:
+          exact: jason
+    route:
+    - destination:
+        host: reviews
+        subset: v2
+  - route:
+    - destination:
+        host: reviews
+        subset: v3
+```
+
+#### Destination Rule
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: reviews-destination
+spec:
+  host: reviews
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+```
+
+#### Security Policy
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-policy
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/sleep"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/info*"]
+```
+
+### Monitoring Setup
+```yaml
+# Prometheus configuration
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-mesh
+spec:
+  selector:
+    matchLabels:
+      istio: mixer
+  endpoints:
+  - port: prometheus
+    interval: 15s
 ```
 
 ## Component Description

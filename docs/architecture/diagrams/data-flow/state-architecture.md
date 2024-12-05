@@ -1,6 +1,8 @@
 # State Management Architecture
 
-This diagram illustrates our state management approach using Zustand and React Query, showing how different types of state are handled across the application.
+## Overview
+
+This document outlines our state management approach using Zustand and React Query, showing how different types of state are handled across the application. The architecture is designed to efficiently manage both client-side and server-side state while maintaining clear separation of concerns and optimal performance.
 
 ## Related Documentation
 
@@ -9,61 +11,9 @@ This diagram illustrates our state management approach using Zustand and React Q
 - [API Architecture](../system/api-architecture.md)
 - [Event-Driven Architecture](../system/event-driven.md)
 
-## State Management Diagram
+## Components
 
-```mermaid
-graph TB
-    subgraph "UI Components"
-        Components[React Components]
-        Hooks[Custom Hooks]
-    end
-
-    subgraph "Client State - Zustand"
-        GlobalStore[Global Store]
-        subgraph "Store Slices"
-            UIState[UI State]
-            UserState[User State]
-            AppState[App State]
-        end
-        Middleware[Middleware]
-    end
-
-    subgraph "Server State - React Query"
-        QueryClient[Query Client]
-        subgraph "Cache Management"
-            QueryCache[Query Cache]
-            MutationCache[Mutation Cache]
-            InfiniteCache[Infinite Query Cache]
-        end
-        Prefetch[Prefetching]
-    end
-
-    subgraph "Persistence Layer"
-        LocalStorage[(Local Storage)]
-        SessionStorage[(Session Storage)]
-    end
-
-    %% Component Connections
-    Components --> Hooks
-    Hooks --> GlobalStore
-    Hooks --> QueryClient
-
-    %% Zustand Connections
-    GlobalStore --> UIState
-    GlobalStore --> UserState
-    GlobalStore --> AppState
-    GlobalStore --> Middleware
-    Middleware --> LocalStorage
-    Middleware --> SessionStorage
-
-    %% React Query Connections
-    QueryClient --> QueryCache
-    QueryClient --> MutationCache
-    QueryClient --> InfiniteCache
-    QueryClient --> Prefetch
-```
-
-## Component Description
+Our state management architecture consists of several key layers and components:
 
 ### UI Layer
 
@@ -88,7 +38,52 @@ graph TB
   - Infinite Query Cache: Pagination data
 - **Prefetching**: Optimistic data loading
 
-## Implementation Guidelines
+## Interactions
+
+The state management system interactions follow these primary patterns:
+
+1. **Component-State Interaction**
+   - Components access state through custom hooks
+   - State updates trigger re-renders only in subscribed components
+   - Batch updates are used for multiple state changes
+
+2. **Client-Server State Synchronization**
+   - React Query manages all server state interactions
+   - Automatic background refetching keeps data fresh
+   - Optimistic updates provide instant feedback
+   - Cache invalidation ensures consistency
+
+3. **Persistence Flow**
+   - Middleware intercepts state changes
+   - Critical data is persisted to LocalStorage/SessionStorage
+   - State rehydration occurs on app initialization
+
+```mermaid
+sequenceDiagram
+    participant C as Component
+    participant H as Hook
+    participant S as Store
+    participant Q as QueryClient
+    participant A as API
+
+    C->>H: Use State
+    H->>S: Access Store
+    H->>Q: Fetch Data
+    Q->>A: API Request
+    A-->>Q: Response
+    Q-->>H: Cached Data
+    H-->>C: Updated State
+```
+
+## Implementation Details
+
+### Technical Stack
+- State Management: Zustand
+- Server State: React Query
+- Storage: LocalStorage/SessionStorage
+- Development Tools: Redux DevTools (via middleware)
+
+### Implementation Guidelines
 
 1. **State Classification**
 

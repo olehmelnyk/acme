@@ -1,8 +1,27 @@
 # Data Processing Architecture
 
-This document outlines our data processing pipelines and transformation patterns.
+## Overview
 
-## Data Processing Pipeline
+This document outlines our data processing pipelines and transformation patterns. The architecture is designed to handle data processing in a scalable, maintainable, and efficient manner, ensuring data quality and consistency throughout the system.
+
+## Components
+
+Our data processing architecture consists of three main layers:
+
+### Input Layer
+- Raw Data Intake
+- Event Stream Processing
+- API Request Handling
+
+### Processing Layer
+- Validation Engine
+- Transformation Pipeline
+- Enrichment Service
+
+### Storage Layer
+- Cache Storage
+- Database Systems
+- Message Queue
 
 ```mermaid
 graph TD
@@ -34,32 +53,75 @@ graph TD
     Enrich --> Queue
 ```
 
-## Processing Stages
+## Interactions
 
-### 1. Data Validation
+The data flows through our system in the following sequence:
+
+1. **Data Ingestion**
+   - Raw data enters through various input channels
+   - Events are captured and streamed
+   - API requests are received and normalized
+
+2. **Processing Pipeline**
+   - Data undergoes validation checks
+   - Validated data is transformed to standard format
+   - Enrichment adds necessary context and metadata
+
+3. **Storage and Distribution**
+   - Processed data is cached for quick access
+   - Permanent storage in database
+   - Events published to message queue for subscribers
+
+```mermaid
+sequenceDiagram
+    participant I as Input Layer
+    participant P as Processing Layer
+    participant S as Storage Layer
+
+    I->>P: Raw Data
+    P->>P: Validate
+    P->>P: Transform
+    P->>P: Enrich
+    P->>S: Store
+    S-->>P: Confirmation
+    P-->>I: Processing Complete
+```
+
+## Implementation Details
+
+### Technical Stack
+- Validation: Zod
+- Processing: Node.js Stream API
+- Queue: RabbitMQ
+- Cache: Redis
+- Storage: PostgreSQL
+
+### Processing Stages
+
+#### 1. Data Validation
 
 - Schema validation
 - Type checking
 - Business rule validation
 - Data sanitization
 
-### 2. Data Transformation
+#### 2. Data Transformation
 
 - Format conversion
 - Data normalization
 - Field mapping
 - Data aggregation
 
-### 3. Data Enrichment
+#### 3. Data Enrichment
 
 - Adding metadata
 - Resolving references
 - Computing derived fields
 - Adding timestamps
 
-## Implementation Patterns
+### Implementation Patterns
 
-### Validation Pattern
+#### Validation Pattern
 
 ```typescript
 // Schema validation
@@ -78,7 +140,7 @@ const validateBusinessRules = (data: InputData): ValidationResult => {
 };
 ```
 
-### Transformation Pattern
+#### Transformation Pattern
 
 ```typescript
 // Data transformer
@@ -93,7 +155,7 @@ const transform = (input: InputData): OutputData => ({
 });
 ```
 
-### Enrichment Pattern
+#### Enrichment Pattern
 
 ```typescript
 // Data enricher

@@ -1,6 +1,32 @@
 # Secrets Management Architecture
 
-This diagram illustrates our secrets management infrastructure using HashiCorp Vault and related security patterns.
+## Overview
+
+This document outlines our secrets management infrastructure using HashiCorp Vault and related security patterns. The architecture provides a secure, scalable, and automated approach to managing sensitive information across our infrastructure while ensuring compliance with security standards and best practices.
+
+## Components
+
+Our secrets management architecture consists of four main component groups:
+
+### Vault Infrastructure
+- Core Components (Vault Server, Storage Backend, HSM)
+- High Availability Setup (Primary/Secondary nodes)
+- Authentication Methods
+
+### Secret Types
+- Static Secrets (Key-Value, PKI/Certificates, SSH Keys)
+- Dynamic Secrets (Database Credentials, Cloud Credentials)
+- Encryption Services (Transit Encryption, Key Rotation)
+
+### Access Control
+- Policy Management (ACL, RBAC)
+- Audit Systems
+- Compliance Controls
+
+### Integration Points
+- Application Integration (Kubernetes, CI/CD)
+- DevOps Tools
+- Security Operations
 
 ## Secrets Management Architecture Diagram
 
@@ -124,6 +150,102 @@ graph TB
     IaC --> SecOps
     Config --> Rotation
     Deploy --> Revocation
+```
+
+## Interactions
+
+The secrets management system operates through the following interaction patterns:
+
+1. **Authentication Flow**
+   - Client authenticates with Vault
+   - Token is issued based on policies
+   - Token is used for subsequent requests
+   - Regular token rotation and renewal
+
+2. **Secret Access Flow**
+   - Request validation
+   - Policy evaluation
+   - Secret retrieval/generation
+   - Audit log creation
+
+3. **Management Flow**
+   - Secret rotation
+   - Policy updates
+   - Backup and recovery
+   - Compliance reporting
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as Auth Method
+    participant V as Vault
+    participant S as Storage
+    
+    C->>A: Authenticate
+    A->>V: Validate
+    V->>V: Generate Token
+    V-->>C: Return Token
+    C->>V: Request Secret
+    V->>S: Retrieve
+    S-->>V: Return
+    V-->>C: Deliver Secret
+```
+
+## Implementation Details
+
+### Technical Stack
+- Secrets Management: HashiCorp Vault
+- Storage Backend: Consul
+- HSM Integration: AWS CloudHSM
+- Authentication: OIDC, JWT
+- Monitoring: Prometheus/Grafana
+
+### Security Controls
+
+#### Authentication Methods
+- Token-based authentication
+- OIDC integration
+- Certificate-based auth
+- Cloud provider auth
+
+#### Access Policies
+- Path-based policies
+- Role-based access control
+- Identity-based policies
+- Namespace isolation
+
+#### Audit and Compliance
+- Detailed audit logs
+- Compliance reporting
+- Security alerts
+- Performance monitoring
+
+### Integration Patterns
+
+#### Application Integration
+```hcl
+# Vault Policy Example
+path "secret/data/{{identity.entity.name}}/*" {
+  capabilities = ["create", "read", "update", "delete"]
+}
+
+# Kubernetes Auth
+path "auth/kubernetes/login" {
+  capabilities = ["create", "read"]
+}
+```
+
+#### DevOps Integration
+```yaml
+# Vault Agent Config
+auto_auth {
+  method "kubernetes" {
+    mount_path = "auth/kubernetes"
+    config = {
+      role = "app-role"
+    }
+  }
+}
 ```
 
 ## Component Description
