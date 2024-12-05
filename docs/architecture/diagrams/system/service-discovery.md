@@ -1,5 +1,74 @@
 # Service Discovery Architecture
 
+## Overview
+
+The Service Discovery Architecture provides a robust and scalable solution for service registration, health monitoring, and load balancing in our distributed system. This architecture enables automatic service registration, real-time health monitoring, and intelligent load distribution across multiple service instances.
+
+Key Features:
+- Automatic service registration
+- Real-time health monitoring
+- Dynamic load balancing
+- Failover management
+- Service metadata management
+
+Benefits:
+- High availability
+- Automatic scaling
+- Reduced downtime
+- Simplified deployment
+- Enhanced reliability
+
+## Interactions
+
+The service discovery system follows these key workflows:
+
+1. Service Registration Flow
+```mermaid
+sequenceDiagram
+    participant Service
+    participant Registry
+    participant Health
+    participant LoadBalancer
+    
+    Service->>Registry: Register Service
+    Registry->>Health: Initialize Health Check
+    Registry->>LoadBalancer: Update Service List
+    LoadBalancer-->>Service: Ready for Traffic
+```
+
+2. Health Check Flow
+```mermaid
+sequenceDiagram
+    participant Health
+    participant Service
+    participant Registry
+    participant LoadBalancer
+    
+    Health->>Service: Check Health
+    alt is healthy
+        Service-->>Health: Healthy Status
+        Health->>Registry: Update Status
+    else is unhealthy
+        Service-->>Health: Unhealthy Status
+        Health->>Registry: Mark Unhealthy
+        Registry->>LoadBalancer: Remove Service
+    end
+```
+
+3. Service Discovery Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Registry
+    participant LoadBalancer
+    participant Service
+    
+    Client->>Registry: Discover Service
+    Registry->>LoadBalancer: Get Available Instance
+    LoadBalancer->>Service: Route Request
+    Service-->>Client: Handle Request
+```
+
 This diagram illustrates our service discovery architecture, including service registry, health checking, and load balancing components.
 
 ```mermaid

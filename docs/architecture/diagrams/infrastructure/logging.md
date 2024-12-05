@@ -1,9 +1,40 @@
 # Logging and Monitoring Architecture
 
-This diagram illustrates our comprehensive logging and monitoring strategy across the application stack.
+## Overview
 
-## Logging Architecture Diagram
+Our logging and monitoring architecture provides comprehensive observability across the entire application stack. It implements a centralized logging system that collects, processes, and analyzes logs from multiple sources while supporting real-time monitoring, alerting, and distributed tracing capabilities.
 
+## Components
+
+### 1. Log Sources
+- **Application Logs**: Error tracking, info logging, and debug information
+- **System Logs**: Performance metrics, health checks, and audit trails
+- **Security Logs**: Authentication, access logs, and security events
+
+### 2. Log Processing Pipeline
+- **Collection**: Centralized log aggregation
+- **Parsing**: Structured log formatting
+- **Enrichment**: Context addition and correlation
+- **Aggregation**: Log consolidation and summarization
+
+### 3. Storage & Analysis
+- **Log Storage**: Distributed log persistence
+- **Analytics Engine**: Log analysis and pattern detection
+- **Search Index**: Fast log querying and retrieval
+
+### 4. Monitoring & Alerts
+- **Dashboards**: Real-time visualization
+- **Alert System**: Proactive notification
+- **Reporting**: Scheduled insights generation
+
+### 5. Integration Layer
+- **APM Integration**: Application performance monitoring
+- **Distributed Tracing**: Request flow tracking
+- **Metrics Platform**: Performance metrics aggregation
+
+## Interactions
+
+### 1. Log Flow
 ```mermaid
 graph TB
     subgraph "Log Sources"
@@ -51,7 +82,6 @@ graph TB
         Metrics[Metrics Platform]
     end
 
-    %% Log Flow
     AppError --> Collection
     AppInfo --> Collection
     AppDebug --> Collection
@@ -64,7 +94,6 @@ graph TB
     AccessLogs --> Collection
     SecurityEvents --> Collection
 
-    %% Processing Flow
     Collection --> Parsing
     Parsing --> Enrichment
     Enrichment --> Aggregation
@@ -73,89 +102,200 @@ graph TB
     LogStore --> Analytics
     LogStore --> Search
 
-    %% Monitoring Flow
     Analytics --> Dashboard
     Analytics --> Alerts
     Analytics --> Reports
 
-    %% Integration Flow
     LogStore --> APM
     LogStore --> Tracing
     LogStore --> Metrics
 ```
 
-## Component Description
+### 2. Processing Flow
+1. Log sources emit structured logs
+2. Collection agents gather logs from all sources
+3. Parser standardizes log format
+4. Enrichment adds metadata and context
+5. Aggregation consolidates related logs
+6. Storage persists processed logs
+7. Analysis generates insights
+8. Monitoring triggers alerts
 
-### Log Sources
+### 3. Alert Flow
+1. System detects anomaly or threshold breach
+2. Alert rules evaluate condition
+3. Notification sent to relevant teams
+4. Incident response initiated if needed
+5. Resolution tracked and documented
 
-1. **Application Logs**
+## Implementation Details
 
-   - Error tracking
-   - Info logging
-   - Debug information
+### 1. Logger Implementation
 
-2. **System Logs**
+```typescript
+// Logger interface
+interface ILogger {
+  error(message: string, meta?: Record<string, unknown>): void;
+  warn(message: string, meta?: Record<string, unknown>): void;
+  info(message: string, meta?: Record<string, unknown>): void;
+  debug(message: string, meta?: Record<string, unknown>): void;
+}
 
-   - Performance metrics
-   - Health status
-   - Audit trails
+// Structured logger implementation
+class StructuredLogger implements ILogger {
+  private context: Record<string, unknown>;
 
-3. **Security Logs**
-   - Authentication events
-   - Access patterns
-   - Security incidents
+  constructor(context: Record<string, unknown>) {
+    this.context = context;
+  }
 
-### Processing Pipeline
+  private log(level: string, message: string, meta?: Record<string, unknown>) {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...this.context,
+      ...meta,
+    };
+    console.log(JSON.stringify(logEntry));
+  }
 
-- **Collection**: Log aggregation
-- **Parsing**: Log structure
-- **Enrichment**: Context addition
-- **Aggregation**: Data consolidation
+  error(message: string, meta?: Record<string, unknown>) {
+    this.log('error', message, meta);
+  }
 
-### Storage & Analysis
+  warn(message: string, meta?: Record<string, unknown>) {
+    this.log('warn', message, meta);
+  }
 
-- **Log Store**: Persistent storage
-- **Analytics**: Data analysis
-- **Search**: Query capability
+  info(message: string, meta?: Record<string, unknown>) {
+    this.log('info', message, meta);
+  }
 
-### Monitoring Tools
+  debug(message: string, meta?: Record<string, unknown>) {
+    this.log('debug', message, meta);
+  }
+}
+```
 
-- **Dashboards**: Visualization
-- **Alerts**: Notification system
-- **Reports**: Regular insights
+### 2. Monitoring Implementation
 
-## Implementation Guidelines
+```typescript
+// Monitoring interface
+interface IMonitor {
+  recordMetric(name: string, value: number, tags?: Record<string, string>): void;
+  startTimer(name: string): () => void;
+  recordHealthCheck(service: string, status: 'up' | 'down'): void;
+}
 
-1. **Log Management**
+// Monitor implementation
+class Monitor implements IMonitor {
+  private metrics: Map<string, number[]>;
 
-   - Structured logging
-   - Log levels
-   - Retention policies
-   - Privacy compliance
+  constructor() {
+    this.metrics = new Map();
+  }
 
-2. **Monitoring Strategy**
+  recordMetric(name: string, value: number, tags?: Record<string, string>) {
+    const key = this.formatMetricKey(name, tags);
+    if (!this.metrics.has(key)) {
+      this.metrics.set(key, []);
+    }
+    this.metrics.get(key)!.push(value);
+  }
 
-   - Real-time monitoring
-   - Trend analysis
-   - Anomaly detection
-   - Alert thresholds
+  startTimer(name: string): () => void {
+    const start = Date.now();
+    return () => {
+      const duration = Date.now() - start;
+      this.recordMetric(name, duration);
+    };
+  }
 
-3. **Integration Setup**
+  recordHealthCheck(service: string, status: 'up' | 'down') {
+    this.recordMetric(`health.${service}`, status === 'up' ? 1 : 0);
+  }
 
-   - APM configuration
-   - Trace correlation
-   - Metric collection
-   - Tool integration
+  private formatMetricKey(name: string, tags?: Record<string, string>): string {
+    if (!tags) return name;
+    const tagString = Object.entries(tags)
+      .map(([k, v]) => `${k}=${v}`)
+      .join(',');
+    return `${name}{${tagString}}`;
+  }
+}
+```
 
-4. **Best Practices**
+### 3. Alert Configuration
 
-   - Log sanitization
-   - Performance impact
-   - Storage optimization
-   - Access control
+```typescript
+interface AlertRule {
+  name: string;
+  condition: string;
+  threshold: number;
+  duration: string;
+  severity: 'critical' | 'warning' | 'info';
+  channels: string[];
+}
 
-5. **Operational Procedures**
-   - Incident response
-   - Log rotation
-   - Backup strategy
-   - Recovery process
+const alertRules: AlertRule[] = [
+  {
+    name: 'High Error Rate',
+    condition: 'error_rate > threshold',
+    threshold: 0.01,
+    duration: '5m',
+    severity: 'critical',
+    channels: ['slack', 'email'],
+  },
+  {
+    name: 'High Latency',
+    condition: 'p95_latency > threshold',
+    threshold: 500,
+    duration: '10m',
+    severity: 'warning',
+    channels: ['slack'],
+  },
+  {
+    name: 'Low Disk Space',
+    condition: 'disk_free_percent < threshold',
+    threshold: 20,
+    duration: '15m',
+    severity: 'warning',
+    channels: ['email'],
+  },
+];
+```
+
+## Best Practices
+
+1. **Logging Best Practices**
+   - Use structured logging format
+   - Include relevant context
+   - Follow consistent log levels
+   - Implement log rotation
+   - Secure sensitive information
+   - Use correlation IDs
+
+2. **Monitoring Best Practices**
+   - Define clear SLOs/SLIs
+   - Implement proper retention policies
+   - Use appropriate granularity
+   - Monitor system boundaries
+   - Track business metrics
+   - Implement proper aggregation
+
+3. **Alert Best Practices**
+   - Define clear severity levels
+   - Avoid alert fatigue
+   - Include actionable information
+   - Implement proper routing
+   - Define escalation policies
+   - Document response procedures
+
+## Related Documentation
+
+- [Performance Monitoring](../system/performance.md)
+- [Security Monitoring](../security/security-monitoring.md)
+- [Error Handling](../system/error-handling.md)
+- [Deployment Architecture](./deployment.md)
+- [Infrastructure Monitoring](./infrastructure-monitoring.md)

@@ -1,8 +1,24 @@
 # Component State Patterns
 
-This document outlines our component state management patterns and best practices.
+## Overview
 
-## State Management Architecture
+This document outlines our component state management patterns and best practices. It describes how we handle different types of state across our application, from global application state to local component state, ensuring consistent and maintainable state management.
+
+## Components
+
+Our state management architecture consists of several key components:
+
+1. Global State Layer
+   - Redux Store: For application-wide state
+   - React Context: For feature-specific shared state
+
+2. Local State Layer
+   - Component State: For component-specific UI state
+   - Form State: For form handling and validation
+
+3. Cache Layer
+   - Query Cache: For server state management
+   - Local Storage: For persistent client-side storage
 
 ```mermaid
 graph TD
@@ -58,7 +74,29 @@ graph TD
 - Form values
 - UI element states
 
-## State Management Patterns
+## Interactions
+
+Our state management follows these interaction patterns:
+
+1. Global State Flow:
+   - Components subscribe to global state changes
+   - Actions dispatch state updates
+   - Reducers process state mutations
+   - Components re-render with new state
+
+2. Local State Flow:
+   - Component initializes local state
+   - User interactions trigger state updates
+   - State changes cause re-renders
+   - Effects run based on state changes
+
+3. Cache Interaction Flow:
+   - Data queries trigger cache checks
+   - Cache hits return immediate results
+   - Cache misses fetch from server
+   - Background revalidation maintains freshness
+
+## Implementation Details
 
 ### Global State Pattern
 

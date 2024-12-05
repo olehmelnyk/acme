@@ -1,10 +1,212 @@
 # Internationalization (i18n) Architecture
 
-This diagram illustrates our comprehensive internationalization and localization strategy across the application.
+## Overview
 
-## Implementation
+The Internationalization (i18n) Architecture provides a comprehensive solution for managing multilingual content, localization, and cultural adaptations across the application. This system ensures consistent user experience across different languages and regions while maintaining development efficiency and content management flexibility.
 
-Our i18n system is built using Context Provider particles as defined in our [Atomic Design Structure](../components/atomic-design.md#particles). These providers manage locale state, translations, and formatting rules throughout the component tree.
+Key capabilities:
+- Dynamic language switching
+- Locale-aware formatting
+- RTL language support
+- Automated translation management
+- Context-aware pluralization
+
+Benefits:
+- Consistent user experience across locales
+- Simplified content management
+- Reduced translation overhead
+- Improved accessibility
+- Scalable localization process
+
+## Components
+
+### Translation Layer
+1. Message Management
+   - Translation key system
+   - Namespace organization
+   - Fallback chains
+   - Dynamic interpolation
+
+2. Locale Support
+   - Language configuration
+   - Regional settings
+   - RTL text handling
+   - Plural rules
+
+3. Formatting System
+   - Date/time formatting
+   - Number formatting
+   - Currency handling
+   - Unit conversions
+
+### Content Layer
+1. Static Content
+   - UI elements
+   - Meta information
+   - Static pages
+   - Error messages
+
+2. Dynamic Content
+   - Form content
+   - System messages
+   - User-generated content
+   - Notifications
+
+3. Rich Content
+   - Date/time display
+   - Number presentation
+   - Currency display
+   - Measurement units
+
+### Infrastructure Layer
+1. Build System
+   - Key extraction
+   - Message compilation
+   - Bundle generation
+   - Source maps
+
+2. Runtime System
+   - Context providers
+   - Format utilities
+   - HOC wrappers
+   - Custom hooks
+
+## Interactions
+
+The i18n system follows these primary workflows:
+
+1. Translation Loading Flow
+```mermaid
+sequenceDiagram
+    participant App
+    participant Provider
+    participant Bundle
+    participant Formatter
+    
+    App->>Provider: Set Locale
+    Provider->>Bundle: Load Messages
+    Bundle->>Formatter: Configure Locale
+    Formatter-->>App: Ready State
+```
+
+2. Content Rendering Flow
+```mermaid
+sequenceDiagram
+    participant Component
+    participant Hook
+    participant Provider
+    participant Formatter
+    
+    Component->>Hook: Get Translation
+    Hook->>Provider: Request Message
+    Provider->>Formatter: Format Message
+    Formatter-->>Component: Localized Content
+```
+
+3. Dynamic Content Flow
+```mermaid
+sequenceDiagram
+    participant User
+    participant Form
+    participant Validator
+    participant Formatter
+    
+    User->>Form: Input Data
+    Form->>Validator: Validate Input
+    Validator->>Formatter: Format Message
+    Formatter-->>User: Localized Feedback
+```
+
+## Implementation Details
+
+### Translation Provider Implementation
+```typescript
+interface I18nConfig {
+  defaultLocale: string;
+  supportedLocales: string[];
+  fallbackChain: string[];
+  loadPath: string;
+}
+
+class I18nProvider {
+  async initialize(config: I18nConfig): Promise<void> {
+    const messages = await this.loadMessages(config.loadPath);
+    const formatter = new IntlMessageFormat(messages);
+    
+    return this.setupProvider(formatter, config);
+  }
+  
+  translate(key: string, params?: Record<string, any>): string {
+    return this.formatter.format(key, params, this.currentLocale);
+  }
+}
+```
+
+### Format Utility Implementation
+```typescript
+interface FormatConfig {
+  locale: string;
+  timezone?: string;
+  currency?: string;
+  numberSystem?: string;
+}
+
+class FormatUtils {
+  constructor(private config: FormatConfig) {}
+  
+  formatDate(date: Date, format?: Intl.DateTimeFormatOptions): string {
+    return new Intl.DateTimeFormat(
+      this.config.locale,
+      { timeZone: this.config.timezone, ...format }
+    ).format(date);
+  }
+  
+  formatNumber(
+    value: number,
+    format?: Intl.NumberFormatOptions
+  ): string {
+    return new Intl.NumberFormat(
+      this.config.locale,
+      { numberingSystem: this.config.numberSystem, ...format }
+    ).format(value);
+  }
+}
+```
+
+### Translation Hook Implementation
+```typescript
+interface TranslationHook {
+  t: (key: string, params?: object) => string;
+  locale: string;
+  setLocale: (locale: string) => Promise<void>;
+  isRTL: boolean;
+}
+
+function useTranslation(namespace?: string): TranslationHook {
+  const context = useI18nContext();
+  const [locale, setLocale] = useState(context.locale);
+  
+  const t = useCallback(
+    (key: string, params?: object) => {
+      const fullKey = namespace ? `${namespace}:${key}` : key;
+      return context.translate(fullKey, params);
+    },
+    [context, namespace]
+  );
+  
+  const changeLocale = async (newLocale: string) => {
+    await context.loadMessages(newLocale);
+    setLocale(newLocale);
+  };
+  
+  return {
+    t,
+    locale,
+    setLocale: changeLocale,
+    isRTL: context.isRTL(locale)
+  };
+}
+```
 
 ## i18n Architecture Diagram
 

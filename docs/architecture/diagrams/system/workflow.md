@@ -1,6 +1,130 @@
 # System Workflow Architecture
 
-This diagram illustrates the high-level workflow and interaction between different system components.
+## Overview
+
+The System Workflow Architecture defines the high-level organization and interaction patterns between different system components. This architecture implements a layered approach with clear separation of concerns, ensuring scalability, maintainability, and reliability of the system.
+
+Key Features:
+- Layered architecture
+- Event-driven communication
+- Microservices design
+- Scalable infrastructure
+- Fault tolerance
+
+Benefits:
+- System modularity
+- Independent scaling
+- Improved reliability
+- Better maintainability
+- Enhanced security
+
+## Components
+
+### Client Components
+1. Web Application
+   - Next.js frontend
+   - React components
+   - Client-side state
+   - API integration
+
+2. Mobile Applications
+   - Native clients
+   - Cross-platform support
+   - Offline capabilities
+   - Push notifications
+
+3. API Clients
+   - SDK libraries
+   - Authentication
+   - Rate limiting
+   - Error handling
+
+### Infrastructure Components
+1. API Gateway
+   - Request routing
+   - Authentication
+   - Rate limiting
+   - Load balancing
+
+2. Service Layer
+   - User service
+   - Order service
+   - Payment service
+   - Notification service
+
+3. Message Bus
+   - Event bus
+   - Command bus
+   - Message queues
+   - Event store
+
+### Storage Components
+1. Database Systems
+   - Primary database
+   - Read replicas
+   - Sharding
+   - Backups
+
+2. Caching Layer
+   - Distributed cache
+   - Local caches
+   - Cache invalidation
+   - Cache warming
+
+3. File Storage
+   - Object storage
+   - CDN integration
+   - File versioning
+   - Access control
+
+## Interactions
+
+The system components interact through these key workflows:
+
+1. Request Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Gateway
+    participant Service
+    participant Storage
+    
+    Client->>Gateway: API Request
+    Gateway->>Gateway: Authenticate
+    Gateway->>Service: Route Request
+    Service->>Storage: Data Operation
+    Storage-->>Service: Data Response
+    Service-->>Gateway: Service Response
+    Gateway-->>Client: API Response
+```
+
+2. Event Flow
+```mermaid
+sequenceDiagram
+    participant Service
+    participant EventBus
+    participant Queue
+    participant Handler
+    
+    Service->>EventBus: Publish Event
+    EventBus->>Queue: Queue Event
+    Queue->>Handler: Process Event
+    Handler-->>Service: Confirm Processing
+```
+
+3. Cache Flow
+```mermaid
+sequenceDiagram
+    participant Service
+    participant Cache
+    participant Database
+    
+    Service->>Cache: Check Cache
+    Cache-->>Service: Cache Miss
+    Service->>Database: Fetch Data
+    Database-->>Service: Return Data
+    Service->>Cache: Update Cache
+```
 
 ## Workflow Diagram
 

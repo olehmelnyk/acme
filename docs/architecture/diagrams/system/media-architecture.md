@@ -1,6 +1,66 @@
 # Media Handling Architecture
 
-This diagram illustrates our media processing and delivery infrastructure using cloud storage and CDN.
+## Overview
+
+The Media Handling Architecture is a scalable and robust system designed to manage the complete lifecycle of media assets within our platform. It provides end-to-end solutions for media upload, processing, storage, and delivery while ensuring high performance, security, and reliability.
+
+Key capabilities:
+- Efficient media processing and transformation
+- Multi-region content delivery
+- Intelligent caching strategies
+- Secure access control
+- Scalable storage solutions
+- Real-time analytics and monitoring
+
+## Components
+
+### Storage Layer
+1. Cloud Storage
+   - S3 Bucket: Primary storage for original media assets
+   - CloudFront: CDN integration for fast content delivery
+   - Cloudflare R2: Edge storage for frequently accessed content
+
+2. Local Cache
+   - Temporary Storage: For processing and validation
+   - Local Cache: Frequently accessed media
+   - File Buffer: Streaming and chunked uploads
+
+3. Database
+   - Media Metadata: Asset information and properties
+   - File References: Content addressing and mapping
+   - Version Control: Asset version management
+
+### Processing Layer
+1. Upload Processing
+   - Chunked Upload Handler
+   - File Validation Service
+   - Virus Scanning Engine
+
+2. Transformation Engine
+   - Image Resizing Service
+   - Format Conversion
+   - Compression Pipeline
+
+3. Optimization Service
+   - Quality Optimization
+   - Format Selection
+   - Size Optimization
+
+### Delivery Layer
+1. CDN Integration
+   - Edge Location Management
+   - Cache Control
+   - Purge Mechanisms
+
+2. Streaming Services
+   - HLS Protocol Support
+   - DASH Implementation
+   - Live Streaming Handler
+
+3. Download Management
+   - Direct Download Service
+   - Resume Capability
+   - Batch Processing
 
 ## Media Architecture Diagram
 
@@ -123,79 +183,155 @@ graph TB
     Encrypt --> Storage
 ```
 
-## Component Description
+## Interactions
 
-### Media Storage
+The media handling system follows these primary workflows:
 
-1. **Cloud Storage**
+1. Upload Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Upload
+    participant Process
+    participant Storage
+    
+    Client->>Upload: Initiate Upload
+    Upload->>Upload: Chunk & Validate
+    Upload->>Process: Transform & Optimize
+    Process->>Storage: Store & Index
+    Storage->>Client: Return Reference
+```
 
-   - S3 buckets
-   - CloudFront CDN
-   - R2 storage
+2. Delivery Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant CDN
+    participant Cache
+    participant Storage
+    
+    Client->>CDN: Request Media
+    CDN->>Cache: Check Cache
+    Cache-->>Storage: Miss & Fetch
+    Storage-->>Client: Deliver Content
+```
 
-2. **Local Cache**
+3. Processing Flow
+```mermaid
+sequenceDiagram
+    participant Upload
+    participant Transform
+    participant Optimize
+    participant Deliver
+    
+    Upload->>Transform: Raw Media
+    Transform->>Optimize: Processed Media
+    Optimize->>Deliver: Optimized Asset
+```
 
-   - Temporary storage
-   - Local caching
-   - Buffer management
+## Implementation Details
 
-3. **Metadata Storage**
-   - File metadata
-   - References
-   - Versioning
+### Upload Implementation
+```typescript
+interface UploadConfig {
+  chunkSize: number;
+  concurrency: number;
+  allowedTypes: string[];
+  maxFileSize: number;
+}
 
-### Media Processing
+class MediaUploadService {
+  async upload(file: File, config: UploadConfig): Promise<MediaReference> {
+    // Chunk validation
+    const chunks = await this.createChunks(file, config.chunkSize);
+    
+    // Parallel upload
+    const uploads = chunks.map(chunk => this.uploadChunk(chunk));
+    const results = await Promise.all(uploads);
+    
+    // Finalize
+    return this.finalizeUpload(results);
+  }
+}
+```
 
-1. **Upload Pipeline**
+### Transformation Pipeline
+```typescript
+interface TransformOptions {
+  resize?: {
+    width: number;
+    height: number;
+    mode: 'contain' | 'cover';
+  };
+  format?: 'webp' | 'avif' | 'jpeg';
+  quality?: number;
+}
 
-   - File chunking
-   - Validation
-   - Virus scanning
+class MediaTransformService {
+  async transform(
+    media: MediaReference,
+    options: TransformOptions
+  ): Promise<MediaReference> {
+    const pipeline = new TransformPipeline()
+      .resize(options.resize)
+      .convert(options.format)
+      .optimize(options.quality);
+      
+    return pipeline.process(media);
+  }
+}
+```
 
-2. **Transformation**
-   - Image resizing
-   - Format conversion
-   - Compression
+### Delivery Configuration
+```typescript
+interface DeliveryConfig {
+  cdn: {
+    regions: string[];
+    ttl: number;
+    cacheStrategy: 'aggressive' | 'balanced' | 'disabled';
+  };
+  streaming: {
+    protocol: 'hls' | 'dash';
+    segmentSize: number;
+    bufferSize: number;
+  };
+}
 
-## Implementation Guidelines
+class MediaDeliveryService {
+  async getDeliveryUrl(
+    reference: MediaReference,
+    config: DeliveryConfig
+  ): Promise<string> {
+    const url = await this.createSignedUrl(reference);
+    return this.optimizeForDelivery(url, config);
+  }
+}
+```
 
-1. **Storage Strategy**
+## Best Practices
 
-   - Storage selection
-   - Cache policy
-   - Retention rules
-   - Backup strategy
+1. Storage
+   - Implement proper backup strategies
+   - Use appropriate storage classes
+   - Regular cleanup of temporary files
 
-2. **Processing Pipeline**
+2. Processing
+   - Validate files before processing
+   - Implement retry mechanisms
+   - Monitor processing queues
 
-   - Upload workflow
-   - Transform chain
-   - Optimization rules
-   - Error handling
+3. Delivery
+   - Use appropriate cache headers
+   - Implement rate limiting
+   - Monitor CDN metrics
 
-3. **Delivery Options**
+4. Security
+   - Implement proper access controls
+   - Use signed URLs
+   - Regular security audits
 
-   - CDN setup
-   - Streaming config
-   - Download options
-   - Cache rules
-
-4. **Best Practices**
-
-   - File naming
-   - Path structure
-   - Access control
-   - Performance
-
-5. **Security**
-
-   - Access policies
-   - URL signing
-   - Encryption
-   - Scanning
-
-6. **Documentation**
-   - API endpoints
-   - Storage paths
-   - Process flows
-   - Security rules
+## Related Documentation
+- [Content Delivery Architecture](../infrastructure/content-delivery.md)
+- [Performance Architecture](../infrastructure/performance.md)
+- [Security Architecture](./security.md)
+- [Backup and Recovery](../infrastructure/backup-recovery.md)

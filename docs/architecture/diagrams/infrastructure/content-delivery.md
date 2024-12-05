@@ -1,9 +1,34 @@
 # Content Delivery Architecture
 
-This diagram illustrates our content delivery infrastructure using CDN and edge computing capabilities.
+## Overview
 
-## Content Delivery Architecture Diagram
+Our content delivery architecture implements a globally distributed system for delivering static and dynamic content with high performance, reliability, and security. It leverages CDN capabilities, edge computing, and modern delivery protocols to ensure optimal user experience across different regions and devices.
 
+## Components
+
+### 1. Origin Infrastructure
+- **Origin Servers**: Web, application, and media servers
+- **Storage Systems**: Object storage, file systems, and databases
+- **Caching Layer**: Origin, application, and database caches
+
+### 2. CDN Layer
+- **Edge Network**: Global Points of Presence (PoPs)
+- **Optimization Features**: Image, JS, and CSS optimization
+- **Security Features**: WAF, DDoS protection, SSL/TLS
+
+### 3. Edge Computing
+- **Edge Functions**: Serverless compute at edge locations
+- **Processing**: Content transformation and personalization
+- **Analytics**: Real-time metrics and user insights
+
+### 4. Client Delivery
+- **Protocol Stack**: HTTP/3, QUIC, TLS 1.3
+- **Optimization**: Compression, bundling, lazy loading
+- **Performance Metrics**: TTFB, LCP, CLS tracking
+
+## Interactions
+
+### 1. Content Flow
 ```mermaid
 graph TB
     subgraph "Origin Infrastructure"
@@ -86,7 +111,6 @@ graph TB
         end
     end
 
-    %% Origin Flow
     WebServer --> ObjectStore
     AppServer --> FileSystem
     MediaServer --> Database
@@ -95,7 +119,6 @@ graph TB
     FileSystem --> AppCache
     Database --> DBCache
 
-    %% CDN Flow
     POPs --> ImageOpt
     EdgeServers --> JSMin
     RegionalCache --> CSSMin
@@ -104,7 +127,6 @@ graph TB
     JSMin --> DDoS
     CSSMin --> SSL
 
-    %% Edge Flow
     EdgeFunctions --> Transform
     Workers --> Personalize
     Lambda --> ABTest
@@ -113,7 +135,6 @@ graph TB
     Personalize --> EdgeMetrics
     ABTest --> UserInsights
 
-    %% Client Flow
     HTTP3 --> Compression
     QUIC --> Bundling
     TLS13 --> LazyLoad
@@ -123,79 +144,241 @@ graph TB
     LazyLoad --> CLS
 ```
 
-## Component Description
+### 2. Request Flow
+1. Client requests content
+2. Request routed to nearest PoP
+3. Edge cache checked
+4. Edge functions process request
+5. Origin fetched if needed
+6. Content optimized
+7. Response delivered to client
 
-### Origin Infrastructure
+### 3. Cache Flow
+1. Content cached at origin
+2. Distributed to edge locations
+3. Cache rules applied
+4. TTL managed
+5. Invalidation handled
+6. Metrics collected
 
-1. **Origin Servers**
+## Implementation Details
 
-   - Web servers
-   - Application servers
-   - Media servers
+### 1. CDN Configuration
 
-2. **Storage Systems**
+```typescript
+// CDN configuration
+interface CDNConfig {
+  origins: Origin[];
+  caching: CacheRules;
+  optimization: OptimizationRules;
+  security: SecurityConfig;
+}
 
-   - Object storage
-   - File systems
-   - Databases
+interface Origin {
+  name: string;
+  domain: string;
+  protocol: 'http' | 'https';
+  port: number;
+  path: string;
+  customHeaders: Record<string, string>;
+}
 
-3. **Caching Layer**
-   - Origin cache
-   - Application cache
-   - Database cache
+interface CacheRules {
+  defaultTTL: number;
+  maxTTL: number;
+  minTTL: number;
+  bypassCache: string[];
+  customRules: CacheRule[];
+}
 
-### CDN Layer
+const cdnConfig: CDNConfig = {
+  origins: [
+    {
+      name: 'main-app',
+      domain: 'origin.example.com',
+      protocol: 'https',
+      port: 443,
+      path: '/',
+      customHeaders: {
+        'X-Custom-Header': 'value',
+      },
+    },
+  ],
+  caching: {
+    defaultTTL: 86400,
+    maxTTL: 31536000,
+    minTTL: 0,
+    bypassCache: ['/api/*', '/admin/*'],
+    customRules: [
+      {
+        pattern: '*.jpg',
+        ttl: 604800,
+      },
+      {
+        pattern: '*.js',
+        ttl: 86400,
+      },
+    ],
+  },
+  optimization: {
+    enableCompression: true,
+    imageOptimization: true,
+    minifyJS: true,
+    minifyCSS: true,
+  },
+  security: {
+    enableWAF: true,
+    ddosProtection: true,
+    tlsVersion: 'TLSv1.3',
+    securityHeaders: true,
+  },
+};
+```
 
-1. **Edge Network**
+### 2. Edge Function Implementation
 
-   - Points of Presence (PoPs)
-   - Edge servers
-   - Regional caches
+```typescript
+// Edge function for content transformation
+interface ContentTransform {
+  resize?: ImageResize;
+  format?: ImageFormat;
+  quality?: number;
+  metadata?: Record<string, string>;
+}
 
-2. **Optimization Features**
-   - Image optimization
-   - JS minification
-   - CSS minification
+interface ImageResize {
+  width?: number;
+  height?: number;
+  fit?: 'contain' | 'cover' | 'fill';
+}
 
-## Implementation Guidelines
+// Edge worker implementation
+class EdgeWorker {
+  private config: ContentTransform;
 
-1. **CDN Setup**
+  constructor(config: ContentTransform) {
+    this.config = config;
+  }
 
-   - Provider selection
-   - Configuration
-   - Cache rules
-   - Security settings
+  async handleRequest(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    const imageParams = this.parseImageParams(url);
+    
+    if (this.isImage(url.pathname)) {
+      return this.transformImage(request, imageParams);
+    }
+    
+    return fetch(request);
+  }
+
+  private async transformImage(
+    request: Request,
+    params: ContentTransform
+  ): Promise<Response> {
+    const response = await fetch(request);
+    const image = await response.arrayBuffer();
+    
+    return this.processImage(image, params);
+  }
+
+  private async processImage(
+    buffer: ArrayBuffer,
+    params: ContentTransform
+  ): Promise<Response> {
+    // Image processing implementation
+    return new Response(buffer, {
+      headers: {
+        'Content-Type': 'image/webp',
+        'Cache-Control': 'public, max-age=31536000',
+      },
+    });
+  }
+}
+```
+
+### 3. Performance Monitoring
+
+```typescript
+// Performance monitoring configuration
+interface PerformanceConfig {
+  metrics: MetricConfig[];
+  thresholds: ThresholdConfig;
+  reporting: ReportingConfig;
+}
+
+interface MetricConfig {
+  name: string;
+  type: 'timer' | 'counter' | 'gauge';
+  description: string;
+}
+
+interface ThresholdConfig {
+  ttfb: number;
+  lcp: number;
+  cls: number;
+}
+
+const performanceConfig: PerformanceConfig = {
+  metrics: [
+    {
+      name: 'edge_latency',
+      type: 'timer',
+      description: 'Edge processing time',
+    },
+    {
+      name: 'cache_hit_ratio',
+      type: 'gauge',
+      description: 'Cache hit ratio percentage',
+    },
+    {
+      name: 'origin_errors',
+      type: 'counter',
+      description: 'Origin error count',
+    },
+  ],
+  thresholds: {
+    ttfb: 100,
+    lcp: 2500,
+    cls: 0.1,
+  },
+  reporting: {
+    interval: 60,
+    destination: 'metrics.example.com',
+    aggregation: 'avg',
+  },
+};
+```
+
+## Best Practices
+
+1. **CDN Configuration**
+   - Use appropriate cache TTLs
+   - Configure proper origin failover
+   - Enable compression
+   - Implement proper security headers
+   - Configure proper SSL/TLS
+   - Monitor edge performance
 
 2. **Edge Computing**
+   - Minimize edge function complexity
+   - Implement proper error handling
+   - Use appropriate memory limits
+   - Monitor function performance
+   - Implement proper logging
+   - Cache computation results
 
-   - Function deployment
-   - Processing rules
-   - Analytics setup
-   - Monitoring
+3. **Performance Optimization**
+   - Enable HTTP/3 and QUIC
+   - Use proper cache-control headers
+   - Implement proper image optimization
+   - Monitor Core Web Vitals
+   - Use proper compression
+   - Implement proper routing
 
-3. **Performance**
+## Related Documentation
 
-   - Optimization rules
-   - Caching strategy
-   - Load times
-   - Metrics
-
-4. **Best Practices**
-
-   - Cache invalidation
-   - Security headers
-   - SSL/TLS config
-   - DDoS protection
-
-5. **Monitoring**
-
-   - Performance metrics
-   - Error tracking
-   - User analytics
-   - Cost analysis
-
-6. **Documentation**
-   - Architecture docs
-   - Configuration guides
-   - Performance tuning
-   - Security policies
+- [Performance Architecture](../system/performance.md)
+- [Security Architecture](../security/security-architecture.md)
+- [Caching Strategy](./caching.md)
+- [Monitoring Architecture](./monitoring.md)
+- [Edge Computing](./edge-computing.md)

@@ -1,8 +1,27 @@
 # Authorization Model
 
-This document outlines our Role-Based Access Control (RBAC) and authorization patterns.
+## Overview
 
-## Authorization Architecture
+This document outlines our Role-Based Access Control (RBAC) and authorization patterns. Our authorization system implements a hierarchical role-based model with granular permissions, policy enforcement, and comprehensive security monitoring. The system is designed to enforce the principle of least privilege while maintaining flexibility and scalability.
+
+## Components
+
+Our authorization system consists of several key components:
+
+### 1. User Management
+- User Roles: Define access levels
+- Permissions: Granular access control
+- Role Hierarchy: Inheritance structure
+
+### 2. Resource Access
+- API Endpoints: Service access
+- Data Objects: Content access
+- Features: Functionality access
+
+### 3. Security Enforcement
+- Auth Guards: Request validation
+- Policy Engine: Access decisions
+- Audit Logging: Access monitoring
 
 ```mermaid
 graph TD
@@ -33,7 +52,7 @@ graph TD
     Policy --> Audit
 ```
 
-## Role Hierarchy
+### Role Hierarchy
 
 ```mermaid
 graph TD
@@ -43,9 +62,34 @@ graph TD
     U --> G[Guest]
 ```
 
-## Permission Model
+## Interactions
 
-### Role Definitions
+Our authorization system follows these interaction patterns:
+
+### 1. Permission Check Flow
+1. User makes request
+2. System loads user role
+3. Permission check performed
+4. Access granted/denied
+5. Action logged
+
+### 2. Role Assignment Flow
+1. Admin assigns role
+2. System validates hierarchy
+3. Permissions inherited
+4. Access updated
+5. Change logged
+
+### 3. Policy Enforcement Flow
+1. Request intercepted
+2. Policy loaded
+3. Context evaluated
+4. Decision made
+5. Result enforced
+
+## Implementation Details
+
+### 1. Role and Permission Model
 
 ```typescript
 interface Role {
@@ -59,11 +103,182 @@ interface Permission {
   action: 'create' | 'read' | 'update' | 'delete';
   conditions?: Condition[];
 }
+
+interface Condition {
+  type: 'time' | 'location' | 'ip' | 'custom';
+  value: any;
+  evaluate: (context: Context) => boolean;
+}
+
+class RoleManager {
+  private roles: Map<string, Role>;
+  
+  constructor() {
+    this.roles = new Map();
+  }
+  
+  addRole(role: Role): void {
+    // Validate role hierarchy
+    if (role.inherits) {
+      this.validateHierarchy(role);
+    }
+    
+    // Merge inherited permissions
+    const permissions = this.mergePermissions(role);
+    
+    // Store role
+    this.roles.set(role.name, {
+      ...role,
+      permissions
+    });
+  }
+  
+  private validateHierarchy(role: Role): void {
+    const visited = new Set<string>();
+    
+    const checkCycle = (r: Role) => {
+      if (visited.has(r.name)) {
+        throw new Error('Circular inheritance detected');
+      }
+      
+      visited.add(r.name);
+      r.inherits?.forEach(checkCycle);
+      visited.delete(r.name);
+    };
+    
+    checkCycle(role);
+  }
+}
 ```
 
-### Implementation
+### 2. Access Control Implementation
 
 ```typescript
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(
+    private readonly policyEngine: PolicyEngine,
+    private readonly auditLogger: AuditLogger
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    const resource = this.getResource(context);
+    const action = this.getAction(context);
+    
+    try {
+      // 1. Load policy
+      const policy = await this.policyEngine.getPolicy(resource);
+      
+      // 2. Evaluate access
+      const allowed = await policy.evaluate(user, action);
+      
+      // 3. Log attempt
+      await this.auditLogger.logAccess({
+        user,
+        resource,
+        action,
+        allowed,
+        timestamp: new Date()
+      });
+      
+      return allowed;
+    } catch (error) {
+      // Log error and deny access
+      await this.auditLogger.logError(error);
+      return false;
+    }
+  }
+}
+```
+
+### 3. Policy Engine Implementation
+
+```typescript
+class PolicyEngine {
+  private policies: Map<string, Policy>;
+  
+  constructor(private readonly roleManager: RoleManager) {
+    this.policies = new Map();
+  }
+  
+  async evaluateAccess(
+    user: User,
+    resource: string,
+    action: string
+  ): Promise<boolean> {
+    // 1. Get user's role
+    const role = await this.roleManager.getRole(user.role);
+    if (!role) return false;
+    
+    // 2. Check basic permission
+    const hasPermission = role.permissions.some(
+      p => p.resource === resource && p.action === action
+    );
+    if (!hasPermission) return false;
+    
+    // 3. Load resource policy
+    const policy = this.policies.get(resource);
+    if (!policy) return true; // No specific policy = allowed if has permission
+    
+    // 4. Evaluate conditions
+    return policy.evaluateConditions(user, action);
+  }
+  
+  async enforcePolicy(
+    context: RequestContext
+  ): Promise<PolicyResult> {
+    try {
+      // 1. Extract context
+      const { user, resource, action } = context;
+      
+      // 2. Check access
+      const allowed = await this.evaluateAccess(
+        user,
+        resource,
+        action
+      );
+      
+      // 3. Return result
+      return {
+        allowed,
+        reason: allowed ? 'GRANTED' : 'DENIED',
+        context
+      };
+    } catch (error) {
+      // Handle evaluation error
+      return {
+        allowed: false,
+        reason: 'ERROR',
+        error
+      };
+    }
+  }
+}
+```
+
+### Permission Model
+
+```typescript
+interface Role {
+  name: string;
+  permissions: Permission[];
+  inherits?: Role[];
+}
+
+interface Permission {
+  resource: string;
+  action: 'create' | 'read' | 'update' | 'delete';
+  conditions?: Condition[];
+}
+
+interface Condition {
+  type: 'time' | 'location' | 'ip' | 'custom';
+  value: any;
+  evaluate: (context: Context) => boolean;
+}
+
 // Role definition
 const userRole: Role = {
   name: 'user',
@@ -81,93 +296,35 @@ const hasPermission = (user: User, resource: string, action: Action): boolean =>
 };
 ```
 
-## Access Control Patterns
-
-### 1. Route Guards
-
-```typescript
-// Route guard
-@Injectable()
-export class AuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    return this.validateRequest(request);
-  }
-}
-```
-
-### 2. Policy Enforcement
-
-```typescript
-// Policy enforcer
-class PolicyEnforcer {
-  async enforce(user: User, resource: string, action: Action): Promise<boolean> {
-    const policy = await this.loadPolicy(resource);
-    return policy.evaluate(user, action);
-  }
-}
-```
-
-### 3. Data Filtering
-
-```typescript
-// Query filter
-const applySecurityFilter = (query: Query, user: User): Query => {
-  const role = roles.get(user.role);
-  return {
-    ...query,
-    where: {
-      ...query.where,
-      ...role.dataFilter,
-    },
-  };
-};
-```
-
-## Security Patterns
-
-### 1. Principle of Least Privilege
-
-- Assign minimal required permissions
-- Regular permission audits
-- Time-bound elevated access
-- Just-in-time access
-
-### 2. Separation of Duties
-
-- Role segregation
-- Approval workflows
-- Dual control mechanisms
-- Task separation
-
-### 3. Defense in Depth
-
-- Multiple authorization layers
-- Contextual access control
-- Resource isolation
-- Access monitoring
-
-## Best Practices
+### Best Practices
 
 1. **Role Management**
-
-   - Clear role definitions
-   - Regular role reviews
-   - Role inheritance hierarchy
-   - Role-based separation
+   - Define clear role hierarchies
+   - Implement role inheritance
+   - Regular role audits
+   - Document role changes
+   - Version role definitions
 
 2. **Permission Control**
+   - Use granular permissions
+   - Implement conditional access
+   - Regular permission reviews
+   - Audit permission changes
+   - Document access patterns
 
-   - Granular permissions
-   - Resource-based access
-   - Conditional access
-   - Permission auditing
+3. **Security Enforcement**
+   - Implement defense in depth
+   - Log all access attempts
+   - Monitor for anomalies
+   - Regular security audits
+   - Document security events
 
-3. **Security Monitoring**
-   - Access logging
-   - Anomaly detection
-   - Usage analytics
-   - Compliance reporting
+4. **Performance**
+   - Cache role definitions
+   - Optimize permission checks
+   - Monitor policy evaluation
+   - Handle high concurrency
+   - Document bottlenecks
 
 ## Related Documentation
 

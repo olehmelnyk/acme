@@ -1,5 +1,72 @@
 # Event Sourcing Architecture
 
+## Overview
+
+The Event Sourcing Architecture provides a robust system for capturing, storing, and processing all state changes as a sequence of events. This architecture implements event-driven patterns to maintain a complete history of all domain changes while enabling powerful querying and auditing capabilities.
+
+Key Features:
+- Event-driven state management
+- Complete audit history
+- Temporal querying
+- Event replay capability
+- State reconstruction
+
+Benefits:
+- Data consistency
+- Audit compliance
+- System debugging
+- Time travel queries
+- Event replay
+
+## Interactions
+
+The event sourcing system follows these key workflows:
+
+1. Command Processing Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Command
+    participant Domain
+    participant EventStore
+    
+    Client->>Command: Submit Command
+    Command->>Domain: Validate Command
+    Domain->>EventStore: Generate Events
+    EventStore->>Domain: Store Events
+    Domain-->>Client: Command Result
+```
+
+2. Event Processing Flow
+```mermaid
+sequenceDiagram
+    participant EventStore
+    participant Processor
+    participant Handler
+    participant ReadModel
+    
+    EventStore->>Processor: Publish Event
+    Processor->>Handler: Route Event
+    Handler->>ReadModel: Update State
+    ReadModel-->>Handler: Confirm Update
+```
+
+3. State Reconstruction Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant EventStore
+    participant Snapshot
+    participant State
+    
+    Client->>EventStore: Request State
+    EventStore->>Snapshot: Load Snapshot
+    EventStore->>State: Apply Events
+    State-->>Client: Current State
+```
+
+# Event Sourcing Diagram
+
 This diagram illustrates our event sourcing architecture, including command handling, event processing, and read model updates.
 
 ```mermaid

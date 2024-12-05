@@ -1,8 +1,38 @@
 # Component Library Architecture
 
-This diagram illustrates our component library architecture using shadcn/ui and Atomic Design principles, showing how components are organized and composed.
+## Overview
 
-## Component Architecture Diagram
+This document outlines our component library architecture, which is built using shadcn/ui and follows Atomic Design principles. The architecture is designed to create a scalable, maintainable, and consistent component ecosystem that supports rapid development while maintaining high quality and reusability.
+
+## Components
+
+Our component library consists of several key layers and systems:
+
+### Atomic Design Hierarchy
+
+1. **Atoms**
+   - Basic UI elements
+   - Pure presentational
+   - Highly reusable
+   - Style foundation
+
+2. **Molecules**
+   - Composed of atoms
+   - Simple combinations
+   - Specific functionality
+   - Reusable patterns
+
+3. **Organisms**
+   - Complex components
+   - Business-specific
+   - Composed of molecules
+   - Feature-complete units
+
+4. **Templates**
+   - Page layouts
+   - Component composition
+   - Content structure
+   - Layout patterns
 
 ```mermaid
 graph TB
@@ -78,48 +108,101 @@ graph TB
     Templates --> StyleGuide
 ```
 
-## Component Description
+## Interactions
 
-### Atomic Design Levels
+Our component library follows these interaction patterns:
 
-1. **Atoms**
+1. **Component Composition Flow**
+   - Atoms combine to form Molecules
+   - Molecules combine to form Organisms
+   - Organisms arrange into Templates
+   - Templates implement specific Pages
 
-   - Basic UI elements
-   - Pure presentational
-   - Highly reusable
-   - Style foundation
+2. **Theme System Integration**
+   - Design tokens define base values
+   - Theme system applies consistent styling
+   - Components inherit theme properties
+   - Runtime theme switching supported
 
-2. **Molecules**
+3. **Development Workflow**
+   - Components developed in isolation
+   - Storybook for development/testing
+   - Automated testing via Testing Library
+   - Documentation via Style Guide
 
-   - Composed of atoms
-   - Simple combinations
-   - Specific functionality
-   - Reusable patterns
+## Implementation Details
 
-3. **Organisms**
+### 1. Component Structure
 
-   - Complex components
-   - Business logic
-   - Feature-specific
-   - Layout patterns
+```typescript
+// Basic component structure
+interface ButtonProps {
+  variant: 'primary' | 'secondary';
+  size: 'sm' | 'md' | 'lg';
+  children: React.ReactNode;
+}
 
-4. **Templates**
-   - Page structures
-   - Layout systems
-   - Component composition
-   - User flows
+const Button = ({ variant, size, children }: ButtonProps) => {
+  return (
+    <button className={cn(styles[variant], styles[size])}>
+      {children}
+    </button>
+  );
+};
+```
 
-### Infrastructure
+### 2. Theme Implementation
 
-- **Theme System**: Design system implementation
-- **Style System**: CSS/styling architecture
-- **Design Tokens**: Visual variables
+```typescript
+// Theme configuration
+const theme = {
+  colors: {
+    primary: {
+      main: 'var(--color-primary)',
+      light: 'var(--color-primary-light)',
+      dark: 'var(--color-primary-dark)',
+    },
+    // ... other color definitions
+  },
+  spacing: {
+    sm: 'var(--spacing-sm)',
+    md: 'var(--spacing-md)',
+    lg: 'var(--spacing-lg)',
+  },
+};
+```
 
-### Tools
+### 3. Testing Strategy
 
-- **Storybook**: Component development
-- **Testing Library**: Component testing
-- **Style Guide**: Documentation
+```typescript
+// Component test example
+describe('Button', () => {
+  it('renders with correct variant', () => {
+    render(<Button variant="primary">Click me</Button>);
+    expect(screen.getByRole('button')).toHaveClass('primary');
+  });
+});
+```
+
+### Best Practices
+
+1. **Component Development**
+   - Follow single responsibility principle
+   - Implement proper prop typing
+   - Include accessibility features
+   - Write comprehensive tests
+
+2. **Documentation**
+   - Document all props and variants
+   - Include usage examples
+   - Provide accessibility guidelines
+   - Keep documentation up-to-date
+
+3. **Performance**
+   - Implement proper memoization
+   - Optimize bundle size
+   - Use lazy loading where appropriate
+   - Monitor performance metrics
 
 ## Implementation Guidelines
 
