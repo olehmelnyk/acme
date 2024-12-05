@@ -1,5 +1,7 @@
 # Quality and Security Guidelines
 
+> **Note**: For detailed security documentation, including automated tools, application security, and reporting procedures, see our [Security Documentation](security/readme.md).
+
 ## Overview
 
 This document outlines our comprehensive approach to code quality, security, and monitoring across the entire application.
@@ -23,6 +25,7 @@ const env = envSchema.parse(process.env);
 ### Security Scanning
 
 1. **Snyk Integration**
+
    ```json
    // .snyk
    {
@@ -37,13 +40,14 @@ const env = envSchema.parse(process.env);
    ```
 
 2. **Dependency Updates**
+
    ```bash
    # Check for updates and security issues
    bun update
-   
+
    # Update specific package
    bun update package-name
-   
+
    # Additional security scanning
    bunx snyk test
    ```
@@ -60,13 +64,14 @@ const env = envSchema.parse(process.env);
        numberOfRuns: 3
      assert:
        assertions:
-         "first-contentful-paint": ["warn", {"minScore": 0.8}]
-         "interactive": ["error", {"minScore": 0.8}]
+         'first-contentful-paint': ['warn', { 'minScore': 0.8 }]
+         'interactive': ['error', { 'minScore': 0.8 }]
    ```
 
 ### Accessibility Compliance
 
 1. **Automated Checks**
+
    ```typescript
    // Example axe-core integration
    import { axe } from 'jest-axe';
@@ -90,12 +95,13 @@ const env = envSchema.parse(process.env);
 ### Internationalization (i18n)
 
 1. **Translation Coverage**
+
    ```typescript
    // i18n validation script
    const validateTranslations = () => {
      const baseTranslations = require('./en.json');
      const otherLocales = ['es', 'fr', 'de'];
-     
+
      for (const locale of otherLocales) {
        const translations = require(`./${locale}.json`);
        validateKeys(baseTranslations, translations);
@@ -106,6 +112,7 @@ const env = envSchema.parse(process.env);
 ### Code Quality Tools
 
 1. **SonarLint/SonarQube**
+
    ```json
    // sonar-project.properties
    sonar.projectKey=my-project
@@ -115,14 +122,11 @@ const env = envSchema.parse(process.env);
    ```
 
 2. **ESLint Configuration**
+
    ```javascript
    // .eslintrc.js
    module.exports = {
-     extends: [
-       'next/core-web-vitals',
-       'plugin:@typescript-eslint/recommended',
-       'plugin:sonarjs/recommended',
-     ],
+     extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended', 'plugin:sonarjs/recommended'],
      plugins: ['sonarjs'],
      rules: {
        'sonarjs/cognitive-complexity': ['error', 15],
@@ -146,6 +150,7 @@ const env = envSchema.parse(process.env);
 ### Documentation Quality
 
 1. **Documentation Linting**
+
    ```json
    // markdownlint config
    {
@@ -156,6 +161,7 @@ const env = envSchema.parse(process.env);
    ```
 
 2. **API Documentation**
+
    ```typescript
    // Example OpenAPI validation
    import { OpenAPIValidator } from 'express-openapi-validator';
@@ -183,23 +189,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: oven-sh/setup-bun@v1
-      
+
       - name: Security Scan
         run: |
           bun update
           bunx snyk test
-          
+
       - name: Lint
         run: |
           bun lint
           bun run prettier:check
-          
+
       - name: Test
         run: bun test:coverage
-        
+
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
-        
+
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@v3
 ```
@@ -207,6 +213,7 @@ jobs:
 ## Best Practices
 
 ### Security
+
 1. Regular security audits
 2. Dependency updates
 3. Secret scanning
@@ -214,6 +221,7 @@ jobs:
 5. Input validation
 
 ### Quality
+
 1. Code review guidelines
 2. Documentation standards
 3. Testing requirements
@@ -221,6 +229,7 @@ jobs:
 5. Accessibility compliance
 
 ### Monitoring
+
 1. Error tracking
 2. Performance metrics
 3. Security alerts
@@ -230,6 +239,7 @@ jobs:
 ## Tools and Services
 
 ### Quality Tools
+
 - SonarLint (VS Code extension)
 - SonarQube
 - ESLint
@@ -237,18 +247,21 @@ jobs:
 - CodeRabbit.ai
 
 ### Security Tools
+
 - Snyk
 - Bun audit
 - OWASP ZAP
 - GitHub Security
 
 ### Performance Tools
+
 - Lighthouse
 - WebPageTest
 - Chrome DevTools
 - React Profiler
 
 ### Monitoring Tools
+
 - Sentry
 - Datadog
 - Prometheus

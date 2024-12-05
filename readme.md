@@ -118,6 +118,19 @@ Might be extended to have more specific features like:
 └── /tmp                 # Temporary files and drafts
 ```
 
+## Security
+
+This project implements comprehensive security measures:
+
+### Automated Security Tools
+
+- **Dependabot**: Automated dependency updates and security patches
+- **CodeQL Analysis**: Continuous code scanning for vulnerabilities
+- **Security Headers**: Robust HTTP security headers implementation
+- **Rate Limiting**: API protection against abuse
+
+For detailed security information and vulnerability reporting guidelines, see our [security policy](.github/security.md).
+
 ## Template System
 
 ### UI Component Template
