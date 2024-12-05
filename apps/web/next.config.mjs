@@ -9,6 +9,16 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  // Remove the static export since we want a server-rendered app
+  distDir: 'artifacts/apps/web/.next',
+  // Ensure Next.js uses the correct base path
+  basePath: '',
+  // Disable image optimization since we're using static export
+  images: {
+    unoptimized: true,
+  },
+  // Enable React strict mode for better development
+  reactStrictMode: true,
 };
 
 const plugins = [

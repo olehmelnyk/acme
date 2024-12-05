@@ -9,15 +9,16 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "artifacts/apps/web",
-        "root": "apps/web"
+        "outputPath": "artifacts/apps/web/.next",
+        "root": "apps/web",
+        "configFile": "apps/web/next.config.mjs"
       },
       "configurations": {
         "development": {
-          "outputPath": "artifacts/apps/web/dev"
+          "outputPath": "artifacts/apps/web/.next/dev"
         },
         "production": {
-          "outputPath": "artifacts/apps/web/prod"
+          "outputPath": "artifacts/apps/web/.next/prod"
         }
       }
     },
