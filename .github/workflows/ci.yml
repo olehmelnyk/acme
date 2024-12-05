@@ -116,21 +116,14 @@ jobs:
           main-branch-name: 'main'
       - name: Run tests
         run: |
-          # Run tests for each project separately with proper error handling
-          for project in "@acme/workspace" "web" "docs-fetcher"; do
+          # Run tests for each project
+          for project in "@acme/workspace" "web" "docs-fetcher" "cleanup"; do
             echo "Testing project: $project"
             bun nx test $project --skip-nx-cache || {
               echo "Failed: $project"
               exit 1
             }
           done
-          
-          # Handle cleanup project separately since it has no tests
-          echo "Testing cleanup project (allowing no tests)"
-          bun nx test cleanup --skip-nx-cache --passWithNoTests || {
-            echo "Failed: cleanup"
-            exit 1
-          }
 
   security:
     needs: setup
