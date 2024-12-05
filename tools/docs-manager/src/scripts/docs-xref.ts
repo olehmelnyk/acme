@@ -16,13 +16,23 @@ interface ValidationResult {
 }
 
 async function findMarkdownFiles(root: string): Promise<string[]> {
-  const files = await glob('**/*.md', { 
-    cwd: root,
-    ignore: ['**/node_modules/**', '**/dist/**'],
-    absolute: true,
-    nodir: true
-  });
-  return files;
+  console.log('Searching in root:', root);
+  try {
+    const pattern = '**/*.md';
+    const options = {
+      cwd: root,
+      ignore: ['**/node_modules/**', '**/dist/**', '**/artifacts/**'],
+      absolute: true,
+      nodir: true,
+      withFileTypes: false
+    };
+    
+    const matches = await glob(pattern, options);
+    return Array.isArray(matches) ? matches.map(match => match.toString()) : [];
+  } catch (error) {
+    console.error('Error finding markdown files:', error);
+    return [];
+  }
 }
 
 function extractCrossReferences(file: string): XRef[] {
