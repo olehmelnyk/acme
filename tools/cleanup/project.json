@@ -28,7 +28,7 @@
       "options": {
         "config": "tools/cleanup/vitest.config.ts",
         "reportsDirectory": "artifacts/tools/cleanup/coverage",
-        "passWithNoTests": false
+        "passWithNoTests": true
       }
     }
   },

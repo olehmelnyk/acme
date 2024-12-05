@@ -115,7 +115,22 @@ jobs:
         with:
           main-branch-name: 'main'
       - name: Run tests
-        run: bun nx affected -t test --skip-nx-cache
+        run: |
+          # Run tests with verbose output and continue on error
+          bun nx affected -t test --skip-nx-cache --verbose || {
+            echo "Tests failed. Checking individual projects..."
+            
+            # List affected projects
+            AFFECTED_PROJECTS=$(bun nx print-affected --select=projects --base=$NX_BASE --head=$NX_HEAD)
+            
+            # Run tests for each project individually to get better error output
+            for project in $AFFECTED_PROJECTS; do
+              echo "Testing project: $project"
+              bun nx test $project --skip-nx-cache || echo "Failed: $project"
+            done
+            
+            exit 1
+          }
 
   security:
     needs: setup
