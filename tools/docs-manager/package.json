@@ -6,9 +6,9 @@
   "scripts": {
     "build": "tsc",
     "test": "bun test",
-    "format": "bun src/cli/format-docs.ts",
-    "format:check": "bun src/cli/format-docs.ts --dry-run",
-    "format:fix": "bun src/cli/format-docs.ts",
+    "format": "bun src/cli/format-docs.ts format --dir ../../",
+    "format:check": "bun src/cli/format-docs.ts format --dry-run --dir ../../",
+    "format:fix": "bun src/cli/format-docs.ts format --dir ../../",
     "xref": "bun src/scripts/docs-xref.ts",
     "xref:check": "bun src/scripts/docs-xref.ts --check",
     "cleanup": "bun src/cli/cleanup.ts",

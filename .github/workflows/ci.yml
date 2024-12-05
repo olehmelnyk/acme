@@ -224,3 +224,26 @@ jobs:
         run: bun playwright install --with-deps
       - name: Run E2E tests
         run: bun nx affected -t e2e --skip-nx-cache
+
+  docs:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.0.14
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+      - name: Validate documentation formatting
+        run: bun run docs:format:check format --dry-run
+      - name: Check documentation cross-references
+        run: bun run docs:xref --check
