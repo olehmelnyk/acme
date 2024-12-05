@@ -4,7 +4,7 @@ interface FontOptions {
   weight?: string[] | string;
 }
 
-export function Inter(options: FontOptions) {
+export function Inter(_options: FontOptions) {
   return {
     className: 'inter',
     style: {

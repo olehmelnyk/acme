@@ -1,0 +1,99 @@
+name: Validate Architecture Documentation
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - 'docs/architecture/**'
+      - '.github/workflows/validate-docs.yml'
+      - 'tools/docs-manager/**'
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd tools/docs-manager && bun install
+
+      - name: Check formatting
+        run: |
+          cd tools/docs-manager
+          bun run format:check
+
+      - name: Validate diagrams
+        run: npm run docs:validate
+
+      - name: Generate cross-references
+        run: npm run docs:xref
+
+      - name: Generate diagram index
+        run: npm run docs:index
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Create PR comment
+        if: steps.git-checkartifactss.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read the git diff
+            const diff = require('child_process')
+              .execSync('git diff')
+              .toString();
+
+            const body = `
+            ## Documentation Validation Results
+
+            The documentation validation process has detected necessary updates to maintain consistency:
+
+            <details>
+            <summary>View Changes</summary>
+
+            \`\`\`diff
+            ${diff}
+            \`\`\`
+
+            </details>
+
+            Please run the following commands locally and commit the changes:
+            1. \`npm run docs:maintain\`
+            2. \`cd tools/docs-manager && bun run format\`
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body
+            });
+
+      - name: Fail if changes needed
+        if: steps.git-checkartifactss.changes == 'true'
+        run: |
+          echo "Documentation updates needed. Please run the following commands locally and commit the changes:"
+          echo "1. npm run docs:maintain"
+          echo "2. cd tools/docs-manager && bun run format"
+          exit 1

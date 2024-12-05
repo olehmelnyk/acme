@@ -3,29 +3,36 @@
 ## Table of Contents
 
 ### Getting Started
-- [Contributing Guidelines](/CONTRIBUTING.md)
-- [Code of Conduct](/CODE_OF_CONDUCT.md)
-- [Security Policy](/SECURITY.md)
+
+- [Contributing Guidelines](../CONTRIBUTING.md)
+- [Code of Conduct](../CODE_OF_CONDUCT.md)
+- [Security Policy](../SECURITY.md)
 
 ### Architecture
-- [Overview](architecture/OVERVIEW.md)
-- [UI Layer](architecture/UI_LAYER.md)
-- [Data Access Layer](architecture/DAL_LAYER.md)
-- [Business Logic Layer](architecture/BL_LAYER.md)
-- [Database Architecture](architecture/DATABASE.md)
-- [API Patterns](architecture/API_PATTERNS.md)
-- [Architecture Diagrams](architecture/DIAGRAMS.md)
+
+- [Overview](./architecture/OVERVIEW.md)
+- [UI Layer](./architecture/UI_LAYER.md)
+- [Data Access Layer](./architecture/DAL_LAYER.md)
+- [Business Logic Layer](./architecture/BL_LAYER.md)
+- [Database Architecture](./architecture/DATABASE.md)
+- [API Patterns](./architecture/API_PATTERNS.md)
+- [Architecture Diagrams](./architecture/DIAGRAMS.md)
 
 ### Development
-- [Quality and Security](QUALITY_AND_SECURITY.md)
-- [Logging and Monitoring](LOGGING_AND_MONITORING.md)
-- [Testing Strategy](architecture/TESTING.md)
-- [Automation](AUTOMATION.md)
+
+- [Development Guidelines](./architecture/DEVELOPMENT.md)
+- [Quality and Security](./architecture/QUALITY_AND_SECURITY.md)
+- [Logging and Monitoring](./architecture/LOGGING_AND_MONITORING.md)
+- [Testing Strategy](./architecture/TESTING.md)
+- [Automation](./architecture/AUTOMATION.md)
+- [AI Integration](./architecture/AI_INSTRUCTIONS.md)
 
 ### AI Development
-- [AI Instructions](AI_INSTRUCTIONS.md)
+
+- [AI Instructions](./architecture/AI_INSTRUCTIONS.md)
 
 ### Testing
+
 1. [Testing Strategy](./architecture/TESTING.md)
    - Unit Testing (Vitest)
    - Component Testing
@@ -36,7 +43,8 @@
    - Mock Data Strategy
 
 ### Quality & Security
-1. [Quality and Security](./QUALITY_AND_SECURITY.md)
+
+1. [Quality and Security Guidelines](./architecture/QUALITY_AND_SECURITY.md)
    - Code Quality Tools
    - Security Scanning
    - Performance Monitoring
@@ -44,7 +52,8 @@
    - Documentation Quality
 
 ### Monitoring
-1. [Logging and Monitoring](./LOGGING_AND_MONITORING.md)
+
+1. [Logging and Monitoring](./architecture/LOGGING_AND_MONITORING.md)
    - Logging Strategy (Pino)
    - Application Monitoring
    - Performance Monitoring
@@ -54,16 +63,18 @@
 ## Quick Links
 
 ### Common Tasks
-- Setting up development environment: [Contributing Guide](/CONTRIBUTING.md#development-setup)
-- Running tests: [Testing Strategy](architecture/TESTING.md#running-tests)
-- Code quality checks: [Quality Guidelines](QUALITY_AND_SECURITY.md#quality-assurance)
-- Database migrations: [Database Guide](architecture/DATABASE.md#migrations)
+
+- Setting up development environment: [Contributing Guide](../CONTRIBUTING.md#development-setup)
+- Running tests: [Testing Strategy](./architecture/TESTING.md#running-tests)
+- Code quality checks: [Quality Guidelines](./architecture/QUALITY_AND_SECURITY.md#quality-assurance)
+- Database migrations: [Database Guide](./architecture/DATABASE.md#migrations)
 
 ### Key Concepts
-- [Feature-Sliced Design](architecture/OVERVIEW.md#architectural-style)
-- [Testing Pyramid](architecture/TESTING.md#testing-pyramid)
-- [API Design Principles](architecture/API_PATTERNS.md#design-principles)
-- [Security Best Practices](QUALITY_AND_SECURITY.md#security-best-practices)
+
+- [Feature-Sliced Design](./architecture/OVERVIEW.md#architectural-style)
+- [Testing Pyramid](./architecture/TESTING.md#testing-pyramid)
+- [API Design Principles](./architecture/API_PATTERNS.md#design-principles)
+- [Security Best Practices](./architecture/QUALITY_AND_SECURITY.md#security-best-practices)
 
 ## Documentation Structure
 
@@ -108,6 +119,7 @@
 ## Documentation Types
 
 ### 1. Architecture Documentation
+
 - System overview and design principles
 - Component interactions and dependencies
 - Data flow and state management
@@ -116,6 +128,7 @@
 - Scalability strategies
 
 ### 2. Development Documentation
+
 - Development environment setup
 - Coding standards and best practices
 - Git workflow and branching strategy
@@ -124,6 +137,7 @@
 - Performance optimization
 
 ### 3. API Documentation
+
 - API endpoints and methods
 - Request/response formats
 - Authentication and authorization
@@ -132,6 +146,7 @@
 - API versioning
 
 ### 4. Testing Documentation
+
 - Testing strategy and approach
 - Unit testing guidelines
 - Integration testing
@@ -140,6 +155,7 @@
 - Security testing
 
 ### 5. Deployment Documentation
+
 - Deployment process and environments
 - Configuration management
 - Monitoring and logging
@@ -148,6 +164,7 @@
 - Incident response
 
 ### 6. Security Documentation
+
 - Security policies and procedures
 - Authentication and authorization
 - Data protection
@@ -158,12 +175,14 @@
 ## Maintenance
 
 1. **Regular Updates**
+
    - Documentation should be updated with code changes
    - Regular reviews for accuracy
    - Version control for documentation
    - Deprecation notices when needed
 
 2. **Review Process**
+
    - Documentation changes require review
    - Technical accuracy verification
    - Clarity and completeness check
@@ -178,12 +197,14 @@
 ## Contributing
 
 1. **Adding New Documentation**
+
    - Follow the established structure
    - Use markdown formatting
    - Include examples where appropriate
    - Add to table of contents
 
 2. **Updating Existing Documentation**
+
    - Maintain original structure
    - Update all affected sections
    - Verify all links and references
@@ -198,12 +219,14 @@
 ## Tools and Resources
 
 1. **Documentation Tools**
+
    - Markdown editors
    - Diagram tools
    - API documentation generators
    - Screenshot tools
 
 2. **Style Guides**
+
    - Markdown style guide
    - API documentation style guide
    - Code documentation style guide

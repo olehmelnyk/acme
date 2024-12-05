@@ -1,0 +1,16 @@
+{
+  "paths": {
+    "diagramsRoot": "docs/architecture/diagrams",
+    "backupDir": ".diagrams-backup"
+  },
+  "maintenance": {
+    "maxBackupAge": "30d",
+    "compressionEnabled": true,
+    "retainCount": 5
+  },
+  "scheduling": {
+    "enabled": true,
+    "interval": "24h",
+    "timeOfDay": "02:00"
+  }
+}

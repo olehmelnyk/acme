@@ -1,13 +1,14 @@
 # [name] Feature
 
 ## Overview
+
 Brief description of the feature and its purpose.
 
 ## Documentation
 
 - [Requirements](./docs/REQUIREMENTS.md)
 - [Technical Specification](./docs/TECHNICAL.md)
-- [Testing Strategy](./docs/TESTING.md)
+- [Testing Strategy](../../../docs/architecture/TESTING.md)
 
 ## Design Assets
 

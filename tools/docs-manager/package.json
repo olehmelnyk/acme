@@ -1,0 +1,33 @@
+{
+  "name": "@acme/docs-manager",
+  "version": "1.0.0",
+  "description": "Documentation management tools for Nx monorepo",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "bun test",
+    "format": "bun src/cli/format-docs.ts",
+    "format:check": "bun src/cli/format-docs.ts --dry-run",
+    "format:fix": "bun src/cli/format-docs.ts",
+    "xref": "bun src/scripts/docs-xref.ts",
+    "xref:check": "bun src/scripts/docs-xref.ts --check",
+    "cleanup": "bun src/cli/cleanup.ts",
+    "cleanup:all": "bun src/cli/cleanup.ts --all"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "bin": {
+    "docs-format": "./dist/cli/format-docs.js",
+    "docs-xref": "./dist/scripts/docs-xref.js",
+    "docs-cleanup": "./dist/cli/cleanup.js"
+  }
+}

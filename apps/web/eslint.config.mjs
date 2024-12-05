@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 export default [
   ...baseConfig,
   {
-    files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
+    files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx', '__mocks__/**/*.ts', '__mocks__/**/*.js'],
     parserOptions: {
       project: [resolve(__dirname, './tsconfig.json')]
     },

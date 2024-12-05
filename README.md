@@ -323,12 +323,53 @@ These commands will:
    - Automation tools
    - Workflow management
 
+## Documentation
+
+- [Architecture Overview](docs/architecture/DIAGRAMS.md) - System architecture and design documentation
+- [Development Guidelines](docs/architecture/DEVELOPMENT.md) - Coding standards and practices
+- [API Documentation](docs/architecture/API.md) - API endpoints and usage
+- [Testing Strategy](docs/architecture/TESTING.md) - Testing approach and guidelines
+
+## New Tools and Scripts
+
+### Package Management
+
+The project uses Bun as the package manager. Here are the key commands:
+
+```bash
+# Install dependencies in all packages
+bun run install:all
+
+# Clean up dependencies and artifacts
+bun run clean:all            # Clean with confirmation
+bun run clean:all --force    # Clean without confirmation
+bun run clean:all --dry-run  # Show what would be cleaned
+```
+
+### Documentation Management
+
+We use a custom docs-manager tool to maintain documentation:
+
+```bash
+# Format documentation
+bun run docs:format        # Format with preview
+bun run docs:format:check  # Check formatting
+bun run docs:format:fix    # Fix formatting issues
+bun run docs:maintain      # Run all documentation maintenance tasks
+```
+
+These tools are located in the `/tools` directory:
+
+- `cleanup` - Manages project cleanup (dependencies, artifacts, etc.)
+- `docs-manager` - Handles documentation formatting and maintenance
+- `docs-fetcher` - Fetches and processes documentation
+
 ## Build Output Structure
 
-All build outputs, test results, and generated files are organized under the `.output` directory in the root:
+All build outputs, test results, and generated files are organized under the `artifacts` directory in the root:
 
 ```
-.output/
+artifacts/
 ├── apps/
 │   ├── web/
 │   │   ├── dist/           # Production build
@@ -346,6 +387,7 @@ All build outputs, test results, and generated files are organized under the `.o
 ```
 
 This structure ensures:
+
 - All generated files are in one centralized location
 - Clear separation between different types of outputs
 - Easy cleanup of all generated files
@@ -366,7 +408,8 @@ bun run cleanup --reinstall
 ```
 
 The cleanup script handles:
-- Build outputs (`.output` directory)
+
+- Build outputs (`artifacts` directory)
 - Build caches (`.next`, `dist`, etc.)
 - Test coverage directories
 - Node modules and package manager files
@@ -421,7 +464,7 @@ Describe how to use the project here.
 
 ## Contributing
 
-Please read our [Contributing Guidelines](./docs/CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes.
 
 ## License
 

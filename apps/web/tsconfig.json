@@ -16,26 +16,21 @@
         "name": "next"
       }
     ],
-    "types": ["node", "vitest/globals"],
+    "types": ["node", "bun-types", "vitest/globals"],
     "paths": {
       "@/*": ["./*"]
     },
     "baseUrl": "."
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
-    "../../dist/apps/web/.next/types/**/*.ts"
+    "next-env.d.ts",
+    "types/**/*.d.ts",
+    "../../artifacts/apps/web/prod/.next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "jest.config.ts",
-    ".next",
-    ".storybook",
-    "coverage"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -1,31 +1,23 @@
+import { logger } from './logger';
+
 /**
  * Manages URL normalization and validation
  */
 export class UrlManager {
   private baseUrl: string;
   private allowedDomains: string[];
-  private startPaths: string[];
   private visitedUrls: Set<string> = new Set();
   private urlQueue: string[] = [];
-  private readonly urlPattern = /^(https?:\/\/[^\/]+)(\/[^?#]*)?(\?[^#]*)?(#.*)?$/;
-  private sectionOrder: Map<string, number> = new Map();
-  private pageOrder: Map<string, Map<string, number>> = new Map();
-  private currentSectionNumber = 1;
+  private maxDepth: number;
 
-  constructor(baseUrl: string, config?: { allowedDomains?: string[]; startPaths?: string[] }) {
+  constructor(baseUrl: string, config?: { allowedDomains?: string[]; maxDepth?: number }) {
     this.baseUrl = this.normalizeUrl(baseUrl);
     const domain = new URL(this.baseUrl).hostname;
     this.allowedDomains = config?.allowedDomains || [domain];
-    this.startPaths = config?.startPaths || ['/'];
+    this.maxDepth = config?.maxDepth || 15;
 
-    // Initialize queue with start paths
-    this.startPaths.forEach(path => {
-      const url = new URL(path, this.baseUrl).toString();
-      this.addToQueue(url);
-    });
-
-    // Initialize page order maps
-    this.pageOrder = new Map();
+    // Add base URL to queue
+    this.addToQueue(this.baseUrl);
   }
 
   normalizeUrl(url: string): string {
@@ -45,143 +37,110 @@ export class UrlManager {
       }
       return normalized;
     } catch {
-      console.warn(`Invalid URL: ${url}`);
+      logger.warn(`Invalid URL: ${url}`);
       return '';
     }
   }
 
-  isAllowedDomain(url: string): boolean {
+  urlToFilename(url: string): string {
     try {
-      const hostname = new URL(url).hostname;
+      const parsedUrl = new URL(url);
+      let pathname = parsedUrl.pathname;
+      
+      // Handle root path
+      if (pathname === '/' || pathname === '') {
+        return 'index.html';
+      }
+
+      // Remove leading and trailing slashes
+      pathname = pathname.replace(/^\/|\/$/g, '');
+
+      // Replace special characters with hyphens
+      let filename = pathname
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-');
+
+      // Handle file extension
+      if (!filename.endsWith('.html')) {
+        filename = `${filename}.html`;
+      }
+
+      // Ensure valid filename
+      return filename;
+    } catch (error) {
+      logger.warn(`Error converting URL to filename: ${url}`, error);
+      return 'unknown.html';
+    }
+  }
+
+  private isValidUrl(url: string): boolean {
+    try {
+      const parsedUrl = new URL(url);
       return this.allowedDomains.some(domain => 
-        hostname === domain || hostname.endsWith(`.${domain}`)
+        parsedUrl.hostname === domain || parsedUrl.hostname.endsWith(`.${domain}`)
       );
     } catch {
       return false;
     }
   }
 
-  isDocumentationPath(url: string): boolean {
-    try {
-      const parsedUrl = new URL(url);
-      const path = parsedUrl.pathname;
-      
-      // Skip obvious non-documentation paths
-      if (/\.(png|jpg|jpeg|gif|svg|ico|css|js|json|woff|woff2|ttf|eot)$/.test(path)) {
-        return false;
-      }
-      
-      // Skip common non-documentation paths
-      const skipPaths = ['/blog', '/news', '/community', '/download', '/changelog'];
-      if (skipPaths.some(skip => path.startsWith(skip))) {
-        return false;
-      }
-      
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   addToQueue(url: string): void {
-    const normalized = this.normalizeUrl(url);
+    const normalizedUrl = this.normalizeUrl(url);
     if (
-      normalized &&
-      !this.visitedUrls.has(normalized) &&
-      !this.urlQueue.includes(normalized) &&
-      this.isAllowedDomain(normalized) &&
-      this.isDocumentationPath(normalized)
+      normalizedUrl &&
+      !this.visitedUrls.has(normalizedUrl) &&
+      !this.urlQueue.includes(normalizedUrl) &&
+      this.isValidUrl(normalizedUrl) &&
+      this.visitedUrls.size < this.maxDepth
     ) {
-      // Add to queue in order based on URL structure
-      const currentUrls = [...this.urlQueue];
-      
-      // Sort URLs to maintain documentation structure order
-      const sortedUrls = [...currentUrls, normalized].sort((a, b) => {
-        const pathA = this.getUrlPath(a);
-        const pathB = this.getUrlPath(b);
-        return pathA.localeCompare(pathB);
-      });
-
-      this.urlQueue.length = 0;
-      this.urlQueue.push(...sortedUrls);
+      logger.log(`Adding to queue: ${normalizedUrl}`);
+      this.urlQueue.push(normalizedUrl);
     }
-  }
-
-  markVisited(url: string): void {
-    const normalized = this.normalizeUrl(url);
-    if (normalized) {
-      this.visitedUrls.add(normalized);
-    }
-  }
-
-  getNextUrl(): string | undefined {
-    return this.urlQueue.shift();
-  }
-
-  isAllowedUrl(url: string): boolean {
-    const normalized = this.normalizeUrl(url);
-    return normalized !== '' && this.isAllowedDomain(normalized) && this.isDocumentationPath(normalized);
-  }
-
-  getUrlPath(url: string): string {
-    try {
-      const urlObj = new URL(url);
-      // Get path without query parameters or hash
-      let path = urlObj.pathname;
-      
-      // Remove trailing slashes
-      path = path.replace(/\/+$/, '');
-      
-      return path;
-    } catch {
-      console.error(`Failed to parse URL: ${url}`);
-      return '';
-    }
-  }
-
-  hasMoreUrls(): boolean {
-    return this.urlQueue.length > 0;
-  }
-
-  getVisitedCount(): number {
-    return this.visitedUrls.size;
-  }
-
-  getQueueCount(): number {
-    return this.urlQueue.length;
-  }
-
-  getSectionNumber(section: string): number {
-    if (!this.sectionOrder.has(section)) {
-      this.sectionOrder.set(section, this.currentSectionNumber++);
-      this.pageOrder.set(section, new Map());
-    }
-    return this.sectionOrder.get(section) || 1;
-  }
-
-  getPageNumber(section: string, url: string): number {
-    const sectionPages = this.pageOrder.get(section);
-    if (!sectionPages) {
-      return 1;
-    }
-
-    if (!sectionPages.has(url)) {
-      const nextNumber = sectionPages.size + 1;
-      sectionPages.set(url, nextNumber);
-    }
-
-    return sectionPages.get(url) || 1;
   }
 
   hasNext(): boolean {
     return this.urlQueue.length > 0;
   }
 
-  next(): string | undefined {
+  getNext(): string | undefined {
     const url = this.urlQueue.shift();
     if (url) {
       this.visitedUrls.add(url);
     }
     return url;
+  }
+
+  getVisitedUrls(): string[] {
+    return Array.from(this.visitedUrls);
+  }
+
+  clearQueue(): void {
+    this.urlQueue = [];
+  }
+
+  isDocumentationUrl(url: string): boolean {
+    const docPatterns = [
+      /docs?/i,
+      /documentation/i,
+      /guide/i,
+      /tutorial/i,
+      /manual/i,
+      /reference/i,
+      /api/i,
+      /readme/i,
+      /getting-started/i
+    ];
+
+    try {
+      const parsedUrl = new URL(url);
+      const pathSegments = parsedUrl.pathname.split('/').filter(Boolean);
+      
+      return docPatterns.some(pattern => 
+        pathSegments.some(segment => pattern.test(segment))
+      );
+    } catch {
+      return false;
+    }
   }
 }

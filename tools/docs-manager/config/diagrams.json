@@ -1,0 +1,36 @@
+{
+  "diagramValidation": {
+    "allowedDirections": ["TB", "BT", "RL", "LR", "TD"],
+    "maxDiagramSize": 1000,
+    "requiredSections": ["description", "components", "implementation"],
+    "styleRules": {
+      "useConsistentStyles": true,
+      "requireSubgraphTitles": true,
+      "enforceNamingConventions": true
+    }
+  },
+  "crossReferences": {
+    "maxReferences": 5,
+    "minRelevanceScore": 1,
+    "topics": {
+      "state": ["state", "store", "cache", "persistence", "zustand", "redux"],
+      "api": ["api", "rest", "graphql", "endpoint", "http", "request"],
+      "auth": [
+        "auth",
+        "authentication",
+        "authorization",
+        "permission",
+        "security"
+      ],
+      "database": [
+        "database",
+        "schema",
+        "query",
+        "model",
+        "entity",
+        "migration"
+      ],
+      "ui": ["ui", "component", "view", "page", "layout", "style"]
+    }
+  }
+}

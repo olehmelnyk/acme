@@ -4,23 +4,15 @@
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/**/test-setup.[jt]s",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/.storybook/**/*",
-      "!{projectRoot}/tsconfig.storybook.json",
-      "!{projectRoot}/eslint.config.js",
+      "!{projectRoot}/tsconfig.*.json",
       "!{projectRoot}/**/*.eslintrc.*",
       "!{projectRoot}/**/eslint.config.*"
     ],
-    "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml"
-    ]
+    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
   "nxCloudId": "6747bfc28c812b1382d5e61a",
   "targetDefaults": {
@@ -30,7 +22,7 @@
     },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "outputs": ["{workspaceRoot}/.output/{projectRoot}/coverage"],
+      "outputs": ["{workspaceRoot}/artifacts/{projectRoot}/coverage"],
       "executor": "@nx/vite:test",
       "options": {
         "passWithNoTests": true
@@ -38,16 +30,20 @@
       "cache": true
     },
     "lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/eslint.config.*"],
-      "outputs": ["{workspaceRoot}/.output/{projectRoot}/lint"]
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/eslint.config.*"
+      ],
+      "outputs": ["{projectRoot}/artifacts/lint"]
     },
     "e2e": {
       "inputs": ["default", "^production"],
-      "outputs": ["{workspaceRoot}/.output/{projectRoot}/e2e"]
+      "outputs": ["{workspaceRoot}/artifacts/{projectRoot}/e2e"]
     },
     "build-storybook": {
       "inputs": ["default", "^production", "{workspaceRoot}/.storybook/**/*"],
-      "outputs": ["{workspaceRoot}/.output/{projectRoot}/storybook"],
+      "outputs": ["{workspaceRoot}/artifacts/{projectRoot}/storybook"],
       "cache": true
     },
     "e2e-ci--**/*": {
@@ -101,6 +97,12 @@
         "serveStorybookTargetName": "storybook",
         "testStorybookTargetName": "test-storybook",
         "configFolder": ".storybook"
+      }
+    },
+    {
+      "plugin": "@nx/js",
+      "options": {
+        "lockfilePackageManager": "bun"
       }
     }
   ],

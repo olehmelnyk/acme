@@ -37,7 +37,7 @@
     "jsxImportSource": "react",
     "typeRoots": ["./node_modules/@types"],
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "playwright"]
+    "types": ["node"]
   },
   "include": [
     "apps/*/src/**/*",

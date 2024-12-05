@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as glob from 'glob';
+import { glob } from 'glob'; 
+import { logger } from './logger';
 
 export interface PackageInfo {
   name: string;
@@ -13,9 +14,6 @@ export async function findPackages(
   scanPaths: string[], 
   excludePaths: string[]
 ): Promise<PackageInfo[]> {
-  const packages: PackageInfo[] = [];
-  
-  // Ensure scan paths are relative to root
   const patterns = scanPaths.map(pattern => {
     // If pattern starts with /, make it relative to root
     if (pattern.startsWith('/')) {
@@ -25,40 +23,38 @@ export async function findPackages(
     return path.join(rootDir, pattern);
   });
   
-  console.log(`Scanning for packages in ${rootDir} with patterns:`, patterns);
+  logger.info(`Scanning for packages in ${rootDir} with patterns:`, patterns);
   
+  const allFiles: string[] = [];
   for (const pattern of patterns) {
-    const files = await new Promise<string[]>((resolve, reject) => {
-      glob.glob(pattern, {
-        ignore: excludePaths.map(p => path.join(rootDir, p)),
-        absolute: true,
-        nodir: true,
-        follow: true,
-        cwd: rootDir
-      }, (err: Error | null, matches: string[]) => {
-        if (err) reject(err);
-        else resolve(matches);
-      });
+    const files = await glob(pattern, {
+      ignore: excludePaths.map(p => path.join(rootDir, p)),
+      absolute: true,
+      nodir: true,
+      follow: true,
+      cwd: rootDir
     });
     
-    console.log(`Found ${files.length} package.json files for pattern ${pattern}`);
-    
-    for (const file of files) {
-      try {
-        console.log(`Processing ${file}...`);
-        const content = await fs.readJson(file);
-        
-        // Include the package itself if it has a name
-        if (content.name) {
-          packages.push({
-            name: content.name,
-            version: content.version || 'latest',
-            path: file
-          });
-        }
-      } catch (error) {
-        console.error(`Error processing ${file}:`, error);
+    logger.info(`Found ${files.length} package.json files for pattern ${pattern}`);
+    allFiles.push(...files);
+  }
+  
+  const packages: PackageInfo[] = [];
+  for (const file of allFiles) {
+    try {
+      logger.debug(`Processing ${file}...`);
+      const content = await fs.readJson(file);
+      
+      // Include the package itself if it has a name
+      if (content.name) {
+        packages.push({
+          name: content.name,
+          version: content.version || 'latest',
+          path: file
+        });
       }
+    } catch (error) {
+      logger.error(`Error processing ${file}:`, error);
     }
   }
   
@@ -108,19 +104,36 @@ export async function searchDocsUrl(packageName: string): Promise<string | undef
   const knownDocs: Record<string, string> = {
     'next': 'https://nextjs.org/docs',
     'react': 'https://react.dev/reference/react',
-    'vue': 'https://vuejs.org/guide/introduction.html',
-    'angular': 'https://angular.io/docs',
-    'svelte': 'https://svelte.dev/docs',
-    'typescript': 'https://www.typescriptlang.org/docs/'
+    'typescript': 'https://www.typescriptlang.org/docs/',
+    'express': 'https://expressjs.com/en/4x/api.html',
+    'chalk': 'https://github.com/chalk/chalk#readme',
+    'lodash': 'https://lodash.com/docs',
+    'axios': 'https://axios-http.com/docs/intro',
+    'vitest': 'https://vitest.dev/guide/',
+    'webpack': 'https://webpack.js.org/concepts/',
+    'vite': 'https://vitejs.dev/guide/',
+    'prisma': 'https://www.prisma.io/docs',
+    'drizzle': 'https://orm.drizzle.team/docs',
+    'tailwindcss': 'https://tailwindcss.com/docs',
+    'shadcn': 'https://ui.shadcn.com/docs',
+    'nx': 'https://nx.dev/docs',
+    'react-native': 'https://reactnative.dev/docs/getting-started',
+    'react-query': 'https://tanstack.com/query/v4/docs',
+    'zustand': 'https://zustand.docs.pmnd.rs/getting-started/introduction',
+    'expo': 'https://docs.expo.dev/',
   };
+
+  logger.info(`🔍 Searching documentation for ${packageName}...`);
 
   // Check if it's a known package
   if (knownDocs[packageName]) {
+    logger.info(`📚 Found known documentation URL for ${packageName}`);
     return knownDocs[packageName];
   }
 
   try {
     // Try npm registry first
+    logger.info(`📦 Checking npm registry for ${packageName}...`);
     const response = await fetch(`https://registry.npmjs.org/${packageName}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch package info: ${response.statusText}`);
@@ -128,51 +141,81 @@ export async function searchDocsUrl(packageName: string): Promise<string | undef
     
     const data = await response.json();
     
-    // Check various common documentation URL locations
+    // Check various common documentation URL locations in priority order
     const possibleUrls = [
+      // Direct documentation URLs
       data.homepage,
-      data.repository?.url,
+      data.documentation,
+      // Repository URLs
+      typeof data.repository === 'string' ? data.repository : data.repository?.url,
+      // README URLs
+      `https://github.com/${packageName}/${packageName}#readme`,
+      `https://github.com/${packageName.replace('@', '')}#readme`,
+      // Package website
+      `https://${packageName}.js.org`,
+      // Other possible locations
       ...(data.maintainers?.map((m: { url: string }) => m.url) || []),
       data.bugs?.url
     ].filter(Boolean);
+
+    logger.info(`🔗 Found ${possibleUrls.length} potential documentation URLs`);
     
+    // Clean up GitHub URLs
+    const cleanUrls = possibleUrls.map(url => {
+      if (typeof url !== 'string') return url;
+      return url
+        .replace('git+https://', 'https://')
+        .replace('git://', 'https://')
+        .replace('.git', '');
+    });
+
     // Try to find a documentation URL
-    for (const url of possibleUrls) {
+    for (const url of cleanUrls) {
       if (url && isValidDocsUrl(url)) {
+        logger.info(`✅ Found valid documentation URL: ${url}`);
         return url;
       }
     }
     
-    return undefined;
+    // If no valid docs URL found, default to npm package page
+    logger.info(`⚠️ No specific documentation found, using npm page`);
+    return `https://www.npmjs.com/package/${packageName}`;
   } catch (error) {
-    console.error(`Error searching docs URL for ${packageName}:`, error);
+    logger.error(`❌ Error searching docs URL for ${packageName}:`, error);
     return undefined;
   }
 }
 
 export function isValidDocsUrl(url: string): boolean {
+  if (!url) return false;
+  
   try {
-    const urlObj = new URL(url);
-    const hostname = urlObj.hostname.toLowerCase();
+    const parsedUrl = new URL(url);
     
-    // Common documentation hostnames
-    const docHosts = [
-      'docs.',
-      'documentation.',
-      'developer.',
-      'developers.',
-      'wiki.',
-      'github.io',
+    // List of known documentation domains
+    const validDomains = [
+      'github.com',
+      'npmjs.com',
+      'npmjs.org',
+      'docs.github.com',
       'githubusercontent.com',
       'readthedocs.io',
-      'gitbook.io'
+      'readthedocs.org',
+      'gitbook.io',
+      'js.org'
     ];
-    
-    // Check if URL contains documentation-related terms
-    const docTerms = ['/docs/', '/documentation/', '/wiki/', '/guide/', '/manual/'];
-    
-    return docHosts.some(host => hostname.includes(host)) ||
-           docTerms.some(term => urlObj.pathname.includes(term));
+
+    // Check if the domain or its parent domain is in the valid list
+    const domain = parsedUrl.hostname;
+    const isValidDomain = validDomains.some(valid => 
+      domain === valid || domain.endsWith(`.${valid}`)
+    );
+
+    // Allow custom documentation domains if they contain common doc paths
+    const docPaths = ['/docs', '/doc', '/documentation', '/guide', '/api', '/manual', '/reference', '/learn', '/tutorial'];
+    const hasDocPath = docPaths.some(path => parsedUrl.pathname.includes(path));
+
+    return isValidDomain || hasDocPath;
   } catch {
     return false;
   }

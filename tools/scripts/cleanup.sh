@@ -15,9 +15,9 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}Cleaning up project...${NC}"
 
 # Clean main output directory
-if [ -d ".output" ]; then
-    echo -e "${RED}Removing .output directory...${NC}"
-    rm -rf .output
+if [ -d "artifacts" ]; then
+    echo -e "${RED}Removing artifacts directory...${NC}"
+    rm -rf artifacts
 fi
 
 # Clean Next.js cache

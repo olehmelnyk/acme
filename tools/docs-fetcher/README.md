@@ -1,130 +1,171 @@
 # Documentation Fetcher
 
-A tool for automatically fetching and caching documentation from various sources. Built with TypeScript and Bun.
+A specialized tool designed to download and store up-to-date documentation locally for AI agents. Since AI models cannot directly access online documentation and their training data may be outdated, this tool ensures they have access to the latest documentation by storing it in a local project directory.
+
+## Purpose
+
+- Download and store latest package documentation locally
+- Make up-to-date documentation accessible to AI agents
+- Enable offline documentation search and access
+- Keep documentation current with periodic updates
+- Bridge the gap between AI training data and current package versions
 
 ## Features
 
-- Automatically discovers packages in your project
-- Fetches documentation from official sources
-- Maintains documentation structure and order
-- Supports multiple documentation formats and sources
-- Configurable fetching behavior per package
-- Offline access to documentation
-- Smart URL discovery and validation
-- Configurable rate limiting and retry logic
-- Clean documentation updates (removes old files)
-
-## Prerequisites
-
-- [Bun](https://bun.sh) installed
-- Node.js 18+ (for Playwright)
+- 📥 Downloads complete documentation from official sources
+- 🗂️ Organizes docs by package and version
+- 🔍 Provides efficient search capabilities for AI agents
+- 📚 Stores docs in `.gitignore`d directory for easy management
+- 🔄 Supports periodic documentation updates
+- 📋 Maintains metadata about downloaded documentation
+- 🏷️ Version tracking for documentation updates
+- 🔄 Force refresh documentation with `--force` or `-f` flag
+- Pre-installation documentation fetching
 
 ## Installation
 
 ```bash
-# Install dependencies
+cd tools/docs-fetcher
 bun install
 ```
 
 ## Usage
 
-```bash
-# Fetch documentation for a specific package
-bun run fetch <package-name>
+### Download Documentation
 
-# Options:
-#   --force        Force refresh even if already fetched
-#   --limit=<n>    Limit the number of pages to fetch (default: 15)
+```bash
+# Download docs for a specific package
+bun run cli.ts react
+
+# Download with page limit
+bun run cli.ts express --limit=20
+
+# Download docs for all packages
+bun run cli.ts --all
+
+# Force refresh (ignore cache)
+bun run cli.ts --force react
+bun run cli.ts -f --all
+
+# Get installation instructions before installing
+bun run cli.ts next --pre-install
 ```
+
+### Pre-Installation Documentation
+
+The `--pre-install` flag allows you to fetch installation instructions and documentation links before installing a package. This is useful when you want to:
+
+- Check installation requirements
+- View setup instructions
+- Find documentation resources
+- Verify package compatibility
+
+Example:
+
+```bash
+bun run cli.ts next --pre-install
+```
+
+This will:
+
+1. Fetch package information from npm
+2. Find installation instructions from README or documentation
+3. Display available documentation links
+4. Show basic installation commands
+
+### Search Documentation (for AI agents)
+
+```bash
+# Search in specific package docs
+bun run cli.ts express --search="middleware"
+
+# Search across all downloaded docs
+bun run cli.ts --all --search="routing"
+```
+
+### Cache Management
+
+```bash
+# Clear search cache
+bun run cli.ts --clear-cache
+
+# View cache statistics
+bun run cli.ts --cache-stats
+
+# Force refresh with `--force` or `-f` flag
+bun run cli.ts --force react
+bun run cli.ts -f --all
+```
+
+## Directory Structure
+
+```
+.tools/docs-fetcher/
+├── cache/                 # Documentation cache (gitignored)
+│   ├── search-cache/     # Search index cache
+│   └── [package-name]/   # Package-specific documentation
+├── src/
+│   ├── cli.ts           # Command line interface
+│   ├── index.ts         # Main fetcher logic
+│   ├── url-manager.ts   # URL handling and validation
+│   ├── directory-manager.ts  # File system operations
+│   ├── html-parser.ts   # HTML content parsing
+│   ├── search.ts        # Search functionality
+│   └── cache-manager.ts # Cache management
+├── artifacts/              # Tool output directory (gitignored)
+│   └── docs-fetcher/
+│       ├── cache/        # Documentation cache
+│       └── reports/      # Validation and analysis reports
+└── package.json         # Dependencies and scripts
+```
+
+## For AI Agents
+
+This tool is specifically designed for AI agents to:
+
+1. Access current documentation that may not be in their training data
+2. Search through documentation efficiently
+3. Extract relevant information from latest package versions
+4. Stay up-to-date with package changes and new features
+
+### How AI Agents Should Use This Tool
+
+1. **Documentation Access**:
+
+   - Use search functionality to find relevant documentation
+   - Access stored documentation files directly
+   - Parse and analyze documentation content
+
+2. **Version Awareness**:
+
+   - Check documentation metadata for version information
+   - Compare with known training data cutoff dates
+   - Identify new features or changes
+
+3. **Search Optimization**:
+   - Use specific search queries for better results
+   - Leverage cached search results for efficiency
+   - Access related documentation sections
 
 ## Configuration
 
-The tool can be configured through `fetch-config.ts`:
+The tool can be configured through environment variables or command line arguments:
 
-```typescript
-{
-  // Root directory to scan for packages
-  rootDir: string;
-  
-  // Patterns to scan for package.json files
-  scanPaths: string[];
-  
-  // Paths to exclude from scanning
-  excludePaths: string[];
-  
-  // Directory to store cached documentation
-  cacheDir: string;
-  
-  // Maximum number of pages to fetch per package
-  limit: number;
-  
-  // Maximum depth of links to follow
-  maxDepth: number;
-  
-  // Delay between requests in milliseconds
-  delay: number;
-}
-```
-
-## Documentation Structure
-
-Documentation is stored in a structured format:
-
-```
-cache/
-  package-name/
-    001-getting-started/
-      001-introduction.html
-      001-introduction.meta.json
-      002-installation.html
-      002-installation.meta.json
-    002-features/
-      001-routing.html
-      001-routing.meta.json
-```
-
-Each HTML file has an accompanying metadata file containing:
-- Original URL
-- Fetch timestamp
-- Title
-- Category
-- Path segments
-
-## Project Structure
-
-```
-docs-fetcher/
-├── index.ts           # Main entry point
-├── config.ts          # Configuration handling
-├── fetcher.ts         # Documentation fetching logic
-├── utils.ts           # Utility functions
-├── package.json       # Project dependencies
-├── tsconfig.json      # TypeScript configuration
-├── fetch-config.ts    # Fetch configuration
-└── cache/             # Cached documentation
-```
+- `CACHE_DIR`: Directory for storing documentation (default: ./artifacts/docs-fetcher/cache)
+- `MAX_PAGES`: Maximum pages to download per package
+- `UPDATE_INTERVAL`: How often to check for doc updates
+- `ALLOWED_DOMAINS`: List of allowed documentation domains
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+Feel free to contribute by:
 
-## Development
-
-```bash
-# Run tests
-bun test
-
-# Build the project
-bun run build
-
-# Format code
-bun run format
-```
+1. Adding support for new documentation sources
+2. Improving search algorithms
+3. Enhancing metadata extraction
+4. Optimizing storage and caching
+5. Adding new features for AI agents
 
 ## License
 
-MIT
+MIT License

@@ -24,7 +24,7 @@
   {
     "name": "react",
     "version": "18.3.1",
-    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "path": "/Users/ov.melnyk/acme/artifacts/apps/web/package.json",
     "fetch": true,
     "searchAttempted": true,
     "config": {}
@@ -32,7 +32,7 @@
   {
     "name": "react-dom",
     "version": "18.3.1",
-    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "path": "/Users/ov.melnyk/acme/artifacts/apps/web/package.json",
     "fetch": true,
     "searchAttempted": true,
     "config": {}
@@ -704,7 +704,7 @@
   {
     "name": "sharp",
     "version": "0.33.5",
-    "path": "/Users/ov.melnyk/acme/dist/apps/web/package.json",
+    "path": "/Users/ov.melnyk/acme/artifacts/apps/web/package.json",
     "fetch": true,
     "searchAttempted": true,
     "config": {}

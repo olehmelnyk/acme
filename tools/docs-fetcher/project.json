@@ -5,28 +5,32 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
+      "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/tools/docs-fetcher",
+        "outputPath": "artifacts/tools/docs-fetcher",
         "main": "tools/docs-fetcher/src/index.ts",
         "tsConfig": "tools/docs-fetcher/tsconfig.json",
         "assets": ["tools/docs-fetcher/*.md"],
-        "generatePackageJson": true
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "lint": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{workspaceRoot}/artifacts/tools/docs-fetcher/lint"],
       "options": {
-        "command": "bunx eslint tools/docs-fetcher/src/**/*.ts --config eslint.config.mjs"
+        "lintFilePatterns": [
+          "tools/docs-fetcher/**/*.ts",
+          "tools/docs-fetcher/**/*.mjs"
+        ]
       }
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": ["{workspaceRoot}/artifacts/tools/docs-fetcher/coverage"],
       "options": {
-        "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/tools/docs-fetcher"
+        "config": "tools/docs-fetcher/vitest.config.ts",
+        "passWithNoTests": true
       }
     }
   },

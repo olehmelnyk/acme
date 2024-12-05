@@ -5,8 +5,12 @@ dist
 tmp
 /out-tsc
 
+# Build output directories
+/output/
+/artifacts/
+
 # dependencies
-node_modules
+node_modules/
 
 # Package manager locks (only allow bun.lockb)
 package-lock.json
@@ -47,10 +51,24 @@ Thumbs.db
 .nx/cache
 .nx/workspace-data
 
+# Documentation backups and artifacts
+.diagrams-backup/
+tools/docs-manager/backups/
+cache
+
+# Test outputs
+playwright-report/
+test-results/
+coverage/
+html/
+
 # Next.js
 .next
-out
 
+# Build outputs
+.next/
+out/
+dist/
 
 storybook-static
 vite.config.*.timestamp*
