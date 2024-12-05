@@ -116,19 +116,19 @@ jobs:
           main-branch-name: 'main'
       - name: Run tests
         run: |
-          # Run tests with verbose output and continue on error
-          bun nx affected -t test --skip-nx-cache --verbose || {
-            echo "Tests failed. Checking individual projects..."
-            
-            # List affected projects
-            AFFECTED_PROJECTS=$(bun nx print-affected --select=projects --base=$NX_BASE --head=$NX_HEAD)
-            
-            # Run tests for each project individually to get better error output
-            for project in $AFFECTED_PROJECTS; do
-              echo "Testing project: $project"
-              bun nx test $project --skip-nx-cache || echo "Failed: $project"
-            done
-            
+          # Run tests for each project separately with proper error handling
+          for project in "@acme/workspace" "web" "docs-fetcher"; do
+            echo "Testing project: $project"
+            bun nx test $project --skip-nx-cache || {
+              echo "Failed: $project"
+              exit 1
+            }
+          done
+          
+          # Handle cleanup project separately since it has no tests
+          echo "Testing cleanup project (allowing no tests)"
+          bun nx test cleanup --skip-nx-cache --passWithNoTests || {
+            echo "Failed: cleanup"
             exit 1
           }
 
