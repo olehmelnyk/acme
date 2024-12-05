@@ -99,7 +99,7 @@ For detailed information about git hooks and pre-commit checks, see our [git hoo
 
 ## Reporting Security Issues
 
-For security issue reporting procedures and guidelines, see our [security policy](../../.github/security.md).
+For more information about our security policy and how to report security vulnerabilities, please see our [Security Policy](../../security.md).
 
 ## Additional Resources
 

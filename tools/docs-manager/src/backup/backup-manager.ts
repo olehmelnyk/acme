@@ -100,39 +100,26 @@ export class BackupManager {
    * Clean up old backups based on maxBackupAge configuration
    */
   async cleanupOldBackups(): Promise<void> {
-    if (!this.backupDir) {
-      await this.initialize();
-    }
-
     try {
       const maxAge = await this.config.getMaxBackupAge();
       const maxAgeMs = this.parseMaxAge(maxAge);
       const now = Date.now();
 
       const backups = await readdir(this.backupDir);
-      
       for (const backup of backups) {
+        const backupPath = join(this.backupDir, backup);
         try {
-          const backupPath = join(this.backupDir, backup);
-          const metadataPath = join(backupPath, 'backup-metadata.json');
-
-          if (!(await this.fileExists(metadataPath))) {
-            console.warn(`Skipping invalid backup: ${backup}`);
-            continue;
-          }
-
           const metadata = await this.readBackupMetadata(backupPath);
           if (now - metadata.timestamp > maxAgeMs) {
-            await rm(backupPath, { recursive: true });
+            await rm(backupPath, { recursive: true, force: true });
           }
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          console.error(`Failed to process backup ${backup}:`, errorMessage);
+          // If metadata is invalid, throw the error
+          throw new Error(`Failed to process backup ${backup}: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new Error(`Failed to cleanup old backups: ${errorMessage}`);
+      throw new Error(`Failed to cleanup old backups: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -173,19 +160,37 @@ export class BackupManager {
   }
 
   private async findDiagramFiles(root: string): Promise<string[]> {
-    const files = await readdir(root, { withFileTypes: true });
-    const diagrams: string[] = [];
+    try {
+      const files = await readdir(root, { withFileTypes: true });
+      const diagrams: string[] = [];
 
-    for (const file of files) {
-      const fullPath = join(root, file.name);
-      if (file.isDirectory()) {
-        const subDiagrams = await this.findDiagramFiles(fullPath);
-        diagrams.push(...subDiagrams);
-      } else if (file.isFile() && file.name.endsWith('.diagram')) {
-        diagrams.push(fullPath);
+      for (const file of files) {
+        const fullPath = join(root, file.name);
+        if (file.isDirectory()) {
+          const subDiagrams = await this.findDiagramFiles(fullPath);
+          diagrams.push(...subDiagrams);
+        } else if (file.isFile() && file.name.endsWith('.md')) {
+          diagrams.push(fullPath);
+        }
       }
-    }
 
-    return diagrams;
+      return diagrams;
+    } catch (error) {
+      // If directory doesn't exist, treat it as no files found
+      if (error instanceof Error && error.message.includes('ENOENT')) {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  // Add a public method to check initialization status
+  public async isInitialized(): Promise<boolean> {
+    return !!this.backupDir;
+  }
+
+  // Optional: Add a public method to force initialization for testing
+  public async forceInitialize(): Promise<void> {
+    await this.initialize();
   }
 }

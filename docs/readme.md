@@ -4,36 +4,36 @@
 
 ### Getting Started
 
-- [Contributing Guidelines](../CONTRIBUTING.md)
-- [Code of Conduct](../CODE_OF_CONDUCT.md)
-- [Security Policy](../SECURITY.md)
+- [Contributing Guidelines](../contributing.md)
+- [Code of Conduct](../code_of_conduct.md)
+- [Security Policy](../security.md)
 
 ### Architecture
 
-- [Overview](./architecture/OVERVIEW.md)
-- [UI Layer](./architecture/UI_LAYER.md)
-- [Data Access Layer](./architecture/DAL_LAYER.md)
-- [Business Logic Layer](./architecture/BL_LAYER.md)
-- [Database Architecture](./architecture/DATABASE.md)
-- [API Patterns](./architecture/API_PATTERNS.md)
-- [Architecture Diagrams](./architecture/DIAGRAMS.md)
+- [Overview](./architecture/overview.md)
+- [UI Layer](./architecture/ui_layer.md)
+- [Data Access Layer](./architecture/dal_layer.md)
+- [Business Logic Layer](./architecture/bl_layer.md)
+- [Database Architecture](./architecture/database.md)
+- [API Patterns](./architecture/api_patterns.md)
+- [Architecture Diagrams](./architecture/diagrams.md)
 
 ### Development
 
-- [Development Guidelines](./architecture/DEVELOPMENT.md)
-- [Quality and Security](./architecture/QUALITY_AND_SECURITY.md)
-- [Logging and Monitoring](./architecture/LOGGING_AND_MONITORING.md)
-- [Testing Strategy](./architecture/TESTING.md)
-- [Automation](./architecture/AUTOMATION.md)
-- [AI Integration](./architecture/AI_INSTRUCTIONS.md)
+- [Development Guidelines](./architecture/development.md)
+- [Quality and Security](./quality_and_security.md)
+- [Logging and Monitoring](./architecture/logging_and_monitoring.md)
+- [Testing Strategy](./architecture/testing.md)
+- [Automation](./architecture/automation.md)
+- [AI Integration](./architecture/ai_instructions.md)
 
 ### AI Development
 
-- [AI Instructions](./architecture/AI_INSTRUCTIONS.md)
+- [AI Instructions](./architecture/ai_instructions.md)
 
 ### Testing
 
-1. [Testing Strategy](./architecture/TESTING.md)
+1. [Testing Strategy](./architecture/testing.md)
    - Unit Testing (Vitest)
    - Component Testing
    - Integration Testing
@@ -44,7 +44,7 @@
 
 ### Quality & Security
 
-1. [Quality and Security Guidelines](./architecture/QUALITY_AND_SECURITY.md)
+1. [Quality and Security Guidelines](./quality_and_security.md)
    - Code Quality Tools
    - Security Scanning
    - Performance Monitoring
@@ -53,7 +53,7 @@
 
 ### Monitoring
 
-1. [Logging and Monitoring](./architecture/LOGGING_AND_MONITORING.md)
+1. [Logging and Monitoring](./architecture/logging_and_monitoring.md)
    - Logging Strategy (Pino)
    - Application Monitoring
    - Performance Monitoring
@@ -64,49 +64,49 @@
 
 ### Common Tasks
 
-- Setting up development environment: [Contributing Guide](../CONTRIBUTING.md#development-setup)
-- Running tests: [Testing Strategy](./architecture/TESTING.md#running-tests)
-- Code quality checks: [Quality Guidelines](./architecture/QUALITY_AND_SECURITY.md#quality-assurance)
-- Database migrations: [Database Guide](./architecture/DATABASE.md#migrations)
+- Setting up development environment: [Contributing Guide](../contributing.md#development-setup)
+- Running tests: [Testing Strategy](./architecture/testing.md#running-tests)
+- Code quality checks: [Quality Guidelines](./quality_and_security.md#quality-assurance)
+- Database migrations: [Database Guide](./architecture/database.md#migrations)
 
 ### Key Concepts
 
-- [Feature-Sliced Design](./architecture/OVERVIEW.md#architectural-style)
-- [Testing Pyramid](./architecture/TESTING.md#testing-pyramid)
-- [API Design Principles](./architecture/API_PATTERNS.md#design-principles)
-- [Security Best Practices](./architecture/QUALITY_AND_SECURITY.md#security-best-practices)
+- [Feature-Sliced Design](./architecture/overview.md#architectural-style)
+- [Testing Pyramid](./architecture/testing.md#testing-pyramid)
+- [API Design Principles](./architecture/api_patterns.md#design-principles)
+- [Security Best Practices](./quality_and_security.md#security-best-practices)
 
 ## Documentation Structure
 
 ```
 /docs
 ├── /architecture           # System Architecture
-│   ├── OVERVIEW.md        # High-level architecture overview
-│   ├── DIAGRAMS.md        # Architecture diagrams
-│   ├── API_PATTERNS.md    # API design patterns
-│   ├── STATE_MANAGEMENT.md # State management patterns
-│   └── ERROR_HANDLING.md  # Error handling strategies
+│   ├── overview.md        # High-level architecture overview
+│   ├── diagrams.md        # Architecture diagrams
+│   ├── api_patterns.md    # API design patterns
+│   ├── state_management.md # State management patterns
+│   └── error_handling.md  # Error handling strategies
 │
 ├── /development           # Development Guidelines
-│   ├── SETUP.md          # Development environment setup
-│   ├── WORKFLOW.md       # Development workflow
-│   ├── STANDARDS.md      # Coding standards
-│   └── CODE_GENERATION.md # Code generation guidelines
+│   ├── setup.md          # Development environment setup
+│   ├── workflow.md       # Development workflow
+│   ├── standards.md      # Coding standards
+│   └── code_generation.md # Code generation guidelines
 │
 ├── /deployment           # Deployment Documentation
-│   ├── CI_CD.md         # CI/CD pipeline
-│   ├── ENVIRONMENTS.md  # Environment configuration
-│   └── MONITORING.md    # Production monitoring
+│   ├── ci_cd.md         # CI/CD pipeline
+│   ├── environments.md  # Environment configuration
+│   └── monitoring.md    # Production monitoring
 │
 ├── /security            # Security Documentation
-│   ├── GUIDELINES.md   # Security guidelines
-│   ├── AUTH.md         # Authentication documentation
-│   └── COMPLIANCE.md   # Compliance requirements
+│   ├── guidelines.md   # Security guidelines
+│   ├── auth.md         # Authentication documentation
+│   └── compliance.md   # Compliance requirements
 │
 └── /testing            # Testing Documentation
-    ├── STRATEGY.md     # Testing strategy
-    ├── E2E.md         # End-to-end testing
-    └── PERFORMANCE.md  # Performance testing
+    ├── strategy.md     # Testing strategy
+    ├── e2e.md         # End-to-end testing
+    └── performance.md  # Performance testing
 ```
 
 ## Documentation Guidelines

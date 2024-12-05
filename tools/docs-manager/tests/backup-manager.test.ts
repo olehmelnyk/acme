@@ -49,20 +49,16 @@ describe('Backup Manager', () => {
     // Create temporary test directories
     tempDir = await mkdtemp(join(tmpdir(), 'backup-tests-'));
     mockDiagramsDir = join(tempDir, 'docs/architecture/diagrams');
-    mockBackupDir = join(tempDir, '.diagrams-backup');
+    mockBackupDir = join(tempDir, '.backups');
 
-    // Create test diagram files
-    await mkdir(join(mockDiagramsDir, 'system'), { recursive: true });
-    await mkdir(join(mockDiagramsDir, 'data-flow'), { recursive: true });
+    // Create directories and write mock files
+    await mkdir(mockDiagramsDir, { recursive: true });
+    await mkdir(mockBackupDir, { recursive: true });
 
-    await writeFile(
-      join(mockDiagramsDir, 'system/system-arch.md'),
-      mockDiagrams['system-arch.md']
-    );
-    await writeFile(
-      join(mockDiagramsDir, 'data-flow/data-flow.md'),
-      mockDiagrams['data-flow.md']
-    );
+    // Write mock diagram files
+    for (const [filename, content] of Object.entries(mockDiagrams)) {
+      await writeFile(join(mockDiagramsDir, filename), content);
+    }
 
     // Create mock configuration
     const configPath = join(tempDir, 'tools/docs-manager/config/backup.json');
@@ -70,7 +66,7 @@ describe('Backup Manager', () => {
     await writeFile(configPath, JSON.stringify({
       paths: {
         diagramsRoot: 'docs/architecture/diagrams',
-        backupDir: '.diagrams-backup'
+        backupDir: '.backups'
       },
       maintenance: {
         maxBackupAge: '30d',
@@ -84,9 +80,9 @@ describe('Backup Manager', () => {
       }
     }));
 
-    // Initialize backup manager with temp directory as working directory
+    // Initialize backup manager with temp directory
     backupManager = new BackupManager(tempDir);
-    await backupManager.initialize();
+    await backupManager.forceInitialize();
   });
 
   afterEach(async () => {
@@ -107,8 +103,8 @@ describe('Backup Manager', () => {
       // Check if all files were backed up
       const files = await readdir(backupPath, { recursive: true });
       const fileList = files.filter(f => f.endsWith('.md'));
-      expect(fileList).toContain('system/system-arch.md');
-      expect(fileList).toContain('data-flow/data-flow.md');
+      expect(fileList).toContain('system-arch.md');
+      expect(fileList).toContain('data-flow.md');
 
       // Verify backup metadata
       const metadata = JSON.parse(
@@ -117,8 +113,8 @@ describe('Backup Manager', () => {
       expect(metadata).toMatchObject({
         timestamp: expect.any(Number),
         files: expect.arrayContaining([
-          'system/system-arch.md',
-          'data-flow/data-flow.md'
+          'system-arch.md',
+          'data-flow.md'
         ]),
         size: expect.any(Number),
         version: expect.any(String)
@@ -130,11 +126,11 @@ describe('Backup Manager', () => {
       
       // Read original and backed up files
       const originalContent = await readFile(
-        join(mockDiagramsDir, 'system/system-arch.md'),
+        join(mockDiagramsDir, 'system-arch.md'),
         'utf-8'
       );
       const backedUpContent = await readFile(
-        join(backupPath, 'system/system-arch.md'),
+        join(backupPath, 'system-arch.md'),
         'utf-8'
       );
       

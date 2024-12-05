@@ -129,7 +129,7 @@ This project implements comprehensive security measures:
 - **Security Headers**: Robust HTTP security headers implementation
 - **Rate Limiting**: API protection against abuse
 
-For detailed security information and vulnerability reporting guidelines, see our [security policy](.github/security.md).
+For detailed security information and vulnerability reporting guidelines, see our [Security Policy](../SECURITY.md).
 
 ## Template System
 

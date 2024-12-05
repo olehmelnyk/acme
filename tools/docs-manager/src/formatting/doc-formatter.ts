@@ -121,8 +121,13 @@ export class DocFormatter {
     // Remove trailing whitespace
     formatted = formatted.replace(/[ \t]+$/gm, '');
 
-    // Ensure single newline at end of file
-    formatted = formatted.replace(/\n+$/, '') + '\n';
+    // Remove any existing trailing newlines
+    formatted = formatted.replace(/\n+$/, '');
+
+    // Only add newline if original content had one
+    if (content.endsWith('\n')) {
+      formatted += '\n';
+    }
 
     // Fix heading spacing
     formatted = formatted.replace(/^(#{1,6})([^ #])/gm, '$1 $2');

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "bun test",
+    "test": "vitest run",
     "format": "bun src/cli/format-docs.ts format --dir ../../",
     "format:check": "bun src/cli/format-docs.ts format --dry-run --dir ../../",
     "format:fix": "bun src/cli/format-docs.ts format --dir ../../",
@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.4",
+    "@types/testing-library__jest-dom": "^6.0.0",
     "typescript": "^5.3.3",
     "vitest": "^1.0.4"
   },
