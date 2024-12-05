@@ -8,89 +8,157 @@ on:
       - '.github/workflows/validate-docs.yml'
       - 'tools/docs-manager/**'
 
+# Prevent multiple workflow runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write # Needed for commenting on PRs
+
 jobs:
   validate:
     name: Validate Documentation
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Prevent hanging jobs
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for git diff
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+            tools/docs-manager/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
+        id: install
         run: |
+          echo "::group::Install root dependencies"
           bun install
+          echo "::endgroup::"
+          
+          echo "::group::Install docs-manager dependencies"
           cd tools/docs-manager && bun install
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Check formatting
+        id: format
         run: |
           cd tools/docs-manager
+          echo "::group::Running format check"
           bun run format:check
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Validate cross-references
-        run: bun run docs:xref --check
+        id: xref-check
+        run: |
+          echo "::group::Checking cross-references"
+          bun run docs:xref --check
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Generate cross-references
-        run: bun run docs:xref
+        id: xref-gen
+        run: |
+          echo "::group::Generating cross-references"
+          bun run docs:xref
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Validate diagrams
-        run: bun run docs:validate
+        id: diagrams
+        run: |
+          echo "::group::Validating diagrams"
+          bun run docs:validate
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Generate diagram index
-        run: bun run docs:index
+        id: index
+        run: |
+          echo "::group::Generating diagram index"
+          bun run docs:index
+          echo "::endgroup::"
+        continue-on-error: false
 
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+          echo "::group::Checking for documentation changes"
+          if ! git diff --exit-code; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Found documentation changes that need to be committed"
+          else
+            echo "No documentation changes needed"
+          fi
+          echo "::endgroup::"
 
       - name: Create PR comment
         if: steps.git-check.outputs.changes == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
+            
+            try {
+              // Read the git diff
+              const diff = require('child_process')
+                .execSync('git diff')
+                .toString();
 
-            // Read the git diff
-            const diff = require('child_process')
-              .execSync('git diff')
-              .toString();
+              const body = `
+              ## Documentation Validation Results
 
-            const body = `
-            ## Documentation Validation Results
+              The documentation validation process has detected necessary updates to maintain consistency:
 
-            The documentation validation process has detected necessary updates to maintain consistency:
+              <details>
+              <summary>View Changes</summary>
 
-            <details>
-            <summary>View Changes</summary>
+              \`\`\`diff
+              ${diff}
+              \`\`\`
 
-            \`\`\`diff
-            ${diff}
-            \`\`\`
+              </details>
 
-            </details>
+              Please run the following commands locally and commit the changes:
+              1. \`bun run docs:maintain\`
+              2. \`cd tools/docs-manager && bun run format\`
+              `;
 
-            Please run the following commands locally and commit the changes:
-            1. \`bun run docs:maintain\`
-            2. \`cd tools/docs-manager && bun run format\`
-            `;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body
-            });
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body
+              });
+              
+              console.log('Successfully created PR comment');
+            } catch (error) {
+              console.error('Failed to create PR comment:', error);
+              throw error;
+            }
 
       - name: Fail if changes needed
         if: steps.git-check.outputs.changes == 'true'
         run: |
-          echo "Documentation updates needed. Please run the following commands locally and commit the changes:"
+          echo "::error::Documentation updates needed. Please run the following commands locally and commit the changes:"
           echo "1. bun run docs:maintain"
           echo "2. cd tools/docs-manager && bun run format"
           exit 1
