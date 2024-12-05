@@ -148,7 +148,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "bun run docs:maintain && git add docs/architecture/DIAGRAM_INDEX.md"
+      "pre-commit": "bun run docs:maintain && git add docs/architecture/diagram_index.md"
     }
   },
   "nx": {}

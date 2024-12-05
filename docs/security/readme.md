@@ -90,7 +90,7 @@ We enforce security checks at the pre-commit stage to prevent sensitive informat
 
 ### Git Hooks
 
-For information about our Git hooks implementation, see [Git Hooks Guide](../git_hooks.md).
+For more information about Git hooks, see [git hooks](../git_hooks.md).
 
 ### 4. Infrastructure Security
 
@@ -101,7 +101,7 @@ For information about our Git hooks implementation, see [Git Hooks Guide](../git
 
 ## Reporting Security Issues
 
-For our complete security policy and vulnerability reporting guidelines, see our [Security Policy](../../security.md).
+For our complete security policy and vulnerability reporting guidelines, see our [security policy](../../security.md).
 
 ## Additional Resources
 

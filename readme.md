@@ -478,7 +478,7 @@ Describe how to use the project here.
 
 ## Contributing
 
-For information about contributing to this project, please see our [Contributing Guide](contributing.md).
+For information about contributing to this project, please see our [contributing guide](./contributing.md).
 
 ## License
 

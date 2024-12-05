@@ -4,7 +4,7 @@ This document provides guidelines for AI agents working with this codebase.
 
 ## Architecture Overview
 
-This project follows a strict layered architecture with feature-sliced design in a monorepo setup. Refer to `/docs/architecture/OVERVIEW.md` for the complete architecture documentation.
+This project follows a strict layered architecture with feature-sliced design in a monorepo setup. Refer to `/docs/architecture/overview.md` for the complete architecture documentation.
 
 ## Key Principles
 

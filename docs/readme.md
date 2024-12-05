@@ -4,271 +4,271 @@
 
 ### Getting Started
 
-- [Contributing Guide](../contributing.md)
-- [Code of Conduct](../code_of_conduct.md)
-- [Security Policy](../security.md)
+- [contributing guide](../contributing.md)
+- [code of conduct](../code_of_conduct.md)
+- [security policy](../security.md)
 
 ### Architecture
 
-- [System Overview](architecture/overview.md)
-- [UI Layer](architecture/ui_layer.md)
-- [Data Access Layer](architecture/dal_layer.md)
-- [Business Logic Layer](architecture/bl_layer.md)
-- [Database Design](architecture/database.md)
-- [API Design Patterns](architecture/api_patterns.md)
-- [Architecture Diagrams](architecture/diagrams.md)
+- [system overview](./architecture/overview.md)
+- [ui layer](./architecture/ui_layer.md)
+- [data access layer](./architecture/dal_layer.md)
+- [business logic layer](./architecture/bl_layer.md)
+- [database design](./architecture/database.md)
+- [api design patterns](./architecture/api_patterns.md)
+- [architecture diagrams](./architecture/diagrams.md)
 
 ### Development
 
-- [Environment Setup](development/environment_setup.md)
-- [Development Workflow](architecture/diagrams/system/workflow.md)
-- [Quality and Security](./quality_and_security.md)
-- [Logging and Monitoring](./architecture/logging_and_monitoring.md)
-- [Testing Strategy](./architecture/testing.md)
-- [Automation](./architecture/automation.md)
-- [AI Integration](./architecture/ai_instructions.md)
+- [environment setup](./development/environment_setup.md)
+- [development workflow](./architecture/diagrams/system/workflow.md)
+- [quality and security](./quality_and_security.md)
+- [logging and monitoring](./architecture/logging_and_monitoring.md)
+- [testing strategy](./architecture/testing.md)
+- [automation](./architecture/automation.md)
+- [ai integration](./architecture/ai_instructions.md)
 
 ### AI Development
 
-- [AI Instructions](./architecture/ai_instructions.md)
+- [ai instructions](./architecture/ai_instructions.md)
 
 ### Testing
 
-1. [Testing Strategy](./architecture/testing.md)
-   - Unit Testing (Vitest)
-   - Component Testing
-   - Integration Testing
-   - E2E Testing (Playwright)
-   - Performance Testing
-   - Security Testing
-   - Mock Data Strategy
+1. [testing strategy](./architecture/testing.md)
+   - unit testing (vitest)
+   - component testing
+   - integration testing
+   - e2e testing (playwright)
+   - performance testing
+   - security testing
+   - mock data strategy
 
 ### Quality & Security
 
-1. [Quality and Security Guidelines](./quality_and_security.md)
-   - Code Quality Tools
-   - Security Scanning
-   - Performance Monitoring
-   - Accessibility Compliance
-   - Documentation Quality
+1. [quality and security guidelines](./quality_and_security.md)
+   - code quality tools
+   - security scanning
+   - performance monitoring
+   - accessibility compliance
+   - documentation quality
 
 ### Monitoring
 
-1. [Logging and Monitoring](./architecture/logging_and_monitoring.md)
-   - Logging Strategy (Pino)
-   - Application Monitoring
-   - Performance Monitoring
-   - Error Tracking
-   - Metrics and Dashboards
+1. [logging and monitoring](./architecture/logging_and_monitoring.md)
+   - logging strategy (pino)
+   - application monitoring
+   - performance monitoring
+   - error tracking
+   - metrics and dashboards
 
 ## Quick Links
 
 ### Common Tasks
 
-- Setting up development environment: [Contributing Guide](../contributing.md#development-setup)
-- Running tests: [Testing Strategy](./architecture/testing.md#running-tests)
-- Code quality checks: [Quality Guidelines](./quality_and_security.md#quality-assurance)
-- Database migrations: [Database Guide](./architecture/database.md#migrations)
+- setting up development environment: [contributing guide](../contributing.md#development-setup)
+- running tests: [testing strategy](./architecture/testing.md#running-tests)
+- code quality checks: [quality guidelines](./quality_and_security.md#quality-assurance)
+- database migrations: [database guide](./architecture/database.md#migrations)
 
 ### Key Concepts
 
-- [Feature-Sliced Design](./architecture/overview.md#architectural-style)
-- [Testing Pyramid](./architecture/testing.md#testing-pyramid)
-- [API Design Principles](./architecture/api_patterns.md#design-principles)
-- [Security Best Practices](./quality_and_security.md#security-best-practices)
+- [feature-sliced design](./architecture/overview.md#architectural-style)
+- [testing pyramid](./architecture/testing.md#testing-pyramid)
+- [api design principles](./architecture/api_patterns.md#design-principles)
+- [security best practices](./quality_and_security.md#security-best-practices)
 
 ## Documentation Structure
 
 ```
 /docs
-├── /architecture           # System Architecture
-│   ├── overview.md        # High-level architecture overview
-│   ├── diagrams.md        # Architecture diagrams
-│   ├── api_patterns.md    # API design patterns
-│   ├── state_management.md # State management patterns
-│   └── error_handling.md  # Error handling strategies
+├── /architecture           # system architecture
+│   ├── overview.md        # high-level architecture overview
+│   ├── diagrams.md        # architecture diagrams
+│   ├── api_patterns.md    # api design patterns
+│   ├── state_management.md # state management patterns
+│   └── error_handling.md  # error handling strategies
 │
-├── /development           # Development Guidelines
-│   ├── setup.md          # Development environment setup
-│   ├── workflow.md       # Development workflow
-│   ├── standards.md      # Coding standards
-│   └── code_generation.md # Code generation guidelines
+├── /development           # development guidelines
+│   ├── setup.md          # development environment setup
+│   ├── workflow.md       # development workflow
+│   ├── standards.md      # coding standards
+│   └── code_generation.md # code generation guidelines
 │
-├── /deployment           # Deployment Documentation
-│   ├── ci_cd.md         # CI/CD pipeline
-│   ├── environments.md  # Environment configuration
-│   └── monitoring.md    # Production monitoring
+├── /deployment           # deployment documentation
+│   ├── ci_cd.md         # ci/cd pipeline
+│   ├── environments.md  # environment configuration
+│   └── monitoring.md    # production monitoring
 │
-├── /security            # Security Documentation
-│   ├── guidelines.md   # Security guidelines
-│   ├── auth.md         # Authentication documentation
-│   └── compliance.md   # Compliance requirements
+├── /security            # security documentation
+│   ├── guidelines.md   # security guidelines
+│   ├── auth.md         # authentication documentation
+│   └── compliance.md   # compliance requirements
 │
-└── /testing            # Testing Documentation
-    ├── strategy.md     # Testing strategy
-    ├── e2e.md         # End-to-end testing
-    └── performance.md  # Performance testing
+└── /testing            # testing documentation
+    ├── strategy.md     # testing strategy
+    ├── e2e.md         # end-to-end testing
+    └── performance.md  # performance testing
 ```
 
 ## Documentation Guidelines
 
-1. **Consistency**: All documentation should follow the same format and style
-2. **Completeness**: Each document should be self-contained and comprehensive
-3. **Clarity**: Use clear, concise language and provide examples
-4. **Currency**: Documentation should be kept up-to-date with code changes
+1. **consistency**: all documentation should follow the same format and style
+2. **completeness**: each document should be self-contained and comprehensive
+3. **clarity**: use clear, concise language and provide examples
+4. **currency**: documentation should be kept up to date with code changes
 
 ## Documentation Types
 
-### 1. Architecture Documentation
+### 1. architecture documentation
 
-- System overview and design principles
-- Component interactions and dependencies
-- Data flow and state management
-- API design patterns and standards
-- Performance considerations
-- Scalability strategies
+- system overview and design principles
+- component interactions and dependencies
+- data flow and state management
+- api design patterns and standards
+- performance considerations
+- scalability strategies
 
-### 2. Development Documentation
+### 2. development documentation
 
-- Development environment setup
-- Coding standards and best practices
-- Git workflow and branching strategy
-- Code review process
-- Debugging guidelines
-- Performance optimization
+- development environment setup
+- coding standards and best practices
+- git workflow and branching strategy
+- code review process
+- debugging guidelines
+- performance optimization
 
-### 3. API Documentation
+### 3. api documentation
 
-- API endpoints and methods
-- Request/response formats
-- Authentication and authorization
-- Rate limiting and caching
-- Error handling
-- API versioning
+- api endpoints and methods
+- request/response formats
+- authentication and authorization
+- rate limiting and caching
+- error handling
+- api versioning
 
-### 4. Testing Documentation
+### 4. testing documentation
 
-- Testing strategy and approach
-- Unit testing guidelines
-- Integration testing
-- End-to-end testing
-- Performance testing
-- Security testing
+- testing strategy and approach
+- unit testing guidelines
+- integration testing
+- end-to-end testing
+- performance testing
+- security testing
 
-### 5. Deployment Documentation
+### 5. deployment documentation
 
-- Deployment process and environments
-- Configuration management
-- Monitoring and logging
-- Backup and recovery
-- Scaling procedures
-- Incident response
+- deployment process and environments
+- configuration management
+- monitoring and logging
+- backup and recovery
+- scaling procedures
+- incident response
 
-### 6. Security Documentation
+### 6. security documentation
 
-- Security policies and procedures
-- Authentication and authorization
-- Data protection
-- Security testing
-- Incident response
-- Compliance requirements
+- security policies and procedures
+- authentication and authorization
+- data protection
+- security testing
+- incident response
+- compliance requirements
 
 ## Maintenance
 
-1. **Regular Updates**
+1. **regular updates**
 
-   - Documentation should be updated with code changes
-   - Regular reviews for accuracy
-   - Version control for documentation
-   - Deprecation notices when needed
+   - documentation should be updated with code changes
+   - regular reviews for accuracy
+   - version control for documentation
+   - deprecation notices when needed
 
-2. **Review Process**
+2. **review process**
 
-   - Documentation changes require review
-   - Technical accuracy verification
-   - Clarity and completeness check
-   - Link validation
+   - documentation changes require review
+   - technical accuracy verification
+   - clarity and completeness check
+   - link validation
 
-3. **Version Control**
-   - Documentation versioning
-   - Change history
-   - Migration guides
-   - Deprecation notices
+3. **version control**
+   - documentation versioning
+   - change history
+   - migration guides
+   - deprecation notices
 
 ## Contributing
 
-1. **Adding New Documentation**
+1. **adding new documentation**
 
-   - Follow the established structure
-   - Use markdown formatting
-   - Include examples where appropriate
-   - Add to table of contents
+   - follow the established structure
+   - use markdown formatting
+   - include examples where appropriate
+   - add to table of contents
 
-2. **Updating Existing Documentation**
+2. **updating existing documentation**
 
-   - Maintain original structure
-   - Update all affected sections
-   - Verify all links and references
-   - Update last modified date
+   - maintain original structure
+   - update all affected sections
+   - verify all links and references
+   - update last modified date
 
-3. **Review Process**
-   - Technical review
-   - Editorial review
-   - Link validation
-   - Format verification
+3. **review process**
+   - technical review
+   - editorial review
+   - link validation
+   - format verification
 
 ## Tools and Resources
 
-1. **Documentation Tools**
+1. **documentation tools**
 
-   - Markdown editors
-   - Diagram tools
-   - API documentation generators
-   - Screenshot tools
+   - markdown editors
+   - diagram tools
+   - api documentation generators
+   - screenshot tools
 
-2. **Style Guides**
+2. **style guides**
 
-   - Markdown style guide
-   - API documentation style guide
-   - Code documentation style guide
-   - Diagram style guide
+   - markdown style guide
+   - api documentation style guide
+   - code documentation style guide
+   - diagram style guide
 
-3. **Templates**
-   - README template
-   - API documentation template
-   - Technical specification template
-   - Release notes template
+3. **templates**
+   - readme template
+   - api documentation template
+   - technical specification template
+   - release notes template
 
 ## Contributing to Documentation
 
-1. All documentation is written in Markdown
-2. Follow the existing structure and style
-3. Update table of contents when adding new documents
-4. Include code examples where appropriate
-5. Keep documentation up to date with code changes
+1. all documentation is written in markdown
+2. follow the existing structure and style
+3. update table of contents when adding new documents
+4. include code examples where appropriate
+5. keep documentation up to date with code changes
 
 ## Documentation Standards
 
-- Use clear, concise language
-- Include practical examples
-- Keep sections focused and well-organized
-- Use proper Markdown formatting
-- Include diagrams where helpful
-- Cross-reference related documents
-- Maintain consistent terminology
+- use clear, concise language
+- include practical examples
+- keep sections focused and well-organized
+- use proper markdown formatting
+- include diagrams where helpful
+- cross-reference related documents
+- maintain consistent terminology
 
 ## Documentation Updates
 
-This documentation is continuously updated. For any suggestions or improvements:
+this documentation is continuously updated. for any suggestions or improvements:
 
-1. Create an issue with the label `documentation`
-2. Submit a pull request with your changes
-3. Follow the documentation style guide
+1. create an issue with the label `documentation`
+2. submit a pull request with your changes
+3. follow the documentation style guide
 
 ## Style Guide
 
-1. Use Markdown for all documentation
-2. Include code examples where applicable
-3. Keep documentation up to date with code changes
-4. Use proper headings and structure
-5. Include diagrams for complex concepts
+1. use markdown for all documentation
+2. include code examples where applicable
+3. keep documentation up to date with code changes
+4. use proper headings and structure
+5. include diagrams for complex concepts
