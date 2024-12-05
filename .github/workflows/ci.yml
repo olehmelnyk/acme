@@ -188,11 +188,16 @@ jobs:
           main-branch-name: 'main'
       - name: Build
         run: |
+          # Install dependencies first
+          bun install
+          
           # Clean NX cache and regenerate project graph
           bun nx reset
+          
+          # Generate project graph with dependencies installed
           bun nx graph --file=project-graph.json
           
-          # Build web project first
+          # Build web project
           bun nx build web --skip-nx-cache
           
           # Then build remaining affected projects
