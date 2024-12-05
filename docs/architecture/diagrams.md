@@ -1,6 +1,6 @@
 # Architecture Diagrams
 
-This document serves as the central reference for all architecture diagrams in the project. Each diagram follows our [standardized diagram guidelines](diagrams/README.md).
+This document serves as the central reference for all architecture diagrams in the project. Each diagram follows our [standardized diagram guidelines](diagrams/readme.md).
 
 ## System Architecture
 
@@ -45,11 +45,11 @@ This document serves as the central reference for all architecture diagrams in t
 
 ## Related Documentation
 
-- [Development Guidelines](./DEVELOPMENT.md)
-- [State Architecture](./diagrams/data-flow/state-architecture.md)
-- [Security Architecture](./diagrams/system/security.md)
-- [Performance Guidelines](./diagrams/system/performance.md)
+- [Development Guide](development.md)
+- [System Overview](overview.md)
+
+For more information about our diagrams, see the [Diagrams Guide](diagrams/readme.md).
 
 ## Contributing
 
-Please refer to our [diagram standards and guidelines](diagrams/README.md) when adding or updating diagrams.
+Please refer to our [diagram standards and guidelines](diagrams/readme.md) when adding or updating diagrams.

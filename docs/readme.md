@@ -4,23 +4,24 @@
 
 ### Getting Started
 
-- [Contributing Guidelines](../contributing.md)
+- [Contributing Guide](../contributing.md)
 - [Code of Conduct](../code_of_conduct.md)
 - [Security Policy](../security.md)
 
 ### Architecture
 
-- [Overview](./architecture/overview.md)
-- [UI Layer](./architecture/ui_layer.md)
-- [Data Access Layer](./architecture/dal_layer.md)
-- [Business Logic Layer](./architecture/bl_layer.md)
-- [Database Architecture](./architecture/database.md)
-- [API Patterns](./architecture/api_patterns.md)
-- [Architecture Diagrams](./architecture/diagrams.md)
+- [System Overview](architecture/overview.md)
+- [UI Layer](architecture/ui_layer.md)
+- [Data Access Layer](architecture/dal_layer.md)
+- [Business Logic Layer](architecture/bl_layer.md)
+- [Database Design](architecture/database.md)
+- [API Design Patterns](architecture/api_patterns.md)
+- [Architecture Diagrams](architecture/diagrams.md)
 
 ### Development
 
-- [Development Guidelines](./architecture/development.md)
+- [Environment Setup](development/environment_setup.md)
+- [Development Workflow](architecture/diagrams/system/workflow.md)
 - [Quality and Security](./quality_and_security.md)
 - [Logging and Monitoring](./architecture/logging_and_monitoring.md)
 - [Testing Strategy](./architecture/testing.md)

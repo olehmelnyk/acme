@@ -129,7 +129,7 @@ This project implements comprehensive security measures:
 - **Security Headers**: Robust HTTP security headers implementation
 - **Rate Limiting**: API protection against abuse
 
-For detailed security information and vulnerability reporting guidelines, see our [Security Policy](../SECURITY.md).
+For detailed security information and vulnerability reporting guidelines, see our [Security Documentation](docs/security/readme.md).
 
 ## Template System
 
@@ -274,7 +274,7 @@ These commands will:
    - Dependency vulnerability scanning
    - Pre-commit security hooks
    - Environment variable protection
-   - See [Security Tooling](docs/security/TOOLING.md) for details
+   - See [Security Documentation](docs/security/readme.md) for details
 
 ## Extended Features (Optional)
 
@@ -338,10 +338,11 @@ These commands will:
 
 ## Documentation
 
-- [Architecture Overview](docs/architecture/DIAGRAMS.md) - System architecture and design documentation
-- [Development Guidelines](docs/architecture/DEVELOPMENT.md) - Coding standards and practices
-- [API Documentation](docs/architecture/API.md) - API endpoints and usage
-- [Testing Strategy](docs/architecture/TESTING.md) - Testing approach and guidelines
+For detailed documentation, please refer to:
+
+- [System Architecture](docs/architecture/diagrams.md)
+- [Development Guide](docs/architecture/development.md)
+- [API Documentation](docs/architecture/api.md)
 
 ## New Tools and Scripts
 
@@ -477,7 +478,7 @@ Describe how to use the project here.
 
 ## Contributing
 
-Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes.
+For information about contributing to this project, please see our [Contributing Guide](contributing.md).
 
 ## License
 

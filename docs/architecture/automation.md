@@ -281,7 +281,7 @@ Our continuous integration and deployment pipeline handles:
 
 ## Related Documentation
 
-- [Development Guidelines](./DEVELOPMENT.md)
-- [Quality and Security](./QUALITY_AND_SECURITY.md)
-- [Testing Strategy](./TESTING.md)
+- [Development Guide](development.md)
+- [Quality and Security](../quality_and_security.md)
+- [Testing Guidelines](testing.md)
 - [Performance Guidelines](./diagrams/system/performance.md)

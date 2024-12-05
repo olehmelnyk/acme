@@ -4,11 +4,13 @@
 
 Brief description of the feature and its purpose.
 
-## Documentation
+## Feature Documentation
 
-- [Requirements](./docs/REQUIREMENTS.md)
-- [Technical Specification](./docs/TECHNICAL.md)
-- [Testing Strategy](../../../docs/architecture/TESTING.md)
+For detailed information about this feature, see:
+
+- [Requirements](docs/requirements.md)
+- [Technical Design](docs/technical.md)
+- [Testing Strategy](../../../docs/architecture/testing.md)
 
 ## Design Assets
 
@@ -25,6 +27,10 @@ Brief description of the feature and its purpose.
 - [ ] Testing
 - [ ] Documentation
 - [ ] Deployment
+
+## Implementation Details
+
+Please follow our standard development and testing guidelines:
 
 ## Quick Start
 

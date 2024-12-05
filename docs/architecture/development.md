@@ -131,7 +131,7 @@ bun run e2e
 
 ## Related Documentation
 
-- [Architecture Overview](./DIAGRAMS.md)
-- [Testing Strategy](./TESTING.md)
-- [API Guidelines](./API.md)
+- [Architecture Diagrams](diagrams.md)
+- [Testing Guidelines](testing.md)
+- [API Documentation](api.md)
 - [Performance Guidelines](./diagrams/system/performance.md)

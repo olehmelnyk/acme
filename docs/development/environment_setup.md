@@ -167,7 +167,7 @@ We use Husky for Git hooks:
 
 ## Troubleshooting
 
-For common issues and solutions, please refer to our [Development FAQ](./FAQ.md).
+For common issues and solutions, see our [FAQ](faq.md).
 
 ### Common Issues
 
@@ -198,7 +198,13 @@ For common issues and solutions, please refer to our [Development FAQ](./FAQ.md)
 
 ### Getting Help
 
-1. Check the [FAQ](./FAQ.md)
+1. Check the [FAQ](faq.md)
 2. Search existing GitHub issues
 3. Ask in the team chat
 4. Create a new GitHub issue
+
+## Next Steps
+
+After setting up your environment:
+
+1. Review the [FAQ](faq.md) for common questions and answers

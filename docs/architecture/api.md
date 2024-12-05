@@ -179,7 +179,7 @@ const rateLimiter = rateLimit({
 
 ## Related Documentation
 
-- [Architecture Overview](./DIAGRAMS.md)
-- [Security Guidelines](./diagrams/system/security.md)
-- [Performance Guidelines](./diagrams/system/performance.md)
-- [Error Handling](./diagrams/system/error-flow.md)
+- [Architecture Diagrams](diagrams.md)
+- [Security Guidelines](diagrams/system/security.md)
+- [Performance Guidelines](diagrams/system/performance.md)
+- [Error Handling](diagrams/system/error-flow.md)

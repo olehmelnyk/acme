@@ -88,7 +88,9 @@ We enforce security checks at the pre-commit stage to prevent sensitive informat
 - Protected branch verification
 ```
 
-For detailed information about git hooks and pre-commit checks, see our [git hooks documentation](../git_hooks.md).
+### Git Hooks
+
+For information about our Git hooks implementation, see [Git Hooks Guide](../git_hooks.md).
 
 ### 4. Infrastructure Security
 
@@ -99,7 +101,7 @@ For detailed information about git hooks and pre-commit checks, see our [git hoo
 
 ## Reporting Security Issues
 
-For more information about our security policy and how to report security vulnerabilities, please see our [Security Policy](../../security.md).
+For our complete security policy and vulnerability reporting guidelines, see our [Security Policy](../../security.md).
 
 ## Additional Resources
 

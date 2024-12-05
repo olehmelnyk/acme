@@ -21,6 +21,10 @@ A: Try the following:
 2. Reinstall Bun: `curl -fsSL https://bun.sh/install | bash`
 3. Verify installation: `bun --version`
 
+### Q: How do I set up my development environment?
+
+See the [Environment Setup Guide](environment_setup.md) for detailed instructions.
+
 ## Build Issues
 
 ### Q: Why is my build failing with dependency errors?
@@ -84,6 +88,6 @@ A: Tools available:
 
 ## Related Documentation
 
-- [Environment Setup Guide](./ENVIRONMENT_SETUP.md)
-- [Testing Strategy](../architecture/TESTING.md)
+- [Environment Setup Guide](environment_setup.md)
+- [Testing Guidelines](../architecture/testing.md)
 - [Performance Guidelines](../architecture/diagrams/system/performance.md)

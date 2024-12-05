@@ -171,7 +171,7 @@ const securityMiddleware = {
 
 ## Related Documentation
 
-- [Development Guidelines](./DEVELOPMENT.md)
-- [Testing Strategy](./TESTING.md)
+- [Development Guide](development.md)
+- [Testing Guidelines](testing.md)
 - [Security Architecture](./diagrams/system/security.md)
 - [Performance Guidelines](./diagrams/system/performance.md)
