@@ -92,6 +92,10 @@ export class BackupManager {
       if (backupPath) {
         await rm(backupPath, { recursive: true, force: true });
       }
+      // If it's our specific error message, throw it as is
+      if (errorMessage === 'No diagram files found to backup') {
+        throw new Error(errorMessage);
+      }
       throw new Error(`Failed to create backup: ${errorMessage}`);
     }
   }
@@ -176,11 +180,8 @@ export class BackupManager {
 
       return diagrams;
     } catch (error) {
-      // If directory doesn't exist, treat it as no files found
-      if (error instanceof Error && error.message.includes('ENOENT')) {
-        return [];
-      }
-      throw error;
+      // If directory doesn't exist or any other error, treat it as no files found
+      return [];
     }
   }
 
