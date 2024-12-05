@@ -522,5 +522,5 @@ class ReleaseManager {
 - [CI/CD Pipeline](./ci-cd-pipeline.md)
 - [Code Review Guidelines](./code-review.md)
 - [Release Process](./release-process.md)
-- [Testing Strategy](./testing-strategy.md)
+- [Testing Strategy](../system/testing-strategy.md)
 - [Security Guidelines](./security-guidelines.md)

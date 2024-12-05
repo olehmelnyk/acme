@@ -327,4 +327,4 @@ class BuildCache {
 - [Dependency Management](./dependency-management.md)
 - [Asset Pipeline](./asset-pipeline.md)
 - [CI/CD Pipeline](./ci-cd.md)
-- [Development Workflow](../development/workflow.md)
+- [Development Workflow](./dev-workflow.md)

@@ -316,8 +316,8 @@ class BackupMonitor {
 ## Related Documentation
 
 - [Disaster Recovery Plan](./disaster-recovery.md)
-- [Data Protection Strategy](./data-protection.md)
-- [Security Architecture](./security.md)
+- [Data Protection Strategy](../data-flow/data-protection.md)
+- [Security Architecture](../security/security-architecture.md)
 - [Monitoring Architecture](./monitoring.md)
 - [Compliance Guidelines](./compliance.md)
 
@@ -517,4 +517,3 @@ graph TB
     Encryption --> Retention
     AccessControl --> Compliance
     Audit --> Documentation
-```

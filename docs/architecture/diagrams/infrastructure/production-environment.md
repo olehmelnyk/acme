@@ -359,7 +359,7 @@ class MonitoringSystem {
 ## Related Documentation
 
 - [Deployment Architecture](./deployment.md)
-- [Security Architecture](./security.md)
+- [Security Architecture](../security/security-architecture.md)
 - [Monitoring Architecture](./monitoring.md)
 - [Disaster Recovery](./disaster-recovery.md)
 - [Scaling Strategy](./scaling.md)

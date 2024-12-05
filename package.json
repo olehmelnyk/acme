@@ -49,6 +49,7 @@
     "docs:cleanup": "bun run tools/docs-manager/src/cli/cleanup.ts",
     "docs:cleanup:all": "bun run tools/docs-manager/src/cli/cleanup.ts --all",
     "docs:validate": "bun run tools/docs-manager/src/cli/validate-diagrams.ts",
+    "docs:validate:all": "bun run docs:format:check && bun run docs:xref --check && bun run docs:validate",
     "docs:index": "bun run tools/docs-manager/src/cli/generate-index.ts",
     "install:all": "bun tools/cleanup/src/cli/install-all.ts"
   },

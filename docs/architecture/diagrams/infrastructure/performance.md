@@ -500,7 +500,7 @@ class AutoScaler {
 ## Related Documentation
 
 - [Content Delivery Architecture](./content-delivery.md)
-- [Caching Strategy](./caching.md)
+- [Caching](../data-flow/caching.md)
 - [Monitoring Architecture](./monitoring.md)
 - [Database Architecture](../data/database.md)
 - [Frontend Architecture](../frontend/frontend.md)

@@ -410,6 +410,6 @@ interface ArchitectureDoc {
 
 ### Related Documentation
 
-- [Contributing Guidelines](../../CONTRIBUTING.md)
+- [Contributing Guidelines](../../../contributing.md)
 - [Development Workflow](./infrastructure/dev-workflow.md)
 - [Architecture Standards](./system/standards.md)

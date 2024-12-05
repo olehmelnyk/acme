@@ -81,5 +81,5 @@ Describes how errors are handled in this component:
 
 ## Related Documentation
 
-- [Link to related doc 1](../path/to/doc1.md)
-- [Link to related doc 2](../path/to/doc2.md)
+- [API Documentation](../diagrams/system/api.md)
+- [Link to Data Flow Documentation](../data-flow/overview.md)

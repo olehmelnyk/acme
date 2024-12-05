@@ -379,6 +379,6 @@ const performanceConfig: PerformanceConfig = {
 
 - [Performance Architecture](../system/performance.md)
 - [Security Architecture](../security/security-architecture.md)
-- [Caching Strategy](./caching.md)
+- [Caching](../data-flow/caching.md)
 - [Monitoring Architecture](./monitoring.md)
 - [Edge Computing](./edge-computing.md)
