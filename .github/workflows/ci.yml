@@ -68,6 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -78,7 +81,12 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+      - name: Configure Git
+        run: |
+          git fetch origin main:main || git fetch origin master:main
       - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
       - name: Run lint
         run: bun nx affected -t lint --skip-nx-cache
 
@@ -87,6 +95,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -97,7 +108,12 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+      - name: Configure Git
+        run: |
+          git fetch origin main:main || git fetch origin master:main
       - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
       - name: Run tests
         run: bun nx affected -t test --skip-nx-cache
 
@@ -143,6 +159,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -153,7 +172,12 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+      - name: Configure Git
+        run: |
+          git fetch origin main:main || git fetch origin master:main
       - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
       - name: Build
         run: bun nx affected -t build --skip-nx-cache
 
@@ -162,6 +186,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -172,8 +199,13 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+      - name: Configure Git
+        run: |
+          git fetch origin main:main || git fetch origin master:main
+      - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
       - name: Install Playwright
         run: bun playwright install --with-deps
-      - uses: nrwl/nx-set-shas@v4
       - name: Run E2E tests
         run: bun nx affected -t e2e --skip-nx-cache
