@@ -187,7 +187,16 @@ jobs:
         with:
           main-branch-name: 'main'
       - name: Build
-        run: bun nx affected -t build --skip-nx-cache
+        run: |
+          # Clean NX cache and regenerate project graph
+          bun nx reset
+          bun nx graph --file=project-graph.json
+          
+          # Build web project first
+          bun nx build web --skip-nx-cache
+          
+          # Then build remaining affected projects
+          bun nx affected -t build --skip-nx-cache --exclude=web
 
   e2e:
     needs: [setup, build]
