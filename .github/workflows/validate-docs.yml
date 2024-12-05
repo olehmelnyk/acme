@@ -32,11 +32,14 @@ jobs:
           cd tools/docs-manager
           bun run format:check
 
-      - name: Validate diagrams
-        run: bun run docs:validate
+      - name: Validate cross-references
+        run: bun run docs:xref --check
 
       - name: Generate cross-references
         run: bun run docs:xref
+
+      - name: Validate diagrams
+        run: bun run docs:validate
 
       - name: Generate diagram index
         run: bun run docs:index
