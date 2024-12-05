@@ -16,11 +16,13 @@ interface ValidationResult {
 }
 
 async function findMarkdownFiles(root: string): Promise<string[]> {
-  return glob('**/*.md', { 
+  const files = await glob('**/*.md', { 
     cwd: root,
     ignore: ['**/node_modules/**', '**/dist/**'],
-    absolute: true 
+    absolute: true,
+    nodir: true
   });
+  return files;
 }
 
 function extractCrossReferences(file: string): XRef[] {
