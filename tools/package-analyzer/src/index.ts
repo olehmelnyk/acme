@@ -100,44 +100,40 @@ export class PackageAnalyzer {
         return null;
       }
 
-      // Get initial file stats
-      let initialStats;
+      let fileHandle;
       try {
-        initialStats = await fs.promises.stat(cacheFile);
-      } catch {
-        return null;
-      }
-      
-      const ageHours = (Date.now() - initialStats.mtimeMs) / (1000 * 60 * 60);
-      if (ageHours > this.cacheDuration) {
-        return null;
-      }
-
-      // Read and parse file
-      let cached;
-      try {
-        const content = await fs.promises.readFile(cacheFile, 'utf8');
+        // Open file handle for atomic operations
+        fileHandle = await fs.promises.open(cacheFile, 'r');
         
-        // Check if file was modified during read
-        const currentStats = await fs.promises.stat(cacheFile);
-        if (currentStats.mtimeMs !== initialStats.mtimeMs || 
-            currentStats.size !== initialStats.size) {
-          return null; // File was modified during read
+        // Get file stats through the handle
+        const stats = await fileHandle.stat();
+        
+        const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+        if (ageHours > this.cacheDuration) {
+          await fileHandle.close();
+          return null;
         }
+
+        // Read file content through the handle
+        const content = await fileHandle.readFile('utf8');
+        await fileHandle.close();
         
-        cached = JSON.parse(content);
-      } catch {
+        const cached = JSON.parse(content);
+        
+        return {
+          packages: cached.packages,
+          allDependencies: new Map(cached.allDependencies),
+          devDependencies: new Map(cached.devDependencies),
+          peerDependencies: new Map(cached.peerDependencies),
+          frameworksUsed: new Set(cached.frameworksUsed),
+          toolingUsed: new Set(cached.toolingUsed)
+        };
+      } catch (error) {
+        if (fileHandle) {
+          await fileHandle.close().catch(() => {});
+        }
         return null;
       }
-      
-      return {
-        packages: cached.packages,
-        allDependencies: new Map(cached.allDependencies),
-        devDependencies: new Map(cached.devDependencies),
-        peerDependencies: new Map(cached.peerDependencies),
-        frameworksUsed: new Set(cached.frameworksUsed),
-        toolingUsed: new Set(cached.toolingUsed)
-      };
     } catch (error) {
       console.warn('Failed to load cached analysis:', error);
       return null;
