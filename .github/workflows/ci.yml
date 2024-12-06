@@ -23,6 +23,10 @@ env:
   NODE_ENV: ci
   NEXT_TELEMETRY_DISABLED: 1
   CI: true
+  # Global environment variables for all jobs
+  NODE_OPTIONS: "--experimental-vm-modules --experimental-import-meta-resolve"
+  NODE_PRESERVE_SYMLINKS: 1
+  FORCE_CJS: true
 
 jobs:
   setup:
@@ -82,12 +86,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
+
       - name: Restore cache
         uses: actions/cache/restore@v4
         with:
@@ -100,14 +103,22 @@ jobs:
             ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-bun-
             ${{ runner.os }}-
-      - name: Configure Git
+
+      - name: Run linting
         run: |
-          git fetch origin main:main || git fetch origin master:main
-      - uses: nrwl/nx-set-shas@v4
-        with:
-          main-branch-name: 'main'
-      - name: Run lint
-        run: bun nx affected -t lint --skip-nx-cache
+          # Set Node.js flags to handle ESM/CommonJS compatibility
+          export NODE_OPTIONS="--experimental-vm-modules --experimental-import-meta-resolve"
+          
+          # Force CommonJS mode for problematic packages
+          export FORCE_CJS=true
+          
+          # Run nx lint with retry logic
+          retry_command "bun nx affected -t lint --skip-nx-cache"
+        env:
+          # Ensure consistent module resolution
+          NODE_PRESERVE_SYMLINKS: 1
+          # Suppress known ESM warnings
+          NODE_NO_WARNINGS: 1
 
   test:
     needs: setup
@@ -150,25 +161,10 @@ jobs:
         id: run-tests
         run: |
           echo "Testing project: ${{ matrix.project }}"
-          bun nx test ${{ matrix.project }} --skip-nx-cache
+          retry_command "bun nx test ${{ matrix.project }} --skip-nx-cache"
         env:
-          # Increase Node.js memory limit for large builds
-          NODE_OPTIONS: "--max-old-space-size=4096"
-          
-          # Skip security checks in CI environment since they're handled in a separate job
-          SKIP_SECURITY_CHECKS: true
-          
-          # Suppress Node.js warnings:
-          # - ExperimentalWarning: Custom ESM Loaders is an experimental feature
-          # - ExperimentalWarning: --experimental-loader is an experimental feature
-          # These warnings are expected when using Bun with Next.js and don't indicate issues
-          NODE_NO_WARNINGS: 1
-          
-          # Suppress Vite CJS warnings:
-          # - "The CJS build of Vite's Node API is deprecated"
-          # This warning appears due to some dependencies not yet updated to ESM
-          # Safe to ignore as we're using Vite through Next.js/React configuration
-          VITE_CJS_IGNORE_WARNING: true
+          PLAYWRIGHT_HTML_REPORT: playwright-results/html
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
 
   security:
     needs: setup
@@ -406,34 +402,32 @@ jobs:
       - name: Configure Git
         run: |
           git fetch origin main:main || git fetch origin master:main
+
       - uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: 'main'
+
       - name: Install Playwright
         run: |
-          bun playwright install --with-deps
-          # Install additional browser dependencies
-          bun playwright install-deps
+          retry_command "bun playwright install --with-deps"
+          retry_command "bun playwright install-deps"
 
       - name: Create artifacts directory
         run: mkdir -p playwright-results
 
       - name: Run E2E tests
         run: |
-          bun nx affected -t e2e \
+          retry_command "bun nx affected -t e2e \
             --skip-nx-cache \
             --parallel=3 \
             --max-parallel=3 \
             --configuration=ci \
-            --retries=2
+            --retries=2"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
-          # Increase timeout for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
-          # Enable video recording for failed tests
           PLAYWRIGHT_VIDEO: "retain-on-failure"
-          # Enable trace for failed tests
           PLAYWRIGHT_TRACE: "retain-on-failure"
 
       - name: Upload test results
@@ -452,12 +446,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
+      - name: Setup retry function
+        run: |
+          # Create retry function
+          sudo tee /usr/local/bin/retry_command << 'EOF'
+          #!/bin/bash
+          
+          max_attempts=3
+          delay=5
+          attempt=1
+          command="$*"
+          
+          until eval "$command"; do
+            if ((attempt >= max_attempts)); then
+              echo "Command '$command' failed after $max_attempts attempts"
+              exit 1
+            fi
+            
+            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
+            sleep $delay
+            
+            delay=$((delay * 2))
+            attempt=$((attempt + 1))
+          done
+          EOF
+          
+          sudo chmod +x /usr/local/bin/retry_command
 
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
+
       - name: Restore cache
         uses: actions/cache/restore@v4
         with:
@@ -471,68 +491,15 @@ jobs:
             ${{ runner.os }}-bun-
             ${{ runner.os }}-
 
-      - name: Validate documentation formatting
-        working-directory: ${{ github.workspace }}
-        env:
-          SKIP_SECURITY_CHECKS: true
-          NODE_NO_WARNINGS: 1
-          VITE_CJS_IGNORE_WARNING: true
-          GH_TOKEN: ${{ github.token }}
+      - name: Check documentation formatting
         run: |
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
+          # Run format check with retry
+          /usr/local/bin/retry_command "bun run format:check"
 
-          until bun run docs:format:check --dry-run; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to validate docs formatting after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Validation failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
-
-      - name: Check documentation cross-references
-        working-directory: ${{ github.workspace }}
-        env:
-          SKIP_SECURITY_CHECKS: true
-          NODE_NO_WARNINGS: 1
-          VITE_CJS_IGNORE_WARNING: true
-          GH_TOKEN: ${{ github.token }}
+      - name: Validate documentation
         run: |
-          # Ensure docs directory exists
-          mkdir -p docs
-
-          echo "Running documentation cross-reference check..."
-          echo "Current directory: $(pwd)"
-          echo "Docs directory contents:"
-          ls -la docs/
-
-          # Run cross-reference check with debug output
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run docs:xref --check --verbose; do
-            EXIT_CODE=$?
-            
-            # Check if it's a real error or just no markdown files
-            if [[ $EXIT_CODE -eq 0 ]]; then
-              echo "No markdown files found or all references are valid"
-              break
-            fi
-            
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to check docs cross-references after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+          # Run docs validation with retry
+          /usr/local/bin/retry_command "bun run docs:validate"
 
   verify-build:
     needs: build

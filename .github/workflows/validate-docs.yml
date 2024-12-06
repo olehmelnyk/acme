@@ -52,59 +52,66 @@ jobs:
 
       - name: Setup retry function
         run: |
-          function retry_command() {
-            local cmd="$1"
-            local max_retries=3
-            local retry_count=0
-            local retry_delay=5
-
-            until eval "$cmd"; do
-              retry_count=$((retry_count + 1))
-              if [ $retry_count -eq $max_retries ]; then
-                echo "Failed after $max_retries attempts"
-                exit 1
-              fi
-              echo "Failed. Retrying in ${retry_delay} seconds... (Attempt $retry_count of $max_retries)"
-              sleep $retry_delay
-              retry_delay=$((retry_delay * 2))
-            done
-          }
-          export -f retry_command
+          # Create retry function as a system command
+          sudo tee /usr/local/bin/retry_command << 'EOF'
+          #!/bin/bash
+          
+          max_attempts=3
+          delay=5
+          attempt=1
+          command="$*"
+          
+          until eval "$command"; do
+            if ((attempt >= max_attempts)); then
+              echo "Command '$command' failed after $max_attempts attempts"
+              exit 1
+            fi
+            
+            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
+            sleep $delay
+            
+            delay=$((delay * 2))
+            attempt=$((attempt + 1))
+          done
+          EOF
+          
+          # Make it executable
+          sudo chmod +x /usr/local/bin/retry_command
 
       - name: Install dependencies
         id: install
         run: |
           echo "::group::Install root dependencies"
-          bun install --frozen-lockfile
+          /usr/local/bin/retry_command "bun install --frozen-lockfile"
           echo "::endgroup::"
           
           echo "::group::Install docs-manager dependencies"
-          cd tools/docs-manager && bun install --frozen-lockfile
+          cd tools/docs-manager && /usr/local/bin/retry_command "bun install --frozen-lockfile"
           echo "::endgroup::"
         continue-on-error: false
 
       - name: Check formatting
         id: format
         working-directory: tools/docs-manager
-        run: retry_command "bun run format:check"
+        run: /usr/local/bin/retry_command "bun run format:check"
         continue-on-error: false
 
       - name: Validate cross-references
         id: xref-check
         working-directory: tools/docs-manager
-        run: retry_command "bun run xref:check"
+        run: /usr/local/bin/retry_command "bun run xref:check"
         continue-on-error: false
 
       - name: Generate cross-references
         id: xref-gen
         working-directory: tools/docs-manager
-        run: retry_command "bun run xref"
+        run: /usr/local/bin/retry_command "bun run xref"
         continue-on-error: false
 
       - name: Validate diagrams
         id: diagrams
         working-directory: tools/docs-manager
-        run: retry_command "bun run validate"
+        run: /usr/local/bin/retry_command "bun run validate"
         continue-on-error: false
 
       - name: Generate diagram index
@@ -114,7 +121,7 @@ jobs:
           # Ensure docs directory exists
           mkdir -p ../docs/architecture/diagrams
 
-          retry_command "bun run index"
+          /usr/local/bin/retry_command "bun run index"
         continue-on-error: false
 
       - name: Check for changes
