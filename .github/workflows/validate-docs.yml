@@ -146,6 +146,9 @@ jobs:
         id: index
         working-directory: tools/docs-manager
         run: |
+          # Ensure docs directory exists
+          mkdir -p ../docs/architecture/diagrams
+
           MAX_RETRIES=3
           RETRY_COUNT=0
           RETRY_DELAY=5

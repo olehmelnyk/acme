@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { glob } from 'glob';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, relative, dirname, basename } from 'path';
 import chalk from 'chalk';
 
@@ -31,10 +31,22 @@ function extractDiagramInfo(filePath: string, content: string): DiagramInfo | nu
 }
 
 function generateIndex(diagrams: DiagramInfo[]): string {
-  const categories = [...new Set(diagrams.map(d => d.category))].sort();
-  
   let content = '# Architecture Diagrams Index\n\n';
+  
+  if (diagrams.length === 0) {
+    content += 'No architecture diagrams found.\n\n';
+    content += '## Adding New Diagrams\n\n';
+    content += 'To add a new diagram:\n\n';
+    content += '1. Create a new markdown file in the appropriate category directory under `docs/architecture/diagrams/`\n';
+    content += '2. Start the file with a level 1 heading (`# Title`) for the diagram title\n';
+    content += '3. Add a brief description after the title\n';
+    content += '4. Add your diagram content\n\n';
+    return content;
+  }
+
   content += 'This document provides an index of all architecture diagrams in the project.\n\n';
+  
+  const categories = [...new Set(diagrams.map(d => d.category))].sort();
   
   categories.forEach(category => {
     content += `## ${category}\n\n`;
@@ -54,6 +66,12 @@ async function main() {
   const diagramsPath = join(workspaceRoot, DIAGRAMS_DIR);
   const indexPath = join(workspaceRoot, INDEX_FILE);
   
+  // Create diagrams directory if it doesn't exist
+  if (!existsSync(diagramsPath)) {
+    console.log(chalk.blue('📁 Creating diagrams directory...'));
+    mkdirSync(diagramsPath, { recursive: true });
+  }
+
   console.log(chalk.blue('🔍 Scanning for architecture diagrams...'));
   
   const files = await glob('**/*.md', { 
@@ -77,6 +95,13 @@ async function main() {
   }
 
   console.log(chalk.blue('📝 Generating index...'));
+  
+  // Create parent directory for index file if it doesn't exist
+  const indexDir = dirname(indexPath);
+  if (!existsSync(indexDir)) {
+    mkdirSync(indexDir, { recursive: true });
+  }
+  
   const indexContent = generateIndex(diagrams);
   writeFileSync(indexPath, indexContent);
 

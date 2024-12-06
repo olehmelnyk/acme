@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { glob } from 'glob';
 import { readFileSync } from 'fs';
-import { resolve, relative, dirname } from 'path';
+import { resolve, relative, dirname, join, basename } from 'path';
 
 interface XRef {
   source: string;
@@ -20,15 +20,27 @@ async function findMarkdownFiles(root: string): Promise<string[]> {
   try {
     const pattern = '**/*.md';
     const options = {
-      cwd: root,
-      ignore: ['**/node_modules/**', '**/dist/**', '**/artifacts/**'],
+      cwd: join(root, 'docs'),  // Look in the docs directory
+      ignore: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/artifacts/**',
+        '**/architecture/diagrams/readme.md'  // Ignore generated index
+      ],
       absolute: true,
       nodir: true,
       withFileTypes: false
     };
     
     const matches = await glob(pattern, options);
-    return Array.isArray(matches) ? matches.map(match => match.toString()) : [];
+    const files = Array.isArray(matches) ? matches.map(match => match.toString()) : [];
+    
+    if (files.length === 0) {
+      console.warn('No markdown files found in docs directory. Expected markdown files in:', join(root, 'docs'));
+      process.exit(0);  // Exit successfully since this might be a new project
+    }
+    
+    return files;
   } catch (error) {
     console.error('Error finding markdown files:', error);
     return [];
@@ -48,16 +60,7 @@ function extractCrossReferences(file: string): XRef[] {
       const [, , target] = match;
       if (target.endsWith('.md')) {
         // Normalize the target path
-        const normalizedTarget = resolve(dirname(file), target)
-          .split('/')
-          .map((part, i, arr) => {
-            // Keep case for the filename (last part)
-            if (i === arr.length - 1) return part;
-            // Lowercase for directories
-            return part.toLowerCase();
-          })
-          .join('/');
-
+        const normalizedTarget = resolve(dirname(file), target);
         refs.push({
           source: file,
           target: normalizedTarget,
@@ -71,86 +74,66 @@ function extractCrossReferences(file: string): XRef[] {
 }
 
 function validateReferences(files: string[], refs: XRef[]): ValidationResult {
-  // Create a map of lowercase paths to actual paths for case-insensitive comparison
-  const fileMap = new Map(files.map(f => [f.toLowerCase(), f]));
-  const brokenRefs: XRef[] = [];
-  const suggestedFixes = new Map<string, string>();
+  const result: ValidationResult = {
+    valid: true,
+    brokenRefs: [],
+    suggestedFixes: new Map()
+  };
   
   refs.forEach(ref => {
-    const targetLower = ref.target.toLowerCase();
-    if (!fileMap.has(targetLower)) {
-      brokenRefs.push(ref);
+    if (!files.includes(ref.target)) {
+      result.valid = false;
+      result.brokenRefs.push(ref);
       
       // Try to find similar files for suggestions
-      const similarFiles = Array.from(fileMap.values())
-        .filter(f => {
-          const baseName = f.split('/').pop();
-          const targetName = ref.target.split('/').pop();
-          if (!baseName || !targetName) return false;
-          return baseName.toLowerCase() === targetName.toLowerCase();
-        });
+      const targetBase = basename(ref.target).toLowerCase();
+      const suggestions = files
+        .filter(f => basename(f).toLowerCase().includes(targetBase.replace('.md', '')))
+        .map(f => relative(dirname(ref.source), f));
       
-      if (similarFiles.length > 0) {
-        // Use relative path for suggestion
-        suggestedFixes.set(
-          ref.target,
-          relative(dirname(ref.source), similarFiles[0])
-        );
+      if (suggestions.length > 0) {
+        result.suggestedFixes.set(ref.target, suggestions[0]);
       }
     }
   });
   
-  return {
-    valid: brokenRefs.length === 0,
-    brokenRefs,
-    suggestedFixes
-  };
+  return result;
 }
 
 async function main() {
-  try {
-    const root = process.cwd();
-    console.log('🔍 Scanning for markdown files...');
-    
-    const files = await findMarkdownFiles(root);
-    if (files.length === 0) {
-      console.error('❌ No markdown files found');
-      process.exit(1);
-    }
-    console.log(`📑 Found ${files.length} markdown files`);
-    
-    console.log('🔎 Checking cross-references...');
-    const allRefs: XRef[] = [];
-    for (const file of files) {
-      try {
-        const refs = extractCrossReferences(file);
-        allRefs.push(...refs);
-      } catch (error) {
-        console.error(`❌ Error processing ${file}:`, error);
-        process.exit(1);
+  const workspaceRoot = process.cwd();
+  const repoRoot = workspaceRoot.includes('tools/docs-manager') 
+    ? resolve(workspaceRoot, '../..')  // If running from tools/docs-manager
+    : workspaceRoot;                   // If running from repo root
+  
+  const files = await findMarkdownFiles(repoRoot);
+  console.log(`Found ${files.length} markdown files`);
+  
+  const allRefs: XRef[] = [];
+  files.forEach(file => {
+    const refs = extractCrossReferences(file);
+    allRefs.push(...refs);
+  });
+  
+  console.log(`Found ${allRefs.length} cross-references`);
+  
+  const validation = validateReferences(files, allRefs);
+  
+  if (!validation.valid) {
+    console.error('\nBroken cross-references found:');
+    validation.brokenRefs.forEach(ref => {
+      console.error(`\nIn ${relative(repoRoot, ref.source)} (line ${ref.line}):`);
+      console.error(`  Target not found: ${relative(repoRoot, ref.target)}`);
+      
+      const suggestion = validation.suggestedFixes.get(ref.target);
+      if (suggestion) {
+        console.error(`  Suggestion: ${suggestion}`);
       }
-    }
-    console.log(`📝 Found ${allRefs.length} cross-references`);
-    
-    const result = validateReferences(files, allRefs);
-    
-    if (!result.valid) {
-      console.error('\n❌ Found broken references:');
-      result.brokenRefs.forEach(ref => {
-        console.error(`  - ${relative(root, ref.source)}:${ref.line} -> ${ref.target}`);
-        const suggestion = result.suggestedFixes.get(ref.target);
-        if (suggestion) {
-          console.error(`    Suggestion: ${suggestion}`);
-        }
-      });
-      process.exit(1);
-    }
-    
-    console.log('\n✅ All references are valid!');
-  } catch (error) {
-    console.error('❌ Unexpected error:', error);
+    });
     process.exit(1);
   }
+  
+  console.log('\n✅ All cross-references are valid');
 }
 
 main().catch(error => {

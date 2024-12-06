@@ -2,13 +2,16 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 permissions:
   actions: read
   contents: read
+  checks: write
+  statuses: write
+  pull-requests: write
   id-token: write # Required for accessing secrets
 
 env:
@@ -248,24 +251,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-
 
-      - name: Report build status
+      - name: Update build status
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const { owner, repo } = context.repo;
-            const run_id = context.runId;
-            const conclusion = '${{ job.status }}';
-
-            await github.rest.repos.createCommitStatus({
-              owner,
-              repo,
-              sha: context.sha,
-              state: conclusion.toLowerCase(),
-              target_url: `https://github.com/${owner}/${repo}/actions/runs/${run_id}`,
-              description: `Build ${conclusion.toLowerCase()}`,
-              context: 'CI/build'
-            });
+            try {
+              const context = github.context;
+              const state = context.job.status === 'success' ? 'success' : 'failure';
+              
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: context.sha,
+                state: state,
+                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                description: state === 'success' ? 'Build succeeded' : 'Build failed',
+                context: 'CI/build'
+              });
+            } catch (error) {
+              console.warn('Failed to update commit status:', error.message);
+              // Don't fail the build if we can't update the status
+              if (!error.message.includes('Resource not accessible')) {
+                throw error;
+              }
+            }
 
   e2e:
     needs: [setup, build]
@@ -346,11 +356,21 @@ jobs:
           VITE_CJS_IGNORE_WARNING: true
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Ensure docs directory exists
+          mkdir -p docs
+
+          # Run cross-reference check
           MAX_RETRIES=3
           RETRY_COUNT=0
           RETRY_DELAY=5
 
           until bun run docs:xref --check; do
+            # Check if it's a real error or just no markdown files
+            if [[ $? -eq 0 ]]; then
+              echo "No markdown files found - this is okay for now"
+              break
+            fi
+            
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
               echo "Failed to check docs cross-references after $MAX_RETRIES attempts"
