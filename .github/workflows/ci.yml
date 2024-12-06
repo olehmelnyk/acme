@@ -27,6 +27,23 @@ env:
   NODE_OPTIONS: '--experimental-vm-modules --experimental-import-meta-resolve'
   NODE_PRESERVE_SYMLINKS: 1
   FORCE_CJS: true
+  # Retry command script
+  RETRY_COMMAND_SCRIPT: |
+    #!/bin/bash
+    max_attempts=3
+    delay=5
+    attempt=1
+    command="$*"
+    until eval "$command"; do
+      if ((attempt >= max_attempts)); then
+        echo "Command '$command' failed after $max_attempts attempts"
+        exit 1
+      fi
+      echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
+      sleep $delay
+      delay=$((delay * 2))
+      attempt=$((attempt + 1))
+    done
 
 jobs:
   setup:
@@ -40,30 +57,7 @@ jobs:
 
       - name: Setup retry function
         run: |
-          # Create retry function as a system command
-          sudo tee /usr/local/bin/retry_command << 'EOF'
-          #!/bin/bash
-
-          max_attempts=3
-          delay=5
-          attempt=1
-          command="$*"
-
-          until eval "$command"; do
-            if ((attempt >= max_attempts)); then
-              echo "Command '$command' failed after $max_attempts attempts"
-              exit 1
-            fi
-            
-            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
-            sleep $delay
-            
-            delay=$((delay * 2))
-            attempt=$((attempt + 1))
-          done
-          EOF
-
-          # Make it executable
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
           sudo chmod +x /usr/local/bin/retry_command
 
       - name: Setup Bun
@@ -99,6 +93,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -145,6 +144,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -189,6 +193,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
 
       - name: Install security tools
         run: |
@@ -283,6 +292,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -328,6 +342,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -394,6 +413,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup retry function
+        run: |
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
+          sudo chmod +x /usr/local/bin/retry_command
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
@@ -419,7 +443,7 @@ jobs:
       - name: Validate documentation
         run: |
           # Run docs validation with retry
-          /usr/local/bin/retry_command "bun run docs:validate"
+          /usr/local/bin/retry_command "bun run docs:validate:all"
 
   verify-build:
     needs: build
