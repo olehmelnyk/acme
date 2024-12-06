@@ -95,18 +95,41 @@ describe('UserService', () => {
 ### E2E Tests
 
 ```typescript
-// Example E2E test
-test('user signup flow', async ({ page }) => {
-  await page.goto('/signup');
-  await page.fill('[name="email"]', 'test@example.com');
-  await page.fill('[name="password"]', 'password123');
-  await page.click('button[type="submit"]');
+// Example E2E test with best practices
+test.describe('User Signup', () => {
+  let page;
 
-  await expect(page).toHaveURL('/dashboard');
+  test.beforeEach(async ({ browser }) => {
+    page = await browser.newPage();
+  });
+
+  test.afterEach(async () => {
+    await page.close();
+  });
+
+  test('should complete signup flow successfully', async () => {
+    try {
+      await page.goto('/signup');
+      await page.fill('[name="email"]', 'test@example.com');
+      await page.fill('[name="password"]', 'password123');
+      await page.click('button[type="submit"]');
+
+      await expect(page).toHaveURL('/dashboard');
+    } catch (error) {
+      console.error('Signup flow failed:', error);
+      throw error;
+    }
+  });
 });
-```
+
+// This example demonstrates:
+// - Test isolation using `test.describe` and separate page instances
+// - Proper cleanup with `beforeEach` and `afterEach` hooks
+// - Error handling with try/catch blocks
+// - Clear test descriptions and organization
 
 For more information about our testing automation, see [Testing](testing.md).
+```
 
 ## Development Automation
 
@@ -220,7 +243,7 @@ Our continuous integration and deployment pipeline handles:
 
 1. Code changes trigger automated tests
 2. Successful builds are automatically deployed
-3. Documentation is automatically generated and updated
+3. Documentation is automatically generated
 
 ### Future Improvements
 

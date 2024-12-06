@@ -9,13 +9,14 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
-  // Remove the static export since we want a server-rendered app
-  distDir: 'artifacts/apps/web/.next',
-  // Ensure Next.js uses the correct base path
+  // Base path configuration
+  // - Empty string ('') serves the app from the root URL (e.g., example.com/)
+  // - Set to '/subdirectory' when deploying to a subdirectory (e.g., example.com/subdirectory)
+  // - Affects all asset paths and internal routing
+  // - Must match the path where the app is deployed to avoid 404 errors
   basePath: '',
-  // Disable image optimization since we're using static export
   images: {
-    unoptimized: true,
+    unoptimized: false,
   },
   // Enable React strict mode for better development
   reactStrictMode: true,

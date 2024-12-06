@@ -50,20 +50,52 @@ const AIAssistanceProvider = ({ children }: PropsWithChildren) => {
 ### Code Analysis
 
 ```typescript
-// AI-powered code analysis
-const analyzeCode = async (code: string) => {
-  const analysis = await aiService.analyze(code, {
-    checkSecurity: true,
-    checkPerformance: true,
-    suggestImprovements: true,
-  });
+// Type definitions for analysis
+interface AnalysisOptions {
+  checkSecurity: boolean;
+  checkPerformance: boolean;
+  suggestImprovements: boolean;
+}
 
-  return {
-    issues: analysis.issues,
-    suggestions: analysis.suggestions,
-    metrics: analysis.metrics,
-  };
+interface AnalysisResult {
+  issues: Array<{ severity: string; message: string }>;
+  suggestions: Array<{ type: string; description: string }>;
+  metrics: Record<string, number>;
+}
+
+// AI-powered code analysis with error handling and type safety
+const analyzeCode = async (code: string): Promise<AnalysisResult> => {
+  // Rate limiting check
+  if (!aiService.canMakeRequest()) {
+    throw new Error('Rate limit exceeded. Please try again later.');
+  }
+
+  try {
+    const analysis = await aiService.analyze(code, {
+      checkSecurity: true,
+      checkPerformance: true,
+      suggestImprovements: true,
+    });
+
+    return {
+      issues: analysis.issues,
+      suggestions: analysis.suggestions,
+      metrics: analysis.metrics,
+    };
+  } catch (error) {
+    console.error('AI analysis failed:', error);
+    throw new Error('Failed to analyze code. Please check logs for details.');
+  }
 };
+
+// Example usage
+try {
+  const result = await analyzeCode(sourceCode);
+  console.log('Analysis complete:', result);
+} catch (error) {
+  console.error('Analysis error:', error.message);
+  // Implement fallback or retry logic here
+}
 ```
 
 ## Best Practices
@@ -132,5 +164,5 @@ const analyzeCode = async (code: string) => {
 
 - [Development Guide](development.md)
 - [Quality and Security](../quality_and_security.md)
-For more information about our testing practices, see [Testing](testing.md).
+[Testing](testing.md) provides more information about our testing practices.
 - [Security Architecture](./diagrams/system/security.md)

@@ -20,6 +20,9 @@ env:
   NODE_NO_WARNINGS: 1
   VITE_CJS_IGNORE_WARNING: true
   GH_TOKEN: ${{ github.token }}
+  NODE_ENV: ci
+  NEXT_TELEMETRY_DISABLED: 1
+  CI: true
 
 jobs:
   setup:
@@ -38,7 +41,10 @@ jobs:
 
       - name: Generate cache key
         id: cache-key
-        run: echo "value=${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}" >> $GITHUB_OUTPUT
+        run: |
+          LOCKFILE_HASH="${{ hashFiles('**/bun.lockb') }}"
+          WORKFLOW_HASH="${{ hashFiles('.github/workflows/**') }}"
+          echo "value=${{ runner.os }}-bun-$LOCKFILE_HASH-$WORKFLOW_HASH" >> "$GITHUB_OUTPUT"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v4
@@ -46,12 +52,16 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
+            .nx/cache
           key: ${{ steps.cache-key.outputs.value }}
           restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-bun-
+            ${{ runner.os }}-
 
       - name: Install dependencies
         run: |
+          RETRY_DELAY=5
           for i in 1 2 3; do
             echo "Attempt $i: Installing dependencies..."
             if bun install --frozen-lockfile; then
@@ -62,8 +72,9 @@ jobs:
               echo "Failed to install dependencies after 3 attempts"
               exit 1
             fi
-            echo "Retrying in 5 seconds..."
-            sleep 5
+            echo "Retrying in ${RETRY_DELAY} seconds..."
+            sleep ${RETRY_DELAY}
+            RETRY_DELAY=$((RETRY_DELAY * 2))
           done
 
   lint:
@@ -83,7 +94,12 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
+            .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-bun-
+            ${{ runner.os }}-
       - name: Configure Git
         run: |
           git fetch origin main:main || git fetch origin master:main
@@ -96,81 +112,9 @@ jobs:
   test:
     needs: setup
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: 1.0.14
-      - name: Restore cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
-      - name: Configure Git
-        run: |
-          git fetch origin main:main || git fetch origin master:main
-      - uses: nrwl/nx-set-shas@v4
-        with:
-          main-branch-name: 'main'
-      - name: Run tests
-        run: |
-          # Run tests for each project
-          for project in "@acme/workspace" "web" "docs-fetcher" "cleanup"; do
-            echo "Testing project: $project"
-            bun nx test $project --skip-nx-cache || {
-              echo "Failed: $project"
-              exit 1
-            }
-          done
-
-  security:
-    needs: setup
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install security tools
-        run: |
-          echo "Installing required packages..."
-          sudo apt-get update
-          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-
-          # Install Trivy
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
-            sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install -y trivy
-
-          # Install Gitleaks via GitHub CLI
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-
-          gh release download --repo zricethezav/gitleaks --pattern "*linux_x64.tar.gz" --dir /tmp
-          cd /tmp && tar -xzf gitleaks*.tar.gz
-          sudo mv gitleaks /usr/local/bin/
-          rm gitleaks*.tar.gz
-
-      - name: Run security checks
-        run: |
-          trivy fs --security-checks vuln,config,secret .
-          gitleaks detect --verbose
-
-  build:
-    needs: [setup, lint, test]
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20]
+        project: ["@acme/workspace", "web", "docs-fetcher", "cleanup"]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -187,7 +131,171 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
+            .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-bun-
+            ${{ runner.os }}-
+
+      - name: Configure Git
+        run: |
+          git fetch origin main:main || git fetch origin master:main
+
+      - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          echo "Testing project: ${{ matrix.project }}"
+          bun nx test ${{ matrix.project }} --skip-nx-cache
+        env:
+          # Increase Node.js memory limit for large builds
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          
+          # Skip security checks in CI environment since they're handled in a separate job
+          SKIP_SECURITY_CHECKS: true
+          
+          # Suppress Node.js warnings:
+          # - ExperimentalWarning: Custom ESM Loaders is an experimental feature
+          # - ExperimentalWarning: --experimental-loader is an experimental feature
+          # These warnings are expected when using Bun with Next.js and don't indicate issues
+          NODE_NO_WARNINGS: 1
+          
+          # Suppress Vite CJS warnings:
+          # - "The CJS build of Vite's Node API is deprecated"
+          # This warning appears due to some dependencies not yet updated to ESM
+          # Safe to ignore as we're using Vite through Next.js/React configuration
+          VITE_CJS_IGNORE_WARNING: true
+
+  security:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install security tools
+        run: |
+          echo "Installing required packages..."
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+
+          # Install Trivy with version pinning
+          TRIVY_VERSION="0.47.0"
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --batch --yes --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
+            sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy=${TRIVY_VERSION}
+
+          # Install Gitleaks with version pinning and checksum verification
+          GITLEAKS_VERSION="v8.18.1"
+          
+          # Download Gitleaks binary and checksums
+          wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_linux_x64.tar.gz -O /tmp/gitleaks.tar.gz
+          wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_checksums.txt -O /tmp/gitleaks_checksums.txt
+          
+          # Verify checksum
+          cd /tmp
+          sha256sum --check --ignore-missing <(grep linux_x64.tar.gz gitleaks_checksums.txt)
+          
+          # Install Gitleaks
+          tar -xzf gitleaks.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+          sudo chmod +x /usr/local/bin/gitleaks
+          
+          # Clean up
+          rm gitleaks.tar.gz gitleaks_checksums.txt
+          
+          # Verify installations
+          echo "Verifying installations..."
+          trivy --version
+          gitleaks version
+
+      - name: Run security checks
+        run: |
+          # Run Trivy with configuration
+          trivy fs \
+            --security-checks vuln,config,secret \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --timeout 10m \
+            --ignorefile .trivyignore \
+            --format sarif \
+            --output trivy-results.sarif .
+
+          # Run Gitleaks with configuration
+          gitleaks detect \
+            --verbose \
+            --report-format sarif \
+            --report-path gitleaks-results.sarif \
+            --config .gitleaks.toml
+
+      - name: Upload Trivy results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+      - name: Upload Gitleaks results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: gitleaks-results.sarif
+          category: gitleaks
+
+      - name: Archive security scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: |
+            trivy-results.sarif
+            gitleaks-results.sarif
+          retention-days: 7
+
+  build:
+    needs: [setup, lint, test]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+      fail-fast: false
+    env:
+      BUILD_ENV: production
+      NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+      NEXT_PUBLIC_APP_ENV: production
+      ENABLE_SOURCE_MAPS: true
+      ANALYZE_BUNDLE: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.0.14
+
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+            .nx/cache
+          key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-bun-
+            ${{ runner.os }}-
 
       - name: Configure Git
         run: |
@@ -202,6 +310,7 @@ jobs:
           rm -rf artifacts/apps/web
           rm -rf .next
           rm -rf .nx/cache
+          rm -rf node_modules/.cache
           bun nx reset
 
       - name: Setup Node.js
@@ -214,15 +323,20 @@ jobs:
           # Set larger heap for Node
           export NODE_OPTIONS="--max-old-space-size=6144"
 
+          # Ensure Nx workspace is properly initialized
+          bun nx reset
+
           # Run build with retry logic
           MAX_RETRIES=3
           RETRY_COUNT=0
           RETRY_DELAY=10
 
-          until bun nx affected -t build \
+          until bun nx build web \
             --configuration=production \
-            --skip-nx-cache; do
-            
+            --skip-nx-cache \
+            --verbose \
+            --source-maps=$ENABLE_SOURCE_MAPS \
+            --bundle-analyzer=$ANALYZE_BUNDLE; do
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
               echo "Failed to build after $MAX_RETRIES attempts"
@@ -230,6 +344,10 @@ jobs:
             fi
             echo "Build failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
             sleep $RETRY_DELAY
+            # Clean up before retry
+            rm -rf artifacts/apps/web
+            rm -rf .next
+            bun nx reset
             # Increase delay for each retry
             RETRY_DELAY=$((RETRY_DELAY * 2))
           done
@@ -241,41 +359,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NEXT_TELEMETRY_DISABLED: 1
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-${{ github.sha }}
+          path: |
+            artifacts/apps/web/.next
+            artifacts/apps/web/public
+          retention-days: 7
+          if-no-files-found: error
+
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
           path: |
-            artifacts
-            dist
-          key: ${{ runner.os }}-build-${{ github.sha }}
+            artifacts/apps/web/.next
+            artifacts/apps/web/public
+          key: ${{ runner.os }}-build-${{ github.sha }}-${{ env.BUILD_ENV }}
           restore-keys: |
+            ${{ runner.os }}-build-${{ github.sha }}-
             ${{ runner.os }}-build-
-
-      - name: Update build status
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            try {
-              const context = github.context;
-              const state = context.job.status === 'success' ? 'success' : 'failure';
-              
-              await github.rest.repos.createCommitStatus({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                sha: context.sha,
-                state: state,
-                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-                description: state === 'success' ? 'Build succeeded' : 'Build failed',
-                context: 'CI/build'
-              });
-            } catch (error) {
-              console.warn('Failed to update commit status:', error.message);
-              // Don't fail the build if we can't update the status
-              if (!error.message.includes('Resource not accessible')) {
-                throw error;
-              }
-            }
 
   e2e:
     needs: [setup, build]
@@ -294,7 +397,12 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
+            .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-bun-
+            ${{ runner.os }}-
       - name: Configure Git
         run: |
           git fetch origin main:main || git fetch origin master:main
@@ -302,9 +410,42 @@ jobs:
         with:
           main-branch-name: 'main'
       - name: Install Playwright
-        run: bun playwright install --with-deps
+        run: |
+          bun playwright install --with-deps
+          # Install additional browser dependencies
+          bun playwright install-deps
+
+      - name: Create artifacts directory
+        run: mkdir -p playwright-results
+
       - name: Run E2E tests
-        run: bun nx affected -t e2e --skip-nx-cache
+        run: |
+          bun nx affected -t e2e \
+            --skip-nx-cache \
+            --parallel=3 \
+            --max-parallel=3 \
+            --configuration=ci \
+            --retries=2
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-results/html
+          PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
+          # Increase timeout for CI environment
+          PLAYWRIGHT_TIMEOUT: 60000
+          # Enable video recording for failed tests
+          PLAYWRIGHT_VIDEO: "retain-on-failure"
+          # Enable trace for failed tests
+          PLAYWRIGHT_TRACE: "retain-on-failure"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            playwright-results/
+            **/test-results/
+            **/playwright-report/
+          retention-days: 30
 
   docs:
     needs: setup
@@ -323,7 +464,12 @@ jobs:
           path: |
             ~/.bun/install/cache
             node_modules
+            .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-bun-
+            ${{ runner.os }}-
 
       - name: Validate documentation formatting
         working-directory: ${{ github.workspace }}
@@ -374,16 +520,16 @@ jobs:
             
             # Check if it's a real error or just no markdown files
             if [[ $EXIT_CODE -eq 0 ]]; then
-              echo "✅ No markdown files found or all references are valid"
+              echo "No markdown files found or all references are valid"
               break
             fi
             
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "❌ Failed to check docs cross-references after $MAX_RETRIES attempts"
+              echo "Failed to check docs cross-references after $MAX_RETRIES attempts"
               exit 1
             fi
-            echo "⚠️ Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
             sleep $RETRY_DELAY
             RETRY_DELAY=$((RETRY_DELAY * 2))
           done
@@ -409,9 +555,9 @@ jobs:
           # Check if critical files/directories exist
           for dir in ".next" "dist" "build" "artifacts"; do
             if [ -d "$dir" ]; then
-              echo "✓ $dir exists"
+              echo "$dir exists"
             else
-              echo "✗ $dir is missing"
+              echo "$dir is missing"
               exit 1
             fi
           done

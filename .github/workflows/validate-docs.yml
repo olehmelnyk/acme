@@ -50,6 +50,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-docs-
 
+      - name: Setup retry function
+        run: |
+          function retry_command() {
+            local cmd="$1"
+            local max_retries=3
+            local retry_count=0
+            local retry_delay=5
+
+            until eval "$cmd"; do
+              retry_count=$((retry_count + 1))
+              if [ $retry_count -eq $max_retries ]; then
+                echo "Failed after $max_retries attempts"
+                exit 1
+              fi
+              echo "Failed. Retrying in ${retry_delay} seconds... (Attempt $retry_count of $max_retries)"
+              sleep $retry_delay
+              retry_delay=$((retry_delay * 2))
+            done
+          }
+          export -f retry_command
+
       - name: Install dependencies
         id: install
         run: |
@@ -65,81 +86,25 @@ jobs:
       - name: Check formatting
         id: format
         working-directory: tools/docs-manager
-        run: |
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run format:check; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to check formatting after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+        run: retry_command "bun run format:check"
         continue-on-error: false
 
       - name: Validate cross-references
         id: xref-check
         working-directory: tools/docs-manager
-        run: |
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run xref:check; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to check cross-references after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+        run: retry_command "bun run xref:check"
         continue-on-error: false
 
       - name: Generate cross-references
         id: xref-gen
         working-directory: tools/docs-manager
-        run: |
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run xref; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to generate cross-references after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Generation failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+        run: retry_command "bun run xref"
         continue-on-error: false
 
       - name: Validate diagrams
         id: diagrams
         working-directory: tools/docs-manager
-        run: |
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run validate; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to validate diagrams after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Validation failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+        run: retry_command "bun run validate"
         continue-on-error: false
 
       - name: Generate diagram index
@@ -149,20 +114,7 @@ jobs:
           # Ensure docs directory exists
           mkdir -p ../docs/architecture/diagrams
 
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=5
-
-          until bun run index; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to generate diagram index after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Generation failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+          retry_command "bun run index"
         continue-on-error: false
 
       - name: Check for changes
