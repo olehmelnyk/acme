@@ -20,10 +20,15 @@ This document outlines our AI integration practices and standards.
 
 ### 3. Documentation
 
-- Documentation validation
-- Cross-reference checking
-- Style consistency
-- Content suggestions
+- Documentation validation using `docs:validate:all`
+  - Cross-reference checking with `docs:xref`
+  - Format validation with `docs:format:check`
+  - Diagram validation
+- Style consistency enforcement
+- Content suggestions and improvements
+- Automated link validation
+
+For more information about our documentation tools, see the [documentation validation guide](./diagrams/infrastructure/documentation.md).
 
 ## Implementation Patterns
 
@@ -127,5 +132,5 @@ const analyzeCode = async (code: string) => {
 
 - [Development Guide](development.md)
 - [Quality and Security](../quality_and_security.md)
-- [Testing Guidelines](testing.md)
+For more information about our testing practices, see [Testing](testing.md).
 - [Security Architecture](./diagrams/system/security.md)

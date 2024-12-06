@@ -68,6 +68,8 @@ A: Options:
 2. Add console.logs (remove before committing)
 3. Use debugger with `--inspect` flag
 
+For more information about our testing practices, see [Testing](../architecture/testing.md).
+
 ## Performance
 
 ### Q: How do I improve build performance?

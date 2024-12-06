@@ -359,24 +359,31 @@ jobs:
           # Ensure docs directory exists
           mkdir -p docs
 
-          # Run cross-reference check
+          echo "Running documentation cross-reference check..."
+          echo "Current directory: $(pwd)"
+          echo "Docs directory contents:"
+          ls -la docs/
+
+          # Run cross-reference check with debug output
           MAX_RETRIES=3
           RETRY_COUNT=0
           RETRY_DELAY=5
 
-          until bun run docs:xref --check; do
+          until bun run docs:xref --check --verbose; do
+            EXIT_CODE=$?
+            
             # Check if it's a real error or just no markdown files
-            if [[ $? -eq 0 ]]; then
-              echo "No markdown files found - this is okay for now"
+            if [[ $EXIT_CODE -eq 0 ]]; then
+              echo "✅ No markdown files found or all references are valid"
               break
             fi
             
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to check docs cross-references after $MAX_RETRIES attempts"
+              echo "❌ Failed to check docs cross-references after $MAX_RETRIES attempts"
               exit 1
             fi
-            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+            echo "⚠️ Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
             sleep $RETRY_DELAY
             RETRY_DELAY=$((RETRY_DELAY * 2))
           done

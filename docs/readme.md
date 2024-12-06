@@ -4,78 +4,71 @@
 
 ### Getting Started
 
-- [contributing guide](../contributing.md)
-- [code of conduct](../code_of_conduct.md)
-- [security policy](../security.md)
+- [Contributing](contributing.md)
+- [Code of Conduct](code_of_conduct.md)
+- [Security](quality_and_security.md)
 
 ### Architecture
 
-- [system overview](./architecture/overview.md)
-- [ui layer](./architecture/ui_layer.md)
-- [data access layer](./architecture/dal_layer.md)
-- [business logic layer](./architecture/bl_layer.md)
-- [database design](./architecture/database.md)
-- [api design patterns](./architecture/api_patterns.md)
-- [architecture diagrams](./architecture/diagrams.md)
+- [Architecture Overview](architecture/overview.md)
+- [UI Layer](architecture/ui_layer.md)
+- [Data Access Layer](architecture/dal_layer.md)
+- [Business Logic Layer](architecture/bl_layer.md)
+- [Database Design](architecture/database.md)
+- [API Design Patterns](architecture/api_patterns.md)
+- [Architecture Diagrams](architecture/diagrams.md)
 
 ### Development
 
-- [environment setup](./development/environment_setup.md)
-- [development workflow](./architecture/diagrams/system/workflow.md)
-- [quality and security](./quality_and_security.md)
-- [logging and monitoring](./architecture/logging_and_monitoring.md)
-- [testing strategy](./architecture/testing.md)
-- [automation](./architecture/automation.md)
-- [ai integration](./architecture/ai_instructions.md)
-
-### AI Development
-
-- [ai instructions](./architecture/ai_instructions.md)
+- [Environment Setup](development/environment_setup.md)
+- [Development Workflow](architecture/diagrams/system/workflow.md)
+- [Quality and Security](quality_and_security.md)
+- [Logging and Monitoring](architecture/logging_and_monitoring.md)
+- [Testing Strategy](architecture/testing.md)
+- [Automation](architecture/automation.md)
+- [AI Integration](architecture/ai_instructions.md)
+- [FAQ](development/faq.md)
 
 ### Testing
 
-1. [testing strategy](./architecture/testing.md)
-   - unit testing (vitest)
-   - component testing
-   - integration testing
-   - e2e testing (playwright)
-   - performance testing
-   - security testing
-   - mock data strategy
+- [Testing Strategy](architecture/testing.md)
+  - Unit Testing (Vitest)
+  - Component Testing
+  - Integration Testing
+  - E2E Testing (Playwright)
+  - Performance Testing
+  - Security Testing
+  - Mock Data Strategy
 
 ### Quality & Security
 
-1. [quality and security guidelines](./quality_and_security.md)
-   - code quality tools
-   - security scanning
-   - performance monitoring
-   - accessibility compliance
-   - documentation quality
+- [Quality and Security Guidelines](quality_and_security.md)
+  - Code Quality Tools
+  - Security Best Practices
+  - Performance Optimization
+  - Monitoring and Alerting
 
-### Monitoring
+### Deployment
 
-1. [logging and monitoring](./architecture/logging_and_monitoring.md)
-   - logging strategy (pino)
-   - application monitoring
-   - performance monitoring
-   - error tracking
-   - metrics and dashboards
+- [Deployment Guide](deployment/deployment.md)
+- [Production Environment](architecture/diagrams/infrastructure/production-environment.md)
+- [CI/CD Pipeline](architecture/diagrams/infrastructure/ci-cd-pipeline.md)
 
 ## Quick Links
 
 ### Common Tasks
 
-- setting up development environment: [contributing guide](../contributing.md#development-setup)
-- running tests: [testing strategy](./architecture/testing.md#running-tests)
-- code quality checks: [quality guidelines](./quality_and_security.md#quality-assurance)
-- database migrations: [database guide](./architecture/database.md#migrations)
+- setting up development environment: [Contributing](contributing.md#development-setup)
+- running tests: [Testing Strategy](architecture/testing.md#running-tests)
+- code quality checks: [Quality Guidelines](quality_and_security.md#quality-assurance)
+- database migrations: [Database Guide](architecture/database.md#migrations)
 
 ### Key Concepts
 
-- [feature-sliced design](./architecture/overview.md#architectural-style)
-- [testing pyramid](./architecture/testing.md#testing-pyramid)
-- [api design principles](./architecture/api_patterns.md#design-principles)
-- [security best practices](./quality_and_security.md#security-best-practices)
+- [Feature-Sliced Design](architecture/overview.md#architectural-style)
+- [Testing Pyramid](architecture/testing.md#testing-pyramid)
+- [API Design Principles](architecture/api_patterns.md#design-principles)
+- [Security Best Practices](quality_and_security.md#security-best-practices)
 
 ## Documentation Structure
 

@@ -6,24 +6,24 @@ This document outlines our development standards, best practices, and workflows.
 
 ### Code Style
 
-- TypeScript/JavaScript: Follow [TypeScript ESLint](https://typescript-eslint.io/) rules
-- React: Follow [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-- CSS: Use Tailwind CSS with consistent class ordering
-- Testing: Follow [Testing Library](https://testing-library.com/) guidelines
+- TypeScript/JavaScript: Follow our [ESLint configuration](./.eslintrc.js)
+- React: Follow [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/) and our [component guidelines](./ui_layer.md#component-guidelines)
+- CSS: Use [Tailwind CSS](./ui_layer.md#styling-guidelines) with consistent class ordering
+- Testing: Follow [Testing Library](https://testing-library.com/) guidelines and our [testing strategy](./testing.md)
 
 ### Project Structure
 
-- Feature-based organization
-- Atomic Design principles
-- Clear separation of concerns
-- Consistent file naming
+- [Feature-based organization](./overview.md#project-structure)
+- [Atomic Design principles](./diagrams/components/atomic-design.md)
+- [Clear separation of concerns](./overview.md#architecture-principles)
+- [Consistent file naming](../conventions/commit_conventions.md#file-naming)
 
 ### Version Control
 
-- Conventional Commits
-- Branch naming conventions
-- Pull request templates
-- Code review guidelines
+- [Conventional Commits](../conventions/commit_conventions.md)
+- [Branch naming conventions](../conventions/branch_naming.md)
+- [Pull request guidelines](../contributing.md#pull-requests)
+- [Code review guidelines](../contributing.md#code-review)
 
 ## Development Workflow
 
@@ -132,6 +132,6 @@ bun run e2e
 ## Related Documentation
 
 - [Architecture Diagrams](diagrams.md)
-- [Testing Guidelines](testing.md)
+- For more details about testing, see [Testing](testing.md).
 - [API Documentation](api.md)
 - [Performance Guidelines](./diagrams/system/performance.md)

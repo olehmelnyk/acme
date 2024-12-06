@@ -13,6 +13,8 @@ This document outlines our quality assurance processes and security practices.
 
 ### Testing Strategy
 
+For detailed information about our testing strategy, see [Testing](testing.md).
+
 - Unit testing
 - Integration testing
 - E2E testing

@@ -106,6 +106,8 @@ test('user signup flow', async ({ page }) => {
 });
 ```
 
+For more information about our testing automation, see [Testing](testing.md).
+
 ## Development Automation
 
 ### Code Generation
@@ -267,17 +269,15 @@ Our continuous integration and deployment pipeline handles:
 
 ### Testing Tools
 
-- Vitest
-- Playwright
-- Cypress
-- k6
+- [Playwright](https://playwright.dev/) - End-to-end testing
+- [Vitest](https://vitest.dev/) - Unit and integration testing
+- [k6](https://k6.io/) - Performance testing
 
 ### Monitoring Tools
 
-- Prometheus
-- Grafana
-- Datadog
-- New Relic
+- [Grafana](https://grafana.com/) - Metrics visualization
+- [Prometheus](https://prometheus.io/) - Metrics collection
+- [Pino](https://getpino.io/) - Application logging
 
 ## Related Documentation
 

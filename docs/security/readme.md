@@ -90,7 +90,7 @@ We enforce security checks at the pre-commit stage to prevent sensitive informat
 
 ### Git Hooks
 
-For more information about Git hooks, see [git hooks](../git_hooks.md).
+For more information about Git hooks, see [Git Hooks](../git_hooks.md).
 
 ### 4. Infrastructure Security
 
@@ -101,10 +101,10 @@ For more information about Git hooks, see [git hooks](../git_hooks.md).
 
 ## Reporting Security Issues
 
-For our complete security policy and vulnerability reporting guidelines, see our [security policy](../../security.md).
+For our complete security policy and vulnerability reporting guidelines, see our [security policy](../quality_and_security.md).
 
 ## Additional Resources
 
-- [quality and security guidelines](../quality_and_security.md)
+- For more details about our security practices and guidelines, see [Security Guidelines](./security_guidelines.md).
 - [GitHub Security Best Practices](https://docs.github.com/en/code-security)
 - [Next.js Security Documentation](https://nextjs.org/docs/authentication)
