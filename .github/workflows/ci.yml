@@ -349,15 +349,44 @@ jobs:
         id: build
         run: |
           echo "Building project: ${{ matrix.project }}"
-          "/usr/local/bin/retry_command" "bun nx build ${{ matrix.project }} --skip-nx-cache"
+          # Show current directory and its contents
+          pwd
+          ls -la
+          
+          # Create output directory first
+          mkdir -p "artifacts/apps/${{ matrix.project }}"
+          echo "Created build directory: artifacts/apps/${{ matrix.project }}"
+          
+          # Run build command with output
+          echo "Running build command..."
+          "/usr/local/bin/retry_command" "bun nx build ${{ matrix.project }} --skip-nx-cache --verbose"
+          
+          # List possible build output locations
+          echo "Checking common build output locations:"
+          ls -la "dist" || echo "No dist directory"
+          ls -la "build" || echo "No build directory"
+          ls -la "out" || echo "No out directory"
+          ls -la "artifacts" || echo "No artifacts directory"
 
       - name: Verify build output
         run: |
           BUILD_DIR="artifacts/apps/${{ matrix.project }}"
+          echo "Checking build directory: ${BUILD_DIR}"
+          
+          # Show current directory structure
+          echo "Current directory structure:"
+          pwd
+          ls -la
+          
           if [ ! -d "${BUILD_DIR}" ]; then
             echo "❌ Build directory ${BUILD_DIR} is missing"
+            echo "Available directories in artifacts/apps/:"
+            ls -la "artifacts/apps" || echo "artifacts/apps directory not found"
+            echo "Available directories in current location:"
+            ls -la
             exit 1
           fi
+          
           echo "✅ Build directory ${BUILD_DIR} exists and contains:"
           ls -la "${BUILD_DIR}"
 
@@ -422,6 +451,7 @@ jobs:
         run: mkdir -p "playwright-results"
 
       - name: Set test parameters
+        id: set-max-parallel
         run: |
           # Calculate optimal parallel jobs (number of cores minus 1)
           CORES=$(nproc)
@@ -430,15 +460,15 @@ jobs:
           if [ "${MAX_PARALLEL}" -lt 1 ]; then
             MAX_PARALLEL=1
           fi
-          echo "MAX_PARALLEL=${MAX_PARALLEL}" >> "$GITHUB_ENV"
+          echo "max_parallel=${MAX_PARALLEL}" >> "$GITHUB_OUTPUT"
           echo "Using ${MAX_PARALLEL} parallel jobs on ${CORES} cores"
 
       - name: Run E2E tests
         run: |
           "/usr/local/bin/retry_command" "bun nx affected -t e2e \
             --skip-nx-cache \
-            --parallel=${{ env.MAX_PARALLEL }} \
-            --max-parallel=${{ env.MAX_PARALLEL }} \
+            --parallel=${{ steps.set-max-parallel.outputs.max_parallel }} \
+            --max-parallel=${{ steps.set-max-parallel.outputs.max_parallel }} \
             --configuration=${{ env.TEST_CONFIGURATION }}"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
