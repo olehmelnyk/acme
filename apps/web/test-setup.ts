@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, afterEach } from '@jest/globals';
+import { afterEach } from '@jest/globals';
 import { cleanup } from '@testing-library/react';
 import { TextEncoder as NodeTextEncoder, TextDecoder as NodeTextDecoder } from 'util';
 import { Window } from 'happy-dom';
@@ -81,8 +81,6 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/',
   useSearchParams: () => new URLSearchParams()
 }));
-
-const originalConsole = global.console;
 
 // Cleanup after each test
 afterEach(() => {

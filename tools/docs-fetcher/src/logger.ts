@@ -65,7 +65,7 @@ class Logger {
   }
 
   private logInternal(messageOrLevel: string | LogLevel, levelOrMessage?: LogLevel | string, data?: unknown): void {
-    let level: LogLevel = 'info';
+    let level: LogLevel;
     let message: string;
 
     // Determine the correct level and message based on argument types

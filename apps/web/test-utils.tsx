@@ -18,8 +18,7 @@ export function render(element: ReactElement) {
   
   // Simple React-like rendering
   const Component = () => element;
-  const instance = new Component();
-  container.innerHTML = instance.render().toString();
+  container.innerHTML = Component().toString();
   
   return {
     container,

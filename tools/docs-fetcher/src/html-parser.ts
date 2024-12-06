@@ -205,7 +205,10 @@ export class HtmlParser {
     try {
       this.$('a[href]').each((_, el) => {
         const href = this.$(el).attr('href');
-        if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+        // Check for internal fragments and unsafe URL schemes
+        if (href && 
+            !href.startsWith('#') && 
+            !/^(javascript|data|vbscript|file):/i.test(href)) {
           links.push(href);
         }
       });

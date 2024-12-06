@@ -74,11 +74,9 @@ describe('LinkValidator', () => {
   });
 
   test("LinkValidator > should handle invalid content type", async () => {
-    const validator = new LinkValidator({
+    const result = await validator.validateLink('https://example.com/invalid-type', {
       allowedContentTypes: ['text/html', 'text/markdown']
     });
-    
-    const result = await validator.validateLink('https://example.com/invalid-type');
     
     expect(result.isValid).toBe(false);
     expect(result.statusCode).toBe(200);
@@ -95,11 +93,9 @@ describe('LinkValidator', () => {
   });
 
   test("LinkValidator > should handle timeout", async () => {
-    const validator = new LinkValidator({
+    const result = await validator.validateLink('https://example.com/timeout', {
       timeout: 50
     });
-    
-    const result = await validator.validateLink('https://example.com/timeout');
     
     expect(result.isValid).toBe(false);
     expect(result.error).toContain('timeout');
@@ -140,8 +136,8 @@ describe('LinkValidator', () => {
       } as Response);
     });
 
-    const validator = new LinkValidator(options);
-    const result = await validator.validateLink('https://example.com/invalid-type');
+    const validator = new LinkValidator();
+    const result = await validator.validateLink('https://example.com/invalid-type', options);
 
     // Since content type validation is disabled, the link should be considered valid
     expect(result.isValid).toBe(true);

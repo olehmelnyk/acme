@@ -92,18 +92,35 @@ export class PackageAnalyzer {
   private async loadFromCache(): Promise<ProjectAnalysis | null> {
     try {
       const cacheFile = this.getCacheFilePath();
-      if (!fs.existsSync(cacheFile)) {
+      
+      // Check file existence using promises
+      try {
+        await fs.promises.access(cacheFile, fs.constants.R_OK);
+      } catch {
         return null;
       }
 
-      const stats = await fs.promises.stat(cacheFile);
-      const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+      // Get file stats
+      let stats;
+      try {
+        stats = await fs.promises.stat(cacheFile);
+      } catch {
+        return null;
+      }
       
+      const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
       if (ageHours > this.cacheDuration) {
         return null;
       }
 
-      const cached = JSON.parse(await fs.promises.readFile(cacheFile, 'utf8'));
+      // Read and parse file
+      let cached;
+      try {
+        const content = await fs.promises.readFile(cacheFile, 'utf8');
+        cached = JSON.parse(content);
+      } catch {
+        return null;
+      }
       
       return {
         packages: cached.packages,

@@ -1,6 +1,4 @@
 import { vi } from 'vitest';
-import { rm, existsSync } from 'fs';
-import { sync as globSync } from 'glob';
 
 // Mock fs/promises
 vi.mock('fs/promises', () => ({

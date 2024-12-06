@@ -1,14 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CleanupManager } from './cleanup-manager';
 import { existsSync } from 'fs';
 import { rm } from 'fs/promises';
 import { sync as globSync } from 'glob';
-import { createInterface } from 'readline';
 
 vi.mock('fs/promises');
 vi.mock('fs');
 vi.mock('glob');
-vi.mock('readline');
 
 describe('CleanupManager', () => {
   let cleanupManager: CleanupManager;

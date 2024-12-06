@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextResponse, NextRequest } from 'next/server';
 import { middleware as securityHeaders } from './security/headers';
 import { getRateLimitMiddleware } from './security/rate-limit';
 

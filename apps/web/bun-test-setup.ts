@@ -1,4 +1,4 @@
-import { beforeAll, afterEach } from 'bun:test';
+import { afterEach } from 'bun:test';
 import { cleanup } from '@testing-library/react';
 
 interface Mock {
