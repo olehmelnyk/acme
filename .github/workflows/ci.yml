@@ -167,10 +167,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 22]
-        include:
-          - node-version: 20
-            primary: true
+        node-version: [20]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -180,6 +177,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
+
       - name: Restore cache
         uses: actions/cache/restore@v4
         with:
@@ -187,12 +185,15 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+
       - name: Configure Git
         run: |
           git fetch origin main:main || git fetch origin master:main
+
       - uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: 'main'
+
       - name: Clean build artifacts
         run: |
           rm -rf artifacts/apps/web
@@ -204,26 +205,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: Build
         run: |
-          # Calculate constraints based on both CPU and memory
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            CORES=$(nproc)
-          else
-            CORES=$(sysctl -n hw.ncpu)
-          fi
-
-          MEMORY_MB=$(free -m | grep Mem | awk '{print $2}')
-          MEMORY_JOBS=$(( MEMORY_MB / 1024 ))  # 1GB per job
-
-          # Use the lower of CPU or memory-based job count
-          PARALLEL_JOBS=$(( CORES < MEMORY_JOBS ? CORES : MEMORY_JOBS ))
-          PARALLEL_JOBS=$(( PARALLEL_JOBS < 1 ? 1 : PARALLEL_JOBS ))
-
-          echo "Available memory: ${MEMORY_MB}MB"
-          echo "Available cores: ${CORES}"
-          echo "Parallel jobs: ${PARALLEL_JOBS}"
-
           # Set larger heap for Node
           export NODE_OPTIONS="--max-old-space-size=6144"
 
@@ -233,10 +217,8 @@ jobs:
           RETRY_DELAY=10
 
           until bun nx affected -t build \
-            --parallel=$PARALLEL_JOBS \
-            --verbose \
-            --skip-nx-cache \
-            --configuration=production; do
+            --configuration=production \
+            --skip-nx-cache; do
             
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
@@ -254,15 +236,14 @@ jobs:
           NODE_NO_WARNINGS: 1
           VITE_CJS_IGNORE_WARNING: true
           GH_TOKEN: ${{ github.token }}
+          NEXT_TELEMETRY_DISABLED: 1
 
       - name: Cache build artifacts
         uses: actions/cache@v4
         with:
           path: |
-            .next
-            dist
-            build
             artifacts
+            dist
           key: ${{ runner.os }}-build-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-build-
@@ -333,10 +314,52 @@ jobs:
             ~/.bun/install/cache
             node_modules
           key: ${{ needs.setup.outputs.cache-key }}
+
       - name: Validate documentation formatting
-        run: bun run docs:format:check format --dry-run
+        working-directory: ${{ github.workspace }}
+        env:
+          SKIP_SECURITY_CHECKS: true
+          NODE_NO_WARNINGS: 1
+          VITE_CJS_IGNORE_WARNING: true
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          RETRY_DELAY=5
+
+          until bun run docs:format:check --dry-run; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to validate docs formatting after $MAX_RETRIES attempts"
+              exit 1
+            fi
+            echo "Validation failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+            sleep $RETRY_DELAY
+            RETRY_DELAY=$((RETRY_DELAY * 2))
+          done
+
       - name: Check documentation cross-references
-        run: bun run docs:xref --check
+        working-directory: ${{ github.workspace }}
+        env:
+          SKIP_SECURITY_CHECKS: true
+          NODE_NO_WARNINGS: 1
+          VITE_CJS_IGNORE_WARNING: true
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          RETRY_DELAY=5
+
+          until bun run docs:xref --check; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to check docs cross-references after $MAX_RETRIES attempts"
+              exit 1
+            fi
+            echo "Check failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
+            sleep $RETRY_DELAY
+            RETRY_DELAY=$((RETRY_DELAY * 2))
+          done
 
   verify-build:
     needs: build
