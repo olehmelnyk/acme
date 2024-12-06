@@ -100,15 +100,15 @@ export class PackageAnalyzer {
         return null;
       }
 
-      // Get file stats
-      let stats;
+      // Get initial file stats
+      let initialStats;
       try {
-        stats = await fs.promises.stat(cacheFile);
+        initialStats = await fs.promises.stat(cacheFile);
       } catch {
         return null;
       }
       
-      const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
+      const ageHours = (Date.now() - initialStats.mtimeMs) / (1000 * 60 * 60);
       if (ageHours > this.cacheDuration) {
         return null;
       }
@@ -117,6 +117,14 @@ export class PackageAnalyzer {
       let cached;
       try {
         const content = await fs.promises.readFile(cacheFile, 'utf8');
+        
+        // Check if file was modified during read
+        const currentStats = await fs.promises.stat(cacheFile);
+        if (currentStats.mtimeMs !== initialStats.mtimeMs || 
+            currentStats.size !== initialStats.size) {
+          return null; // File was modified during read
+        }
+        
         cached = JSON.parse(content);
       } catch {
         return null;
