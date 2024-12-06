@@ -13,7 +13,7 @@
     "tailwind"
   ],
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=20.x",
     "bun": ">=1.0.0"
   },
   "packageManager": "bun@1.0.0",

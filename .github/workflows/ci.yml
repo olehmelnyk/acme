@@ -27,6 +27,9 @@ env:
   NODE_OPTIONS: '--experimental-vm-modules --experimental-import-meta-resolve'
   NODE_PRESERVE_SYMLINKS: 1
   FORCE_CJS: true
+  BUN_VERSION: 1.0.14
+  # E2E test configuration
+  TEST_CONFIGURATION: ci
   # Retry command script
   RETRY_COMMAND_SCRIPT: |
     #!/bin/bash
@@ -57,8 +60,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -68,9 +71,8 @@ jobs:
       - name: Generate cache key
         id: cache-key
         run: |
-          LOCKFILE_HASH="${{ hashFiles('**/bun.lockb') }}"
-          WORKFLOW_HASH="${{ hashFiles('.github/workflows/**') }}"
-          echo "value=${{ runner.os }}-bun-$LOCKFILE_HASH-$WORKFLOW_HASH" >> "$GITHUB_OUTPUT"
+          CACHE_KEY="${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}"
+          echo "value=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v4
@@ -79,14 +81,21 @@ jobs:
             ~/.bun/install/cache
             node_modules
             .nx/cache
-          key: ${{ steps.cache-key.outputs.value }}
+          key: "${{ steps.cache-key.outputs.value }}"
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Install dependencies
-        run: /usr/local/bin/retry_command "bun install --frozen-lockfile"
+        run: |
+          echo "::group::Install root dependencies"
+          "/usr/local/bin/retry_command" "bun install --frozen-lockfile"
+          echo "::endgroup::"
+          
+          echo "::group::Install docs-manager dependencies"
+          cd "tools/docs-manager" && "/usr/local/bin/retry_command" "bun install --frozen-lockfile"
+          echo "::endgroup::"
 
   lint:
     needs: setup
@@ -96,8 +105,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -112,9 +121,9 @@ jobs:
             .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Run linting
         run: |
@@ -125,7 +134,7 @@ jobs:
           export FORCE_CJS=true
 
           # Run nx lint with retry logic
-          /usr/local/bin/retry_command "bun nx affected -t lint --skip-nx-cache"
+          "/usr/local/bin/retry_command" "bun nx affected -t lint --skip-nx-cache"
         env:
           # Ensure consistent module resolution
           NODE_PRESERVE_SYMLINKS: 1
@@ -146,8 +155,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -162,13 +171,13 @@ jobs:
             .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Configure Git
         run: |
-          git fetch origin main:main || git fetch origin master:main
+          git fetch origin "main:main" || git fetch origin "master:main"
 
       - uses: nrwl/nx-set-shas@v4
         with:
@@ -178,7 +187,7 @@ jobs:
         id: run-tests
         run: |
           echo "Testing project: ${{ matrix.project }}"
-          /usr/local/bin/retry_command "bun nx test ${{ matrix.project }} --skip-nx-cache"
+          "/usr/local/bin/retry_command" "bun nx test ${{ matrix.project }} --skip-nx-cache"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
@@ -196,8 +205,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - name: Install security tools
         run: |
@@ -256,16 +265,30 @@ jobs:
             --report-path gitleaks-results.sarif \
             --config .gitleaks.toml
 
+      - name: Upload Trivy SARIF results to Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+      - name: Upload Gitleaks SARIF results to Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: gitleaks-results.sarif
+          category: gitleaks
+
       - name: Upload Trivy results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-results
           path: trivy-results.sarif
 
       - name: Upload Gitleaks results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gitleaks-results
           path: gitleaks-results.sarif
@@ -294,8 +317,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -310,13 +333,13 @@ jobs:
             .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Configure Git
         run: |
-          git fetch origin main:main || git fetch origin master:main
+          git fetch origin "main:main" || git fetch origin "master:main"
 
       - uses: nrwl/nx-set-shas@v4
         with:
@@ -326,13 +349,23 @@ jobs:
         id: build
         run: |
           echo "Building project: ${{ matrix.project }}"
-          /usr/local/bin/retry_command "bun nx build ${{ matrix.project }} --skip-nx-cache"
+          "/usr/local/bin/retry_command" "bun nx build ${{ matrix.project }} --skip-nx-cache"
+
+      - name: Verify build output
+        run: |
+          BUILD_DIR="artifacts/apps/${{ matrix.project }}"
+          if [ ! -d "${BUILD_DIR}" ]; then
+            echo "❌ Build directory ${BUILD_DIR} is missing"
+            exit 1
+          fi
+          echo "✅ Build directory ${BUILD_DIR} exists and contains:"
+          ls -la "${BUILD_DIR}"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.project }}
-          path: dist/apps/${{ matrix.project }}
+          path: artifacts/apps/${{ matrix.project }}
           retention-days: 1
 
   e2e:
@@ -345,8 +378,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -361,20 +394,20 @@ jobs:
             .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: build-*
-          path: dist/apps
+          path: artifacts/apps
           merge-multiple: true
 
       - name: Configure Git
         run: |
-          git fetch origin main:main || git fetch origin master:main
+          git fetch origin "main:main" || git fetch origin "master:main"
 
       - uses: nrwl/nx-set-shas@v4
         with:
@@ -382,19 +415,31 @@ jobs:
 
       - name: Install Playwright
         run: |
-          /usr/local/bin/retry_command "bun playwright install --with-deps"
-          /usr/local/bin/retry_command "bun playwright install-deps"
+          "/usr/local/bin/retry_command" "bun playwright install --with-deps"
+          "/usr/local/bin/retry_command" "bun playwright install-deps"
 
       - name: Create artifacts directory
-        run: mkdir -p playwright-results
+        run: mkdir -p "playwright-results"
+
+      - name: Set test parameters
+        run: |
+          # Calculate optimal parallel jobs (number of cores minus 1)
+          CORES=$(nproc)
+          MAX_PARALLEL=$((CORES - 1))
+          # Ensure at least 1 parallel job
+          if [ "${MAX_PARALLEL}" -lt 1 ]; then
+            MAX_PARALLEL=1
+          fi
+          echo "MAX_PARALLEL=${MAX_PARALLEL}" >> "$GITHUB_ENV"
+          echo "Using ${MAX_PARALLEL} parallel jobs on ${CORES} cores"
 
       - name: Run E2E tests
         run: |
-          /usr/local/bin/retry_command "bun nx affected -t e2e \
+          "/usr/local/bin/retry_command" "bun nx affected -t e2e \
             --skip-nx-cache \
-            --parallel=3 \
-            --max-parallel=3 \
-            --configuration=ci"
+            --parallel=${{ env.MAX_PARALLEL }} \
+            --max-parallel=${{ env.MAX_PARALLEL }} \
+            --configuration=${{ env.TEST_CONFIGURATION }}"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
@@ -415,8 +460,8 @@ jobs:
 
       - name: Setup retry function
         run: |
-          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee /usr/local/bin/retry_command
-          sudo chmod +x /usr/local/bin/retry_command
+          echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
+          sudo chmod +x "/usr/local/bin/retry_command"
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -431,49 +476,20 @@ jobs:
             .nx/cache
           key: ${{ needs.setup.outputs.cache-key }}
           restore-keys: |
-            ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
-            ${{ runner.os }}-bun-
-            ${{ runner.os }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-${{ hashFiles('**/bun.lockb') }}-
+            ${{ runner.os }}-${{ runner.arch }}-bun-${{ env.BUN_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Check documentation formatting
         run: |
           # Run format check with retry
-          /usr/local/bin/retry_command "bun run format:check"
+          "/usr/local/bin/retry_command" "bun run format:check"
 
       - name: Validate documentation
         run: |
           # Run docs validation with retry
-          /usr/local/bin/retry_command "bun run docs:validate:all"
+          "/usr/local/bin/retry_command" "bun run docs:validate:all"
 
-  verify-build:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Restore build artifacts
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            .next
-            dist
-            build
-            artifacts
-          key: ${{ runner.os }}-build-${{ github.sha }}
-
-      - name: Verify build artifacts
-        run: |
-          # Check if critical files/directories exist
-          for dir in ".next" "dist" "build" "artifacts"; do
-            if [ -d "$dir" ]; then
-              echo "$dir exists"
-            else
-              echo "$dir is missing"
-              exit 1
-            fi
-          done
-
-# Add at the top level of the workflow
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

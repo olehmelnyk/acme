@@ -21,7 +21,7 @@ env:
   NODE_ENV: production
   BUN_INSTALL_CACHE: ~/.bun/install/cache
   BUN_VERSION: 1.0.14
-  NODE_VERSION: 20.0.0
+  NODE_VERSION: 20.x # Use latest LTS version of Node.js 20 for security updates
 
 jobs:
   validate:
