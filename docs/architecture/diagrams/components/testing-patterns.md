@@ -1,8 +1,26 @@
 # Component Testing Patterns
 
-This document outlines our component testing strategies and best practices using Vitest and Testing Library.
+## Overview
 
-## Testing Hierarchy
+This document outlines our component testing strategies and best practices using Vitest and Testing Library. It provides a comprehensive guide for implementing effective testing patterns across different levels of our component architecture.
+
+## Components
+
+### Testing Tools
+- Vitest: Fast unit test runner
+- React Testing Library: Component testing utilities
+- Mock Service Worker: API mocking
+- Jest DOM: DOM testing utilities
+
+### Testing Types
+1. Unit Tests
+2. Component Tests
+3. Integration Tests
+4. E2E Tests
+
+## Interactions
+
+### Testing Hierarchy
 
 ```mermaid
 graph TD
@@ -16,23 +34,32 @@ graph TD
     style D fill:#f3e5f5
 ```
 
-## Testing Patterns
+### Component Interactions
+1. Parent-Child Communication
+2. Context Providers
+3. State Management
+4. Event Handling
+5. API Integration
 
-### 1. Component Unit Tests
+## Implementation Details
+
+### Testing Patterns
+
+#### 1. Component Unit Tests
 - Individual component rendering
 - Props validation
 - Event handlers
 - State changes
 - Error boundaries
 
-### 2. Component Integration Tests
+#### 2. Component Integration Tests
 - Parent-child interactions
 - Context providers
 - Redux/state management
 - Custom hooks
 - Event bubbling
 
-### 3. Best Practices
+#### 3. Best Practices
 - Use React Testing Library
 - Follow AAA pattern (Arrange, Act, Assert)
 - Test user interactions
@@ -40,9 +67,9 @@ graph TD
 - Test accessibility
 - Test error states
 
-## Code Examples
+### Code Examples
 
-### Basic Component Test
+#### Basic Component Test
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Button } from './Button';
@@ -60,7 +87,7 @@ describe('Button', () => {
 });
 ```
 
-### Integration Test Example
+#### Integration Test Example
 ```typescript
 import { render, screen, waitFor } from '@testing-library/react';
 import { UserProfile } from './UserProfile';
@@ -84,7 +111,7 @@ describe('UserProfile Integration', () => {
 });
 ```
 
-## Testing Guidelines
+### Testing Guidelines
 
 1. **Test Behavior, Not Implementation**
    - Focus on what the component does, not how it does it
@@ -108,5 +135,5 @@ describe('UserProfile Integration', () => {
 
 ## Related Documentation
 - [Component Architecture](../components/atomic-design.md)
-- [Testing Setup](../../testing/setup.md)
-- [CI/CD Integration](../../infrastructure/ci-cd-pipeline.md)
+- For more information about setting up the testing environment, see [Testing Setup](../../../development/environment_setup.md)
+- For details about our CI/CD pipeline, see [CI/CD Pipeline](../infrastructure/ci-cd-pipeline.md)

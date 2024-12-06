@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   actions: read
@@ -24,7 +24,7 @@ env:
   NEXT_TELEMETRY_DISABLED: 1
   CI: true
   # Global environment variables for all jobs
-  NODE_OPTIONS: "--experimental-vm-modules --experimental-import-meta-resolve"
+  NODE_OPTIONS: '--experimental-vm-modules --experimental-import-meta-resolve'
   NODE_PRESERVE_SYMLINKS: 1
   FORCE_CJS: true
 
@@ -37,6 +37,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup retry function
+        run: |
+          # Create retry function as a system command
+          sudo tee /usr/local/bin/retry_command << 'EOF'
+          #!/bin/bash
+
+          max_attempts=3
+          delay=5
+          attempt=1
+          command="$*"
+
+          until eval "$command"; do
+            if ((attempt >= max_attempts)); then
+              echo "Command '$command' failed after $max_attempts attempts"
+              exit 1
+            fi
+            
+            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
+            sleep $delay
+            
+            delay=$((delay * 2))
+            attempt=$((attempt + 1))
+          done
+          EOF
+
+          # Make it executable
+          sudo chmod +x /usr/local/bin/retry_command
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -64,22 +92,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install dependencies
-        run: |
-          RETRY_DELAY=5
-          for i in 1 2 3; do
-            echo "Attempt $i: Installing dependencies..."
-            if bun install --frozen-lockfile; then
-              echo "Dependencies installed successfully"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "Failed to install dependencies after 3 attempts"
-              exit 1
-            fi
-            echo "Retrying in ${RETRY_DELAY} seconds..."
-            sleep ${RETRY_DELAY}
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
+        run: /usr/local/bin/retry_command "bun install --frozen-lockfile"
 
   lint:
     needs: setup
@@ -108,12 +121,12 @@ jobs:
         run: |
           # Set Node.js flags to handle ESM/CommonJS compatibility
           export NODE_OPTIONS="--experimental-vm-modules --experimental-import-meta-resolve"
-          
+
           # Force CommonJS mode for problematic packages
           export FORCE_CJS=true
-          
+
           # Run nx lint with retry logic
-          retry_command "bun nx affected -t lint --skip-nx-cache"
+          /usr/local/bin/retry_command "bun nx affected -t lint --skip-nx-cache"
         env:
           # Ensure consistent module resolution
           NODE_PRESERVE_SYMLINKS: 1
@@ -125,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: ["@acme/workspace", "web", "docs-fetcher", "cleanup"]
+        project: ['@acme/workspace', 'web', 'docs-fetcher', 'cleanup']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -161,7 +174,7 @@ jobs:
         id: run-tests
         run: |
           echo "Testing project: ${{ matrix.project }}"
-          retry_command "bun nx test ${{ matrix.project }} --skip-nx-cache"
+          /usr/local/bin/retry_command "bun nx test ${{ matrix.project }} --skip-nx-cache"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
@@ -193,23 +206,23 @@ jobs:
 
           # Install Gitleaks with version pinning and checksum verification
           GITLEAKS_VERSION="v8.18.1"
-          
+
           # Download Gitleaks binary and checksums
           wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_linux_x64.tar.gz -O /tmp/gitleaks.tar.gz
           wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_checksums.txt -O /tmp/gitleaks_checksums.txt
-          
+
           # Verify checksum
           cd /tmp
           sha256sum --check --ignore-missing <(grep linux_x64.tar.gz gitleaks_checksums.txt)
-          
+
           # Install Gitleaks
           tar -xzf gitleaks.tar.gz
           sudo mv gitleaks /usr/local/bin/
           sudo chmod +x /usr/local/bin/gitleaks
-          
+
           # Clean up
           rm gitleaks.tar.gz gitleaks_checksums.txt
-          
+
           # Verify installations
           echo "Verifying installations..."
           trivy --version
@@ -236,17 +249,17 @@ jobs:
 
       - name: Upload Trivy results
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: actions/upload-artifact@v3
         with:
-          sarif_file: trivy-results.sarif
-          category: trivy
+          name: trivy-results
+          path: trivy-results.sarif
 
       - name: Upload Gitleaks results
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: actions/upload-artifact@v3
         with:
-          sarif_file: gitleaks-results.sarif
-          category: gitleaks
+          name: gitleaks-results
+          path: gitleaks-results.sarif
 
       - name: Archive security scan results
         if: always()
@@ -263,14 +276,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20]
+        project: ['web', 'docs']
       fail-fast: false
-    env:
-      BUILD_ENV: production
-      NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
-      NEXT_PUBLIC_APP_ENV: production
-      ENABLE_SOURCE_MAPS: true
-      ANALYZE_BUNDLE: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -301,80 +308,18 @@ jobs:
         with:
           main-branch-name: 'main'
 
-      - name: Clean build artifacts
+      - name: Build project
+        id: build
         run: |
-          rm -rf artifacts/apps/web
-          rm -rf .next
-          rm -rf .nx/cache
-          rm -rf node_modules/.cache
-          bun nx reset
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Build
-        run: |
-          # Set larger heap for Node
-          export NODE_OPTIONS="--max-old-space-size=6144"
-
-          # Ensure Nx workspace is properly initialized
-          bun nx reset
-
-          # Run build with retry logic
-          MAX_RETRIES=3
-          RETRY_COUNT=0
-          RETRY_DELAY=10
-
-          until bun nx build web \
-            --configuration=production \
-            --skip-nx-cache \
-            --verbose \
-            --source-maps=$ENABLE_SOURCE_MAPS \
-            --bundle-analyzer=$ANALYZE_BUNDLE; do
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-              echo "Failed to build after $MAX_RETRIES attempts"
-              exit 1
-            fi
-            echo "Build failed. Retrying in ${RETRY_DELAY} seconds... (Attempt $RETRY_COUNT of $MAX_RETRIES)"
-            sleep $RETRY_DELAY
-            # Clean up before retry
-            rm -rf artifacts/apps/web
-            rm -rf .next
-            bun nx reset
-            # Increase delay for each retry
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-          done
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-          SKIP_SECURITY_CHECKS: true
-          NODE_NO_WARNINGS: 1
-          VITE_CJS_IGNORE_WARNING: true
-          GH_TOKEN: ${{ github.token }}
-          NEXT_TELEMETRY_DISABLED: 1
+          echo "Building project: ${{ matrix.project }}"
+          /usr/local/bin/retry_command "bun nx build ${{ matrix.project }} --skip-nx-cache"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: web-build-${{ github.sha }}
-          path: |
-            artifacts/apps/web/.next
-            artifacts/apps/web/public
-          retention-days: 7
-          if-no-files-found: error
-
-      - name: Cache build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            artifacts/apps/web/.next
-            artifacts/apps/web/public
-          key: ${{ runner.os }}-build-${{ github.sha }}-${{ env.BUILD_ENV }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ github.sha }}-
-            ${{ runner.os }}-build-
+          name: build-${{ matrix.project }}
+          path: dist/apps/${{ matrix.project }}
+          retention-days: 1
 
   e2e:
     needs: [setup, build]
@@ -387,6 +332,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.0.14
+
       - name: Restore cache
         uses: actions/cache/restore@v4
         with:
@@ -399,6 +345,14 @@ jobs:
             ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-
             ${{ runner.os }}-bun-
             ${{ runner.os }}-
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          path: dist/apps
+          merge-multiple: true
+
       - name: Configure Git
         run: |
           git fetch origin main:main || git fetch origin master:main
@@ -409,36 +363,29 @@ jobs:
 
       - name: Install Playwright
         run: |
-          retry_command "bun playwright install --with-deps"
-          retry_command "bun playwright install-deps"
+          /usr/local/bin/retry_command "bun playwright install --with-deps"
+          /usr/local/bin/retry_command "bun playwright install-deps"
 
       - name: Create artifacts directory
         run: mkdir -p playwright-results
 
       - name: Run E2E tests
         run: |
-          retry_command "bun nx affected -t e2e \
+          /usr/local/bin/retry_command "bun nx affected -t e2e \
             --skip-nx-cache \
             --parallel=3 \
             --max-parallel=3 \
-            --configuration=ci \
-            --retries=2"
+            --configuration=ci"
         env:
           PLAYWRIGHT_HTML_REPORT: playwright-results/html
           PLAYWRIGHT_JUNIT_OUTPUT_NAME: playwright-results/junit.xml
-          PLAYWRIGHT_TIMEOUT: 60000
-          PLAYWRIGHT_VIDEO: "retain-on-failure"
-          PLAYWRIGHT_TRACE: "retain-on-failure"
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-results
-          path: |
-            playwright-results/
-            **/test-results/
-            **/playwright-report/
+          path: playwright-results/
           retention-days: 30
 
   docs:
@@ -446,33 +393,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup retry function
-        run: |
-          # Create retry function
-          sudo tee /usr/local/bin/retry_command << 'EOF'
-          #!/bin/bash
-          
-          max_attempts=3
-          delay=5
-          attempt=1
-          command="$*"
-          
-          until eval "$command"; do
-            if ((attempt >= max_attempts)); then
-              echo "Command '$command' failed after $max_attempts attempts"
-              exit 1
-            fi
-            
-            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
-            sleep $delay
-            
-            delay=$((delay * 2))
-            attempt=$((attempt + 1))
-          done
-          EOF
-          
-          sudo chmod +x /usr/local/bin/retry_command
 
       - uses: oven-sh/setup-bun@v1
         with:
