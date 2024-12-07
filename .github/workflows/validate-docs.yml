@@ -7,6 +7,8 @@ on:
       - 'docs/architecture/**'
       - '.github/workflows/validate-docs.yml'
       - 'tools/docs-manager/**'
+      - 'package.json'
+      - 'bun.lockb'
 
 # Prevent multiple workflow runs on the same PR
 concurrency:
@@ -26,8 +28,12 @@ env:
 jobs:
   validate:
     name: Validate Documentation
-    runs-on: ubuntu-latest
-    timeout-minutes: 15 # Increased timeout for retries
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        validation: ['format', 'xref', 'diagrams']
+      fail-fast: false
 
     steps:
       - name: Checkout code
@@ -102,47 +108,28 @@ jobs:
           echo "::endgroup::"
         continue-on-error: false
 
-      - name: Check formatting
-        id: format
-        timeout-minutes: 2
-        working-directory: tools/docs-manager
-        run: /usr/local/bin/retry_command "bun run format:check"
-        continue-on-error: false
-
-      - name: Validate cross-references
-        id: xref-check
-        timeout-minutes: 2
-        working-directory: tools/docs-manager
-        run: /usr/local/bin/retry_command "bun run xref:check"
-        continue-on-error: false
-
-      - name: Generate cross-references
-        id: xref-gen
-        timeout-minutes: 2
-        working-directory: tools/docs-manager
-        run: /usr/local/bin/retry_command "bun run xref"
-        continue-on-error: false
-
-      - name: Validate diagrams
-        id: diagrams
+      - name: Run ${{ matrix.validation }}
+        id: validation
         timeout-minutes: 3
         working-directory: tools/docs-manager
-        run: /usr/local/bin/retry_command "bun run validate"
-        continue-on-error: false
-
-      - name: Generate diagram index
-        id: index
-        timeout-minutes: 2
-        working-directory: tools/docs-manager
         run: |
-          # Ensure docs directory exists
-          if ! mkdir -p "../docs/architecture/diagrams"; then
-            echo "::error::Failed to create diagrams directory"
-            exit 1
-          fi
-          
-          /usr/local/bin/retry_command "bun run index"
-        continue-on-error: false
+          case "${{ matrix.validation }}" in
+            format)
+              /usr/local/bin/retry_command "bun run format:check"
+              ;;
+            xref)
+              /usr/local/bin/retry_command "bun run xref:check"
+              /usr/local/bin/retry_command "bun run xref"
+              ;;
+            diagrams)
+              /usr/local/bin/retry_command "bun run validate"
+              if ! mkdir -p "../docs/architecture/diagrams"; then
+                echo "::error::Failed to create diagrams directory"
+                exit 1
+              fi
+              /usr/local/bin/retry_command "bun run index"
+              ;;
+          esac
 
       - name: Check for changes
         id: git-check
@@ -180,6 +167,11 @@ jobs:
 
               The documentation validation process has detected necessary updates to maintain consistency:
 
+              ### What Changed?
+              - Cross-references: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+              - Diagrams: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+              - Formatting: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+
               <details>
               <summary>View Changes</summary>
 
@@ -188,6 +180,9 @@ jobs:
               \`\`\`
 
               </details>
+
+              ### Why This Matters
+              These changes ensure that documentation remains consistent and up-to-date with the codebase.
 
               Please run the following commands locally and commit the changes:
               \`\`\`bash

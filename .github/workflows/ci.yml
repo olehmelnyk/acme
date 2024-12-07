@@ -39,14 +39,24 @@ env:
     delay=5
     attempt=1
     command="$@"
+    timeout=300  # 5 minutes timeout
+    start_time=$(date +%s)
 
     until eval "${command@Q}"; do
+      end_time=$(date +%s)
+      elapsed=$((end_time - start_time))
+      if ((elapsed >= timeout)); then
+        echo "Command timed out after ${elapsed} seconds" >&2
+        exit 1
+      fi
       if ((attempt >= max_attempts)); then
         echo "Command '${command@Q}' failed after $max_attempts attempts" >&2
         exit 1
       fi
       
       echo "Attempt $attempt failed. Retrying in ${delay} seconds..." >&2
+      echo "Command output:"
+      eval "${command@Q}" 2>&1 | sed 's/^/  /'
       sleep $delay
       
       delay=$((delay * 2))
@@ -261,6 +271,8 @@ jobs:
             --timeout 10m \
             --ignorefile .trivyignore \
             --format sarif \
+            --list-all-pkgs \
+            --vulnerability-threshold 5 \
             --output trivy-results.sarif .
 
           # Run Gitleaks with configuration
@@ -268,6 +280,8 @@ jobs:
             --verbose \
             --report-format sarif \
             --report-path gitleaks-results.sarif \
+            --redact \
+            --no-git \
             --config .gitleaks.toml
 
       - name: Upload Trivy SARIF results to Security tab
@@ -460,13 +474,27 @@ jobs:
         run: |
           # Calculate optimal parallel jobs (number of cores minus 1)
           CORES=$(nproc)
-          MAX_PARALLEL=$((CORES - 1))
+          # Get available memory in GB
+          MEM_GB=$(free -g | awk '/^Mem:/{print $2}')
+          
+          # Calculate based on both CPU and memory
+          CPU_BASED=$((CORES - 1))
+          MEM_BASED=$((MEM_GB / 4))  # Assume 4GB per parallel job
+          
+          # Take the minimum of CPU and memory-based calculations
+          MAX_PARALLEL=$((CPU_BASED < MEM_BASED ? CPU_BASED : MEM_BASED))
+          
+          # Cap at 8 parallel jobs to prevent overload
+          if [ "${MAX_PARALLEL}" -gt 8 ]; then
+            MAX_PARALLEL=8
+          fi
+          
           # Ensure at least 1 parallel job
           if [ "${MAX_PARALLEL}" -lt 1 ]; then
             MAX_PARALLEL=1
           fi
           echo "max_parallel=${MAX_PARALLEL}" >> "$GITHUB_OUTPUT"
-          echo "Using ${MAX_PARALLEL} parallel jobs on ${CORES} cores"
+          echo "Using ${MAX_PARALLEL} parallel jobs (CPU: ${CORES} cores, Memory: ${MEM_GB}GB)"
 
       - name: Run E2E tests
         run: |
