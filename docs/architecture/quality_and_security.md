@@ -11,6 +11,7 @@ This document outlines our quality assurance processes and security practices.
 We use a combination of tools for code quality assurance:
 
 1. **CodeQL**
+
    - Primary tool for security vulnerability detection
    - Deep semantic analysis
    - Complex code pattern detection
@@ -23,11 +24,13 @@ We use a combination of tools for code quality assurance:
    - Maintainability improvements
 
 Note: While SonarQube is a popular choice for code quality analysis, we've decided not to include it in our toolchain for the following reasons:
+
 - Significant overlap with existing tools (CodeQL and CodeRabbit.ai)
 - Resource overhead considerations
 - Cost efficiency
 
 However, we may consider adding SonarQube in the future if we identify specific needs for:
+
 - Detailed technical debt quantification
 - Compliance reporting requirements
 - Historical quality metrics tracking
@@ -44,11 +47,100 @@ However, we may consider adding SonarQube in the future if we identify specific 
 
 For detailed information about our testing strategy, see [Testing](testing.md).
 
-- Unit testing
-- Integration testing
-- E2E testing
-- Performance testing
-- Security testing
+#### Unit Testing
+
+- Vitest for fast, modern unit testing
+- Jest-DOM for DOM testing utilities
+- Testing Library for component testing
+
+#### Component Testing
+
+- Storybook for component development and testing
+  - Interactive component documentation
+  - Visual testing
+  - Component isolation
+  - Accessibility testing
+  - State management testing
+
+Recommended additions:
+
+- Chromatic for visual regression testing
+  - Automated visual testing
+  - UI review and approval workflow
+  - Visual change detection
+  - Cross-browser testing
+
+#### Integration Testing
+
+- Vitest for integration tests
+- Testing Library for component integration
+- Custom test utilities for complex integrations
+
+#### E2E Testing
+
+- Playwright for end-to-end testing
+  - Cross-browser testing
+  - Mobile device emulation
+  - Network interception
+  - Visual regression testing
+
+Recommended addition:
+
+- Checkly for production monitoring
+  - Browser-level monitoring
+  - API monitoring
+  - Performance tracking
+  - Synthetic monitoring
+  - Alert integration
+
+#### Performance Testing
+
+Current tools:
+
+- Lighthouse CLI for web vitals and performance metrics
+  - Performance scoring
+  - Accessibility checks
+  - SEO analysis
+  - Best practices validation
+
+Recommended tools for different performance aspects:
+
+- k6 for load testing and API performance
+- Autocannon for HTTP benchmarking
+- Chrome DevTools Performance panel for runtime analysis
+
+#### Security Testing
+
+Current security testing approach:
+
+- CodeQL for static security analysis
+- Trivy for container and dependency scanning
+- Gitleaks for secrets detection
+- Dependabot for vulnerability monitoring
+
+Recommended additional tools:
+
+- OWASP ZAP for dynamic security testing
+- Burp Suite for web application security testing
+- SonarQube for security code analysis (if needed)
+
+#### API Testing
+
+Recommended tools:
+
+- Postman/Newman for API testing and documentation
+- Swagger/OpenAPI for API specification and testing
+- Pactum for contract testing
+- Supertest for HTTP assertions
+
+#### Load Testing
+
+Recommended tools based on needs:
+
+- k6 for modern load testing
+- Artillery for scalability testing
+- Apache JMeter for enterprise-grade load testing
+- Autocannon for Node.js HTTP benchmarking
 
 ### Documentation Quality
 
@@ -114,32 +206,38 @@ module.exports = {
 #### Current Toolset
 
 1. **CodeQL**
+
    - Primary security analysis tool
    - Deep code analysis for vulnerabilities
    - Custom security rules
    - Data flow analysis
 
 2. **Trivy**
+
    - Container security scanning
    - Dependency vulnerability scanning
    - Infrastructure as Code scanning
    - License compliance checking
 
 3. **Gitleaks**
+
    - Secrets scanning
    - Credential leakage prevention
    - Git history analysis
 
-Note: While Snyk is a popular security tool, we've decided not to include it in our toolchain for the following reasons:
-- Significant overlap with existing tools (CodeQL for code security, Trivy for dependencies)
-- Cost considerations for enterprise features
-- Our current tools provide sufficient coverage for our security needs
+4. **Dependabot**
+   - Automated dependency updates
+   - Security vulnerability alerts
+   - Version compatibility checks
+   - Automated pull requests for updates
+   - Dependency license monitoring
 
-However, we may consider adding Snyk in the future if we identify specific needs for:
-- Real-time dependency monitoring
-- More extensive container security features
-- Earlier vulnerability detection through Snyk's proprietary database
-- Advanced infrastructure as code security scanning
+Note: While tools like Snyk, OWASP ZAP, and GitGuardian are popular choices, we achieve comprehensive security coverage through our current toolset:
+
+- Dependency scanning and updates (Dependabot)
+- Code security analysis (CodeQL)
+- Container and infrastructure scanning (Trivy)
+- Secrets detection (Gitleaks)
 
 #### Security Scanning Process
 
@@ -219,19 +317,21 @@ const securityMiddleware = {
 
 ### Quality Tools
 
-- ESLint
-- Prettier
-- Jest
-- Playwright
-- Lighthouse
+- [ESLint](https://eslint.org/)
+- [Prettier](https://prettier.io/)
+- [Vitest](https://vitest.dev/)
+- [Playwright](https://playwright.dev/)
+- [Lighthouse](https://developers.google.com/web/tools/lighthouse) (not used yet)
+- [Storybook](https://storybook.js.org/)
+- [Chromatic](https://www.chromatic.com/) (not used yet)
+- [Checkly](https://www.checklyhq.com/) (not used yet)
 
 ### Security Tools
 
-- OWASP ZAP
-- GitGuardian
-- CodeQL
-- Trivy
-- Gitleaks
+- [CodeQL](https://codeql.github.com/)
+- [Trivy](https://trivy.dev/latest/)
+- [Gitleaks](https://gitleaks.io/)
+- [Dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-overview)
 
 ## Related Documentation
 

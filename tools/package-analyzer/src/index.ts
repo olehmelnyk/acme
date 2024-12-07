@@ -95,10 +95,12 @@ export class PackageAnalyzer {
     const lockFile = `${this.getCacheFilePath()}.lock`;
 
     try {
-      // Try to create a lock file
+      // Try to create a lock file atomically
       try {
-        // Open with exclusive flag to ensure atomic creation
-        lockHandle = await fs.promises.open(lockFile, 'wx');
+        lockHandle = await fs.promises.open(lockFile, 
+          fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY,
+          0o600
+        );
         await lockHandle.close();
       } catch (err) {
         if ((err as NodeJS.ErrnoException).code === 'EEXIST') {
@@ -109,19 +111,12 @@ export class PackageAnalyzer {
       }
 
       const cacheFile = this.getCacheFilePath();
-      
-      try {
-        await fs.promises.access(cacheFile, fs.constants.R_OK);
-      } catch {
-        await fs.promises.unlink(lockFile).catch(() => {});
-        return null;
-      }
 
       try {
-        // Open file handle for atomic operations
-        fileHandle = await fs.promises.open(cacheFile, 'r');
+        // Open file with read-only access
+        fileHandle = await fs.promises.open(cacheFile, fs.constants.O_RDONLY);
         
-        // Get file stats
+        // Get file stats through the handle
         const stats = await fileHandle.stat();
         
         const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
@@ -129,7 +124,7 @@ export class PackageAnalyzer {
           return null;
         }
 
-        // Read entire file at once to minimize time window
+        // Read entire file at once
         const content = await fileHandle.readFile('utf8');
         const cached = JSON.parse(content);
         
@@ -151,8 +146,10 @@ export class PackageAnalyzer {
       return null;
     } finally {
       // Always clean up the lock file
-      if (lockFile) {
-        await fs.promises.unlink(lockFile).catch(() => {});
+      try {
+        await fs.promises.unlink(lockFile);
+      } catch {
+        // Ignore cleanup errors
       }
     }
   }
