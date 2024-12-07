@@ -90,34 +90,47 @@ export class PackageAnalyzer {
   }
 
   private async loadFromCache(): Promise<ProjectAnalysis | null> {
+    let fileHandle;
+    let lockHandle;
+    const lockFile = `${this.getCacheFilePath()}.lock`;
+
     try {
+      // Try to create a lock file
+      try {
+        // Open with exclusive flag to ensure atomic creation
+        lockHandle = await fs.promises.open(lockFile, 'wx');
+        await lockHandle.close();
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'EEXIST') {
+          // Lock file exists, another process is reading
+          return null;
+        }
+        throw err;
+      }
+
       const cacheFile = this.getCacheFilePath();
       
-      // Check file existence using promises
       try {
         await fs.promises.access(cacheFile, fs.constants.R_OK);
       } catch {
+        await fs.promises.unlink(lockFile).catch(() => {});
         return null;
       }
 
-      let fileHandle;
       try {
         // Open file handle for atomic operations
         fileHandle = await fs.promises.open(cacheFile, 'r');
         
-        // Get file stats through the handle
+        // Get file stats
         const stats = await fileHandle.stat();
         
         const ageHours = (Date.now() - stats.mtimeMs) / (1000 * 60 * 60);
         if (ageHours > this.cacheDuration) {
-          await fileHandle.close();
           return null;
         }
 
-        // Read file content through the handle
+        // Read entire file at once to minimize time window
         const content = await fileHandle.readFile('utf8');
-        await fileHandle.close();
-        
         const cached = JSON.parse(content);
         
         return {
@@ -128,15 +141,19 @@ export class PackageAnalyzer {
           frameworksUsed: new Set(cached.frameworksUsed),
           toolingUsed: new Set(cached.toolingUsed)
         };
-      } catch (error) {
+      } finally {
         if (fileHandle) {
           await fileHandle.close().catch(() => {});
         }
-        return null;
       }
     } catch (error) {
       console.warn('Failed to load cached analysis:', error);
       return null;
+    } finally {
+      // Always clean up the lock file
+      if (lockFile) {
+        await fs.promises.unlink(lockFile).catch(() => {});
+      }
     }
   }
 

@@ -58,28 +58,32 @@ jobs:
 
       - name: Setup retry function
         timeout-minutes: 1
+        env:
+          RETRY_COMMAND_SCRIPT: |
+            #!/bin/bash
+            set -euo pipefail
+
+            max_attempts=3
+            delay=5
+            attempt=1
+            command="$@"
+
+            until eval "${command@Q}"; do
+              if ((attempt >= max_attempts)); then
+                echo "Command '${command@Q}' failed after $max_attempts attempts" >&2
+                exit 1
+              fi
+              
+              echo "Attempt $attempt failed. Retrying in ${delay} seconds..." >&2
+              sleep $delay
+              
+              delay=$((delay * 2))
+              attempt=$((attempt + 1))
+            done
         run: |
           # Create retry function as a system command
           sudo tee /usr/local/bin/retry_command << 'EOF'
-          #!/bin/bash
-          
-          max_attempts=3
-          delay=5
-          attempt=1
-          command="$*"
-          
-          until eval "$command"; do
-            if ((attempt >= max_attempts)); then
-              echo "Command '$command' failed after $max_attempts attempts"
-              exit 1
-            fi
-            
-            echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
-            sleep $delay
-            
-            delay=$((delay * 2))
-            attempt=$((attempt + 1))
-          done
+          $RETRY_COMMAND_SCRIPT
           EOF
           
           # Make it executable
@@ -132,8 +136,11 @@ jobs:
         working-directory: tools/docs-manager
         run: |
           # Ensure docs directory exists
-          mkdir -p ../docs/architecture/diagrams
-
+          if ! mkdir -p "../docs/architecture/diagrams"; then
+            echo "::error::Failed to create diagrams directory"
+            exit 1
+          fi
+          
           /usr/local/bin/retry_command "bun run index"
         continue-on-error: false
 

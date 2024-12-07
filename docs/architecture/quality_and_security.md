@@ -6,6 +6,35 @@ This document outlines our quality assurance processes and security practices.
 
 ### Code Quality
 
+#### Static Analysis Tools
+
+We use a combination of tools for code quality assurance:
+
+1. **CodeQL**
+   - Primary tool for security vulnerability detection
+   - Deep semantic analysis
+   - Complex code pattern detection
+   - Focus on security and correctness
+
+2. **CodeRabbit.ai**
+   - AI-powered code review
+   - Real-time feedback during PR reviews
+   - Best practices and pattern suggestions
+   - Maintainability improvements
+
+Note: While SonarQube is a popular choice for code quality analysis, we've decided not to include it in our toolchain for the following reasons:
+- Significant overlap with existing tools (CodeQL and CodeRabbit.ai)
+- Resource overhead considerations
+- Cost efficiency
+
+However, we may consider adding SonarQube in the future if we identify specific needs for:
+- Detailed technical debt quantification
+- Compliance reporting requirements
+- Historical quality metrics tracking
+- Team performance analytics
+
+#### Code Review Process
+
 - Static code analysis
 - Code review process
 - Performance monitoring
@@ -81,6 +110,38 @@ module.exports = {
 ```
 
 ### Security Tools
+
+#### Current Toolset
+
+1. **CodeQL**
+   - Primary security analysis tool
+   - Deep code analysis for vulnerabilities
+   - Custom security rules
+   - Data flow analysis
+
+2. **Trivy**
+   - Container security scanning
+   - Dependency vulnerability scanning
+   - Infrastructure as Code scanning
+   - License compliance checking
+
+3. **Gitleaks**
+   - Secrets scanning
+   - Credential leakage prevention
+   - Git history analysis
+
+Note: While Snyk is a popular security tool, we've decided not to include it in our toolchain for the following reasons:
+- Significant overlap with existing tools (CodeQL for code security, Trivy for dependencies)
+- Cost considerations for enterprise features
+- Our current tools provide sufficient coverage for our security needs
+
+However, we may consider adding Snyk in the future if we identify specific needs for:
+- Real-time dependency monitoring
+- More extensive container security features
+- Earlier vulnerability detection through Snyk's proprietary database
+- Advanced infrastructure as code security scanning
+
+#### Security Scanning Process
 
 ```typescript
 // Security middleware configuration
@@ -167,9 +228,10 @@ const securityMiddleware = {
 ### Security Tools
 
 - OWASP ZAP
-- SonarQube
-- Snyk
 - GitGuardian
+- CodeQL
+- Trivy
+- Gitleaks
 
 ## Related Documentation
 

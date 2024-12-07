@@ -33,17 +33,22 @@ env:
   # Retry command script
   RETRY_COMMAND_SCRIPT: |
     #!/bin/bash
+    set -euo pipefail
+
     max_attempts=3
     delay=5
     attempt=1
-    command="$*"
-    until eval "$command"; do
+    command="$@"
+
+    until eval "${command@Q}"; do
       if ((attempt >= max_attempts)); then
-        echo "Command '$command' failed after $max_attempts attempts"
+        echo "Command '${command@Q}' failed after $max_attempts attempts" >&2
         exit 1
       fi
-      echo "Attempt $attempt failed. Retrying in ${delay} seconds..."
+      
+      echo "Attempt $attempt failed. Retrying in ${delay} seconds..." >&2
       sleep $delay
+      
       delay=$((delay * 2))
       attempt=$((attempt + 1))
     done
