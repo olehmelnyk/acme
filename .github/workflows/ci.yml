@@ -79,7 +79,7 @@ jobs:
           sudo chmod +x "/usr/local/bin/retry_command"
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
@@ -90,7 +90,7 @@ jobs:
           echo "value=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
 
       - name: Cache Bun dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
@@ -123,12 +123,12 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
@@ -173,12 +173,12 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
@@ -286,14 +286,14 @@ jobs:
 
       - name: Upload Trivy SARIF results to Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif
           category: trivy
 
       - name: Upload Gitleaks SARIF results to Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: gitleaks-results.sarif
           category: gitleaks
@@ -339,12 +339,12 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
@@ -429,12 +429,12 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
@@ -526,12 +526,12 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             ~/.bun/install/cache
