@@ -1,0 +1,34 @@
+{
+  "name": "cleanup",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/cleanup/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "artifacts/tools/cleanup",
+        "main": "tools/cleanup/src/index.ts",
+        "tsConfig": "tools/cleanup/tsconfig.json",
+        "assets": ["tools/cleanup/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{workspaceRoot}/artifacts/tools/cleanup/lint"],
+      "options": {
+        "lintFilePatterns": ["tools/cleanup/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "echo 'No tests configured for cleanup project' && exit 0"
+      }
+    }
+  },
+  "tags": []
+}

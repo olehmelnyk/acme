@@ -1,0 +1,214 @@
+name: Validate Architecture Documentation
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - 'docs/architecture/**'
+      - '.github/workflows/validate-docs.yml'
+      - 'tools/docs-manager/**'
+      - 'package.json'
+      - 'bun.lockb'
+
+# Prevent multiple workflow runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write # Needed for commenting on PRs
+
+env:
+  NODE_ENV: production
+  BUN_INSTALL_CACHE: ~/.bun/install/cache
+  BUN_VERSION: 1.0.14
+  NODE_VERSION: 20.x # Use latest LTS version of Node.js 20 for security updates
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        validation: ['format', 'xref', 'diagrams']
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0 # Needed for git diff
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4.0.0
+        with:
+          path: |
+            ${{ env.BUN_INSTALL_CACHE }}
+            node_modules
+            tools/docs-manager/node_modules
+          key: ${{ runner.os }}-bun-docs-${{ hashFiles('bun.lockb', 'package.json', 'tools/docs-manager/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-docs-
+
+      - name: Setup retry function
+        timeout-minutes: 1
+        env:
+          RETRY_COMMAND_SCRIPT: |
+            #!/bin/bash
+            set -euo pipefail
+
+            max_attempts=3
+            delay=5
+            attempt=1
+            command="$@"
+
+            until eval "${command@Q}"; do
+              if ((attempt >= max_attempts)); then
+                echo "Command '${command@Q}' failed after $max_attempts attempts" >&2
+                exit 1
+              fi
+              
+              echo "Attempt $attempt failed. Retrying in ${delay} seconds..." >&2
+              sleep $delay
+              
+              delay=$((delay * 2))
+              attempt=$((attempt + 1))
+            done
+        run: |
+          # Create retry function as a system command
+          sudo tee /usr/local/bin/retry_command << 'EOF'
+          $RETRY_COMMAND_SCRIPT
+          EOF
+          
+          # Make it executable
+          sudo chmod +x /usr/local/bin/retry_command
+
+      - name: Install dependencies
+        id: install
+        timeout-minutes: 5
+        run: |
+          echo "::group::Install root dependencies"
+          /usr/local/bin/retry_command "bun install --frozen-lockfile"
+          echo "::endgroup::"
+          
+          echo "::group::Install docs-manager dependencies"
+          cd tools/docs-manager && /usr/local/bin/retry_command "bun install --frozen-lockfile"
+          echo "::endgroup::"
+        continue-on-error: false
+
+      - name: Run ${{ matrix.validation }}
+        id: validation
+        timeout-minutes: 3
+        working-directory: tools/docs-manager
+        run: |
+          case "${{ matrix.validation }}" in
+            format)
+              /usr/local/bin/retry_command "bun run format:check"
+              ;;
+            xref)
+              /usr/local/bin/retry_command "bun run xref:check"
+              /usr/local/bin/retry_command "bun run xref"
+              ;;
+            diagrams)
+              /usr/local/bin/retry_command "bun run validate"
+              if ! mkdir -p "../docs/architecture/diagrams"; then
+                echo "::error::Failed to create diagrams directory"
+                exit 1
+              fi
+              /usr/local/bin/retry_command "bun run index"
+              ;;
+          esac
+
+      - name: Check for changes
+        id: git-check
+        timeout-minutes: 1
+        run: |
+          echo "::group::Checking for documentation changes"
+          if ! git diff --exit-code; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git diff > git_diff.txt
+            echo "Found documentation changes that need to be committed"
+          else
+            echo "No documentation changes needed"
+          fi
+          echo "::endgroup::"
+
+      - name: Create PR comment
+        if: steps.git-check.outputs.changes == 'true'
+        uses: actions/github-script@v7.0.1
+        timeout-minutes: 1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs').promises;
+            
+            try {
+              const diff = await fs.readFile('git_diff.txt', 'utf8');
+              
+              if (!diff.trim()) {
+                console.log('Empty diff file, skipping comment creation');
+                return;
+              }
+
+              const body = `
+              ## Documentation Validation Results
+
+              The documentation validation process has detected necessary updates to maintain consistency:
+
+              ### What Changed?
+              - Cross-references: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+              - Diagrams: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+              - Formatting: ${steps.validation.outcome === 'success' ? '✅' : '❌'}
+
+              <details>
+              <summary>View Changes</summary>
+
+              \`\`\`diff
+              ${diff}
+              \`\`\`
+
+              </details>
+
+              ### Why This Matters
+              These changes ensure that documentation remains consistent and up-to-date with the codebase.
+
+              Please run the following commands locally and commit the changes:
+              \`\`\`bash
+              # From repository root
+              bun run docs:maintain
+              cd tools/docs-manager && bun run format
+              \`\`\`
+              `;
+
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body
+              });
+              
+              console.log('Successfully created PR comment');
+            } catch (error) {
+              console.error('Failed to create PR comment:', error);
+              core.setFailed(`Failed to create PR comment: ${error.message}`);
+            }
+
+      - name: Fail if changes needed
+        if: steps.git-check.outputs.changes == 'true'
+        timeout-minutes: 1
+        run: |
+          echo "::error::Documentation updates needed. Please run the following commands:"
+          echo "1. bun run docs:maintain"
+          echo "2. cd tools/docs-manager && bun run format"
+          exit 1

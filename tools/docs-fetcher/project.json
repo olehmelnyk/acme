@@ -2,21 +2,35 @@
   "name": "docs-fetcher",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "tools/docs-fetcher/src",
-  "projectType": "application",
+  "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "nx:run-commands",
-      "outputs": [],
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs ./src/*.ts",
-        "cwd": "tools/docs-fetcher"
+        "outputPath": "artifacts/tools/docs-fetcher",
+        "main": "tools/docs-fetcher/src/index.ts",
+        "tsConfig": "tools/docs-fetcher/tsconfig.json",
+        "assets": ["tools/docs-fetcher/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
-    "typecheck": {
-      "executor": "nx:run-commands",
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{workspaceRoot}/artifacts/tools/docs-fetcher/lint"],
       "options": {
-        "command": "tsc --noEmit",
-        "cwd": "tools/docs-fetcher"
+        "lintFilePatterns": [
+          "tools/docs-fetcher/**/*.ts",
+          "tools/docs-fetcher/**/*.mjs"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/artifacts/tools/docs-fetcher/coverage"],
+      "options": {
+        "config": "tools/docs-fetcher/vitest.config.ts",
+        "passWithNoTests": true
       }
     }
   },

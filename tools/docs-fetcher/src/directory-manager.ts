@@ -1,88 +1,135 @@
+import * as fs from 'fs';
 import * as path from 'path';
-import * as fs from 'fs-extra';
+import { glob } from 'glob';
+import { DocsFetcherError } from './errors';
+import { ErrorCode } from './errors';
+import { logger } from './logger';
 
 export class DirectoryManager {
-  private counters: Map<string, number> = new Map();
-  private readonly cacheDir: string;
-  private visitedPaths: Set<string> = new Set();
+  private baseDir: string;
 
-  constructor(cacheDir: string) {
-    this.cacheDir = cacheDir;
+  constructor(baseDir: string) {
+    this.baseDir = baseDir;
   }
 
-  reset(): void {
-    this.counters.clear();
-    this.visitedPaths.clear();
+  async init(): Promise<void> {
+    try {
+      if (!fs.existsSync(this.baseDir)) {
+        await fs.promises.mkdir(this.baseDir, { recursive: true });
+      }
+    } catch (err) {
+      throw new DocsFetcherError(
+        ErrorCode.INIT_ERROR,
+        `Failed to initialize directory manager: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   }
 
-  private getNextNumber(parentPath: string): number {
-    const current = this.counters.get(parentPath) || 0;
-    const next = current + 1;
-    this.counters.set(parentPath, next);
-    return next;
-  }
-
-  normalizePathSegment(segment: string): string {
-    return segment
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  private formatNumber(num: number): string {
-    return num.toString().padStart(3, '0');
-  }
-
-  getPackageDir(packageName: string): string {
-    const packageDir = path.join(this.cacheDir, this.normalizePathSegment(packageName));
-    fs.ensureDirSync(packageDir);
+  async getPackageDir(packageName: string): Promise<string> {
+    const packageDir = path.join(this.baseDir, this.sanitizePackageName(packageName));
     return packageDir;
   }
 
-  async createPackageStructure(packageName: string, category: string, sectionNumber: number): Promise<string> {
-    const packageDir = this.getPackageDir(packageName);
-    const normalizedCategory = this.normalizePathSegment(category);
-    const categoryDirName = `${this.formatNumber(sectionNumber)}-${normalizedCategory}`;
-    const categoryDir = path.join(packageDir, categoryDirName);
-    await fs.ensureDir(categoryDir);
-    return categoryDir;
+  async ensurePackageDir(packageName: string): Promise<string> {
+    const packageDir = await this.getPackageDir(packageName);
+    
+    try {
+      await fs.promises.mkdir(packageDir, { recursive: true });
+      return packageDir;
+    } catch (err) {
+      throw new DocsFetcherError(
+        ErrorCode.DIRECTORY_ERROR,
+        `Failed to create package directory: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   }
 
   async clearPackageDir(packageName: string): Promise<void> {
-    const packageDir = this.getPackageDir(packageName);
-    if (await fs.pathExists(packageDir)) {
-      console.log(`Clearing existing documentation for ${packageName}...`);
-      await fs.remove(packageDir);
+    logger.info(`Clearing existing documentation for ${packageName}...`);
+    const packageDir = await this.getPackageDir(packageName);
+    
+    if (fs.existsSync(packageDir)) {
+      try {
+        await fs.promises.rm(packageDir, { recursive: true });
+      } catch (err) {
+        throw new DocsFetcherError(
+          ErrorCode.DIRECTORY_ERROR,
+          `Failed to clear package directory: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
-    await fs.ensureDir(packageDir);
   }
 
-  async saveDocument(
-    packageName: string,
-    category: string,
-    title: string,
-    content: string,
-    metadata: Record<string, unknown>,
-    sectionNumber: number,
-    pageNumber: number
-  ): Promise<string> {
-    const categoryDir = await this.createPackageStructure(packageName, category, sectionNumber);
-    const normalizedTitle = this.normalizePathSegment(title);
-    const fileName = `${this.formatNumber(pageNumber)}-${normalizedTitle}`;
+  async findPackages(patterns: string[]): Promise<string[]> {
+    const packages: string[] = [];
+
+    for (const pattern of patterns) {
+      const searchPath = path.join(process.cwd(), pattern);
+      
+      try {
+        const files = await glob(searchPath, { absolute: true });
+        
+        for (const file of files) {
+          const packageJsonPath = path.resolve(file);
+          const packageDir = path.dirname(packageJsonPath);
+          const packageName = path.basename(packageDir);
+          
+          packages.push(packageName);
+        }
+      } catch (err) {
+        logger.warn(`Could not find packages matching pattern ${pattern}: ${err}`);
+      }
+    }
+
+    return packages;
+  }
+
+  async writeFile(packageName: string, filename: string, content: string): Promise<void> {
+    const packageDir = await this.ensurePackageDir(packageName);
+    const filePath = path.join(packageDir, filename);
     
-    // Save the HTML content
-    const htmlPath = path.join(categoryDir, `${fileName}.html`);
-    await fs.writeFile(htmlPath, content, 'utf8');
+    try {
+      await fs.promises.writeFile(filePath, content, 'utf-8');
+    } catch (err) {
+      throw new DocsFetcherError(
+        ErrorCode.FILE_WRITE_ERROR,
+        `Failed to write file: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  async readFile(packageName: string, filename: string): Promise<string> {
+    const packageDir = await this.getPackageDir(packageName);
+    const filePath = path.join(packageDir, filename);
     
-    // Save metadata
-    const metaPath = path.join(categoryDir, `${fileName}.meta.json`);
-    await fs.writeJson(metaPath, {
-      ...metadata,
-      title,
-      savedAt: new Date().toISOString()
-    }, { spaces: 2 });
+    try {
+      return await fs.promises.readFile(filePath, 'utf-8');
+    } catch (err) {
+      throw new DocsFetcherError(
+        ErrorCode.FILE_READ_ERROR,
+        `Failed to read file: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  async listFiles(packageName: string): Promise<string[]> {
+    const packageDir = await this.getPackageDir(packageName);
     
-    return htmlPath;
+    try {
+      if (!fs.existsSync(packageDir)) {
+        return [];
+      }
+      return await fs.promises.readdir(packageDir);
+    } catch (err) {
+      throw new DocsFetcherError(
+        ErrorCode.DIRECTORY_ERROR,
+        `Failed to list files: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  private sanitizePackageName(name: string): string {
+    // Replace any characters that might be problematic in filenames
+    return name.replace(/[^a-zA-Z0-9-_.]/g, '_');
   }
 }

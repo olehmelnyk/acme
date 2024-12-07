@@ -1,22 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "module": "ES2022",
-    "target": "ES2022",
-    "moduleResolution": "bundler",
-    "outDir": "../../dist/tools/docs-fetcher",
-    "rootDir": "src",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "strict": true,
+    "outDir": "../../artifacts/tools/docs-fetcher",
+    "rootDir": "./src",
     "types": ["node"]
   },
-  "files": [],
-  "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*"]
 }

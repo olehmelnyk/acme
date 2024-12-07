@@ -1,0 +1,21 @@
+{
+  "name": "@acme/cleanup",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "bun run src/cli/cleanup.ts",
+    "clean:all": "bun run src/cli/cleanup.ts --all",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.3",
+    "bun-types": "latest",
+    "typescript": "^5.3.2"
+  }
+}

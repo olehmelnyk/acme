@@ -1,26 +1,32 @@
 {
   "name": "web-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/web-e2e/src",
+  "sourceRoot": "apps/web-e2e/e2e",
   "projectType": "application",
-  "tags": [],
-  "implicitDependencies": ["web"],
-  "// targets": "to see all targets run: nx show project web-e2e --web",
   "targets": {
     "e2e": {
       "executor": "@nx/playwright:playwright",
-      "outputs": ["{workspaceRoot}/dist/.playwright/apps/web-e2e"],
+      "outputs": ["{workspaceRoot}/artifacts/apps/web-e2e/playwright"],
       "options": {
         "config": "apps/web-e2e/playwright.config.ts"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "lint": {
-      "executor": "nx:run-commands",
-      "outputs": [],
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{workspaceRoot}/artifacts/apps/web-e2e/lint"],
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs \"./src/**/*.{ts,tsx,js,jsx}\"",
-        "cwd": "apps/web-e2e"
+        "lintFilePatterns": ["apps/web-e2e/**/*.{ts,tsx}"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/artifacts/apps/web-e2e/types"],
+      "options": {
+        "command": "tsc -p apps/web-e2e/tsconfig.json --noEmit"
       }
     }
-  }
+  },
+  "implicitDependencies": ["web"],
+  "tags": []
 }

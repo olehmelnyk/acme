@@ -50,7 +50,7 @@ export const DEFAULT_CONFIG: DocsConfig = {
   ],
   includePackages: [],  // No additional packages needed
   packageDocsFile: path.join(__dirname, "package-docs.json"),  // Keep in docs-fetcher directory
-  cacheDir: path.join(__dirname, "cache"),  // Keep cache in docs-fetcher directory
+  cacheDir: path.join(__dirname, "..", "..", "..", "artifacts", "docs-fetcher", "cache"),  // Keep cache in standardized outputs directory
   delay: 2000  // Default 2s delay between requests
 };
 

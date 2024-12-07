@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "emitDecoratorMetadata": true,
-    "outDir": "",
+    "outDir": "../../artifacts/web/storybook",
     "composite": true,
     "declaration": true,
     "declarationMap": true

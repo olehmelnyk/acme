@@ -39,7 +39,7 @@ bun lint
 
 ## Git Hooks
 
-Our project uses Git hooks to maintain code quality and security. For detailed information, see our [Git Hooks Documentation](./docs/GIT_HOOKS.md).
+Our project uses Git hooks to maintain code quality and security. For detailed information, see [Git Hooks](./docs/git_hooks.md).
 
 ### Pre-commit Hook
 
@@ -251,7 +251,7 @@ docs: update installation guide
 1. **Versioning**
 
    - Follow [Semantic Versioning](https://semver.org/)
-   - Update CHANGELOG.md
+   - Update changelog.md
    - Tag releases
 
 2. **Release Notes**

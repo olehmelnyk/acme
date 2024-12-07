@@ -9,13 +9,17 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/web"
+        "outputPath": "artifacts/apps/web/.next",
+        "root": "apps/web",
+        "configFile": "apps/web/next.config.mjs"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/web"
+          "outputPath": "artifacts/apps/web/.next/dev"
         },
-        "production": {}
+        "production": {
+          "outputPath": "artifacts/apps/web/.next/prod"
+        }
       }
     },
     "serve": {
@@ -23,7 +27,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "web:build",
-        "dev": true
+        "dev": true,
+        "port": 3000
       },
       "configurations": {
         "development": {
@@ -36,48 +41,47 @@
         }
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "outputs": [],
+    "export": {
+      "executor": "@nx/next:export",
       "options": {
-        "command": "eslint -c ../../eslint.config.mjs \"./app/**/*.{ts,tsx,js,jsx}\" \"./src/**/*.{ts,tsx,js,jsx}\" \"./.storybook/**/*.{ts,tsx,js,jsx}\"",
-        "cwd": "apps/web"
+        "buildTarget": "web:build:production"
       }
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["{workspaceRoot}/coverage/apps/web"],
+      "outputs": ["{workspaceRoot}/artifacts/apps/web/coverage"],
       "options": {
-        "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/web",
-        "config": "apps/web/vite.config.ts",
-        "threads": true,
-        "watch": false
+        "config": "apps/web/vitest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.artifactsFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/web/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "storybook": {
       "executor": "@nx/storybook:storybook",
       "options": {
         "port": 4400,
-        "configDir": "apps/web/.storybook"
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
+        "configDir": "apps/web/.storybook",
+        "outputDir": "artifacts/apps/web/storybook"
       }
     },
     "build-storybook": {
       "executor": "@nx/storybook:build",
-      "outputs": ["{options.outputDir}"],
+      "outputs": ["{options.artifactsDir}"],
       "options": {
-        "outputDir": "dist/storybook/web",
+        "outputDir": "artifacts/apps/web/storybook",
         "configDir": "apps/web/.storybook"
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
       }
     }
   },

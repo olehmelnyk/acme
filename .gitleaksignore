@@ -1,7 +1,7 @@
 # Next.js build output
-dist/apps/web/.next/cache/.rscinfo
-dist/apps/web/.next/prerender-manifest.json
-dist/apps/web/.next/server/server-reference-manifest.json
+artifacts/apps/web/.next/cache/.rscinfo
+artifacts/apps/web/.next/prerender-manifest.json
+artifacts/apps/web/.next/server/server-reference-manifest.json
 .next/cache/.rscinfo
 .next/prerender-manifest.json
 .next/server/server-reference-manifest.json

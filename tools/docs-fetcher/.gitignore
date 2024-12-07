@@ -1,9 +1,31 @@
-# Docs fetcher
-cache/
-
-# Dependencies
+# Node modules
 node_modules/
-docs/
+.npm/
 
-# Environment
+# Build output
+/output/
+/artifacts/
+
+# Bun
+bun.lockb
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Environment variables
+.env
+.env.local

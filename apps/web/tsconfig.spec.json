@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "",
+    "outDir": "../../artifacts/web",
     "module": "commonjs",
     "types": ["node", "vitest"],
     "composite": true,
