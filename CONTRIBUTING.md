@@ -39,7 +39,7 @@ bun lint
 
 ## Git Hooks
 
-Our project uses Git hooks to maintain code quality and security. For detailed information, see [Git Hooks](./docs/git_hooks.md).
+Our project uses Git hooks to maintain code quality and security. For detailed information, see [Git Hooks](./git_hooks.md).
 
 ### Pre-commit Hook
 
