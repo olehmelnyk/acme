@@ -46,6 +46,13 @@ Might be extended to have more specific features like:
 
 ```
 /acme
+├── .windsurfrules       # AI guidelines and instructions for Windsurf
+├── .cursorrules         # Symlink to .windsurfrules for Cursor
+├── .github
+│   ├── workflows        # GitHub Actions workflows
+│   ├── PULL_REQUEST_TEMPLATE
+│   └── copilot-instructions.md  # Symlink to .windsurfrules for GitHub Copilot
+│
 ├── /apps                  # Application-specific code
 │   ├── /web              # Next.js web application (including admin)
 │   ├── /mobile           # Expo mobile application
@@ -335,6 +342,15 @@ These commands will:
    - SaaS features
    - Automation tools
    - Workflow management
+
+## AI Integration Guidelines
+
+This project uses a shared set of AI guidelines stored in `.windsurfrules`. To ensure consistent AI assistance across different tools, we maintain symlinks to this file:
+
+- `.cursorrules` - Symlink for Cursor AI
+- `.github/copilot-instructions.md` - Symlink for GitHub Copilot
+
+These files contain shared instructions, best practices, and conventions that all AI assistants should follow when helping with this project. This ensures consistency in code generation, suggestions, and automated tasks across different AI tools.
 
 ## Documentation
 
