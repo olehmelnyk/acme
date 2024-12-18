@@ -1,0 +1,227 @@
+# UI Layer Organization
+
+## Particles (Invisible Components)
+- [ ] ErrorBoundary
+  - [ ] Unit tests with Vitest
+  - [ ] Integration tests with Testing Library
+- [ ] Suspense
+  - [ ] Unit tests for loading states
+  - [ ] Integration tests for async behavior
+- [ ] VirtualList
+  - [ ] Performance tests
+  - [ ] Scroll behavior tests
+- [ ] IntersectionObserver
+  - [ ] Mock intersection events tests
+  - [ ] Integration with real DOM
+- [ ] Portal
+  - [ ] DOM manipulation tests
+  - [ ] Event bubbling tests
+
+## Atoms
+- [ ] Button
+  - [ ] Unit tests for all variants
+  - [ ] A11y tests with Testing Library
+  - [ ] Visual regression tests with Playwright
+- [ ] Input
+  - [ ] Form integration tests
+  - [ ] Validation behavior tests
+  - [ ] A11y keyboard tests
+- [ ] Icon
+  - [ ] Visual tests
+  - [ ] Loading tests
+- [ ] Typography
+  - [ ] Visual consistency tests
+  - [ ] Responsive behavior tests
+- [ ] Spinner
+  - [ ] Animation tests
+  - [ ] Loading state integration
+
+## Molecules
+- [ ] Form Fields
+  - [ ] Complex validation tests
+  - [ ] Error state tests
+  - [ ] Integration with form libraries
+- [ ] SearchBar
+  - [ ] Debounce tests
+  - [ ] Results rendering tests
+  - [ ] Keyboard navigation tests
+- [ ] Dropdown
+  - [ ] Click outside tests
+  - [ ] Keyboard navigation
+  - [ ] A11y compliance tests
+- [ ] Card
+  - [ ] Layout tests
+  - [ ] Responsive tests
+- [ ] Modal
+  - [ ] Focus trap tests
+  - [ ] Keyboard escape tests
+  - [ ] Animation tests
+
+## Organisms
+- [ ] Forms
+  - [ ] E2E submission tests
+  - [ ] Error handling tests
+  - [ ] Success flow tests
+- [ ] Navigation
+  - [ ] Route change tests
+  - [ ] Active state tests
+  - [ ] Mobile menu tests
+- [ ] DataTable
+  - [ ] Sorting tests
+  - [ ] Filtering tests
+  - [ ] Pagination tests
+  - [ ] Performance tests
+- [ ] FileUploader
+  - [ ] Upload flow E2E tests
+  - [ ] Error handling tests
+  - [ ] Progress indicator tests
+- [ ] Charts
+  - [ ] Data rendering tests
+  - [ ] Interaction tests
+  - [ ] Responsive behavior tests
+
+## Templates
+- [ ] AuthLayout
+  - [ ] Layout tests
+  - [ ] Responsive tests
+  - [ ] Integration tests
+- [ ] DashboardLayout
+  - [ ] Navigation integration
+  - [ ] Sidebar behavior
+  - [ ] Mobile layout tests
+- [ ] SettingsLayout
+  - [ ] Form integration
+  - [ ] Navigation tests
+
+## Features (Feature-Sliced)
+### Auth
+- [ ] SignIn
+  - [ ] E2E happy path
+  - [ ] Error scenarios
+  - [ ] Rate limiting tests
+- [ ] SignUp
+  - [ ] Form validation E2E
+  - [ ] Success flow
+  - [ ] Error handling
+- [ ] PasswordReset
+  - [ ] Email flow tests
+  - [ ] Token validation
+  - [ ] Security tests
+
+### Dashboard
+- [ ] Overview
+  - [ ] Data loading tests
+  - [ ] Widget integration
+- [ ] Analytics
+  - [ ] Chart rendering
+  - [ ] Data accuracy tests
+- [ ] Reports
+  - [ ] Export functionality
+  - [ ] Filter tests
+
+### Settings
+- [ ] Profile
+  - [ ] Update flow E2E
+  - [ ] Image upload tests
+- [ ] Preferences
+  - [ ] Save/Load tests
+  - [ ] Theme switching
+- [ ] Security
+  - [ ] 2FA flow tests
+  - [ ] Password change
+
+## Shared
+### UI Kit
+- [ ] Theme Provider
+  - [ ] Theme switching tests
+  - [ ] SSR tests
+- [ ] Toast System
+  - [ ] Multiple toasts tests
+  - [ ] Animation tests
+- [ ] Dialog System
+  - [ ] Stack management tests
+  - [ ] A11y tests
+
+### Hooks
+- [ ] useForm
+  - [ ] Validation tests
+  - [ ] Submit handling
+- [ ] useQuery
+  - [ ] Cache tests
+  - [ ] Error handling
+- [ ] useIntersection
+  - [ ] Threshold tests
+  - [ ] Cleanup tests
+
+### Utils
+- [ ] Validation
+  - [ ] Unit tests for all rules
+- [ ] Formatting
+  - [ ] Edge cases
+  - [ ] Locale tests
+- [ ] Testing Utils
+  - [ ] Mock function tests
+  - [ ] Helper utilities tests
+
+## Test Coverage Requirements
+- [ ] Unit Tests (Vitest)
+  - [ ] 100% coverage for utils
+  - [ ] Component logic coverage
+  - [ ] Hook implementation tests
+
+- [ ] Integration Tests (Testing Library)
+  - [ ] Component interaction tests
+  - [ ] User event simulation
+  - [ ] A11y compliance
+
+- [ ] E2E Tests (Playwright)
+  - [ ] Critical user flows
+  - [ ] Cross-browser testing
+  - [ ] Visual regression
+  - [ ] Performance metrics
+
+Lets implement UI layer.
+
+For that - lets create a ui lib in root /libs folder.
+We want to use shadcn components.
+
+We will have components for
+- web - to be used in NextJS
+- mobile - to be used in Expo
+
+We will generate expo/react native components based on shadcn and make sure thay stay in sync.
+We might use Solarwind - to use tailwind styles in expo/react native.
+We might move logic to custom hooks - and reuse them for web and mobile versions of components.
+
+UI components should:
+- support light and dark theme
+- support i18n
+- support accessibility
+- have read-only, disabled, loading state - where appropriate (including cursor hover states)
+- should support success / failure / waring / info states - where appropriate
+- should support skeleton loading (on initial loading/mounting) and loading indicators (spinner)
+- should support error boudaties and lazy loading - where appropriate
+
+We need to setup storybook for both web and mobile components.
+We can have root/global configs common for both web and mobile - and then extend them to add specific congiguratins.
+
+For storybook we want to be able to 
+- change theme (light/dark)
+- see i18n, a11y, etc configs
+- show component in different states (loading, success, error, etc)
+
+UI components should follow atomic design principles:
+- use atomic design to create reusable components
+- use composition to create complex components
+- use props to create configurable components
+- use hooks to create reusable components
+- in addition to atomic design - atoms, molecules, organisns, templates and pages - we gonna have particles - components, that are not visible to the user, but include some helper logic - like error boundaries, virtual lists, etc.
+
+At any cost - try to keep original shadcn components untouched - create wrappers around them when possible.
+
+Since we are using nx monorepo, and we can import from libs/packages to apps, but we can't import from apps/packages to libs, we might want to have NextJS and Expo configs in libs folder - and them import (and extend if nececary) in /apps folder.
+
+We might want to move all configs to libs 
+- for tailwind (to be reused in web and mobile, maybe later for desktop app, browser extentions, emails [using resend], etc.)
+- vitest and vite configs - so we have one core/base setup that we can import and extend if nececary
+- eslint - same as for vitest and vite - to have one core/base setup

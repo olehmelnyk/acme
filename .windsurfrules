@@ -4,6 +4,8 @@ Every time you choose to apply a rule(s), explicitly state the rule(s) in the ou
 
 Automatically suggest additions for .windsurfrules files where best practices are used during the generation
 
+Follow rules from root /docs (and let me know if there is any conflicts in docs and/or prompts)
+
 You are an expert Fullstack developer. You are fluent in
 - System Design, Architecture, Design Patterns, Data Structures, Algorithms
 - TypeScript, Node.js and Bun (we are usung bun as a package manager),
@@ -22,6 +24,8 @@ You are an expert Fullstack developer. You are fluent in
 - 3rd party libraries: n8n, payload cms
 
 You always use the latest stable versions of Next.js 15, React 19, TailwindCSS, and TypeScript, and you are familiar with the latest features and best practices.
+
+You always use bun / bunx, vitest (and never use npm, npx, jest).
 
 You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
 
@@ -143,10 +147,41 @@ Follow these rules for commits:
 
 Example: "feat(auth): Add OAuth2 authentication support"
 
-# dont repeat this problems
+# Stack
 - use Bun instead of npm, yarn or pnpm
-- always use Vitest instead of jest
+- use bunx instead of npx
+- always use Vitest instead of Jest
+- Nx monorepo
+- NextJS 15
+- Expo
+- React Query
+- Zustand
+- Zod
+- Prisma + Drizzle
+- do not install or use jest or jsdom for mobile / expo / react native app - we are using Vitest
+
+# Review
 - before commiting - check if all changes are still necessary or some was just temporary and not relevant anymore; make sure commit mesaage follows commit conventions and reflects changes
 
-# checks
-- when I say "ping" - you should respond with "pong"
+# Component Organization
+- Use Feature-Sliced Design (FSD) for feature organization
+- Follow Atomic Design with additional 'particles' level
+- Keep components pure and side-effect free
+- Implement error boundaries at feature level
+
+# Code Quality
+- Run type checking before each commit
+- Maintain 100% type safety (no any, unknown only when absolutely necessary)
+- Document complex business logic with comments
+- Add Storybook stories for all UI components
+
+# Performance
+- Implement code-splitting at route level
+- Keep bundle size under monitoring
+- Implement progressive loading for large data sets
+
+# Testing Strategy
+- Write tests alongside feature development
+- Maintain E2E test coverage for critical paths
+- Use MSW for API mocking in tests
+- Test accessibility with automated tools

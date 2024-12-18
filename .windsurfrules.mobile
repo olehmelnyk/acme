@@ -1,0 +1,9 @@
+# Mobile Development Environment Setup
+- Ensure Xcode is installed from the App Store for iOS development
+- Configure proper UTF-8 encoding for CocoaPods
+- Maintain sufficient disk space (keep at least 20% free)
+- Clear NX cache if encountering SQLite errors
+- Use React Native and Expo for cross-platform development
+- Follow mobile-first design principles
+- Implement proper error handling and loading states
+- Ensure proper permissions handling for mobile features

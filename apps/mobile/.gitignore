@@ -1,0 +1,50 @@
+# OSX
+.DS_Store
+
+# Expo
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Native
+ios/
+android/
+
+# Node
+node_modules/
+npm-debug.*
+*.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Debug
+.debug/
+debug.log
+
+# Build
+build/
+*.ipa
+*.apk
+*.aab
