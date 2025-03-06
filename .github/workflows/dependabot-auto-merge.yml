@@ -27,14 +27,14 @@ jobs:
 
       - name: Approve Dependabot PR
         env:
-          GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          gh pr review --approve "$PR_URL"
+          gh pr review --approve "$PR_URL" || echo "Approval failed"
 
       - name: Enable auto-merge
         env:
-          GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          gh pr merge --auto --merge "$PR_URL"
+          gh pr merge --auto --merge "$PR_URL" || echo "Auto-merge failed"
