@@ -70,7 +70,7 @@ sequenceDiagram
     participant Pipeline
     participant Analyzer
     participant Index
-    
+
     Source->>Pipeline: Raw Data
     Pipeline->>Analyzer: Process Data
     Analyzer->>Index: Index Document
@@ -84,7 +84,7 @@ sequenceDiagram
     participant Query
     participant Search
     participant Index
-    
+
     Client->>Query: Search Request
     Query->>Search: Parse Query
     Search->>Index: Execute Search
@@ -98,7 +98,7 @@ sequenceDiagram
     participant Analytics
     participant Metrics
     participant Dashboard
-    
+
     Search->>Analytics: Search Events
     Analytics->>Metrics: Process Data
     Metrics->>Dashboard: Update Stats
@@ -120,13 +120,13 @@ class SearchManager {
   private config: SearchConfig;
   private client: ElasticsearchClient;
   private analyzer: TextAnalyzer;
-  
+
   constructor(config: SearchConfig) {
     this.config = config;
     this.client = new ElasticsearchClient();
     this.analyzer = new TextAnalyzer();
   }
-  
+
   async search<T>(
     query: SearchQuery,
     options: SearchOptions
@@ -136,10 +136,10 @@ class SearchManager {
       parsedQuery,
       options
     );
-    
+
     return this.processResults(results);
   }
-  
+
   private async parseQuery(
     query: SearchQuery
   ): Promise<ParsedQuery> {
@@ -161,13 +161,13 @@ class IndexManager {
   private config: IndexConfig;
   private pipeline: IndexPipeline;
   private validator: DocumentValidator;
-  
+
   constructor(config: IndexConfig) {
     this.config = config;
     this.pipeline = new IndexPipeline();
     this.validator = new DocumentValidator();
   }
-  
+
   async index<T>(
     document: T,
     options?: IndexOptions
@@ -175,22 +175,22 @@ class IndexManager {
     const validated = await this.validator.validate(
       document
     );
-    
+
     const processed = await this.pipeline.process(
       validated,
       options
     );
-    
+
     return this.indexDocument(processed);
   }
-  
+
   private async indexDocument(
     document: ProcessedDocument
   ): Promise<IndexResult> {
     const operation = await this.prepareIndex(
       document
     );
-    
+
     return this.executeOperation(operation);
   }
 }
@@ -208,25 +208,25 @@ class SearchAnalytics {
   private config: AnalyticsConfig;
   private collector: MetricCollector;
   private reporter: AnalyticsReporter;
-  
+
   constructor(config: AnalyticsConfig) {
     this.config = config;
     this.collector = new MetricCollector();
     this.reporter = new AnalyticsReporter();
   }
-  
+
   async trackSearch(
     event: SearchEvent
   ): Promise<void> {
     await this.collector.collect(event);
-    
+
     const metrics = await this.processMetrics(
       event
     );
-    
+
     await this.updateDashboard(metrics);
   }
-  
+
   private async processMetrics(
     event: SearchEvent
   ): Promise<SearchMetrics> {
@@ -234,10 +234,11 @@ class SearchAnalytics {
       event,
       period: this.config.reporting.period
     });
-    
+
     return this.computeMetrics(data);
   }
 }
+```
 
 ## Search Architecture Diagram
 

@@ -88,7 +88,7 @@ sequenceDiagram
     participant Collector
     participant Storage
     participant Analysis
-    
+
     App->>Collector: Send Metrics
     Collector->>Storage: Store Data
     Storage->>Analysis: Process Data
@@ -102,7 +102,7 @@ sequenceDiagram
     participant Rules
     participant Alert
     participant Team
-    
+
     Monitor->>Rules: Check Rules
     Rules->>Alert: Trigger Alert
     Alert->>Team: Notify
@@ -116,7 +116,7 @@ sequenceDiagram
     participant Tracer
     participant Storage
     participant Analysis
-    
+
     Request->>Tracer: Capture Trace
     Tracer->>Storage: Store Trace
     Storage->>Analysis: Analyze
@@ -137,13 +137,13 @@ class MetricsManager {
   private config: MetricsConfig;
   private collectors: MetricCollector[];
   private storage: MetricStorage;
-  
+
   constructor(config: MetricsConfig) {
     this.config = config;
     this.collectors = this.initCollectors();
     this.storage = new MetricStorage();
   }
-  
+
   async collect(
     metric: Metric,
     options?: CollectOptions
@@ -151,21 +151,21 @@ class MetricsManager {
     const processed = await this.process(
       metric
     );
-    
+
     const stored = await this.storage.store(
       processed
     );
-    
+
     return this.analyze(stored);
   }
-  
+
   private async process(
     metric: Metric
   ): Promise<ProcessedMetric> {
     for (const collector of this.collectors) {
       metric = await collector.process(metric);
     }
-    
+
     return metric;
   }
 }
@@ -183,13 +183,13 @@ class AlertManager {
   private config: AlertConfig;
   private rules: AlertRules;
   private router: AlertRouter;
-  
+
   constructor(config: AlertConfig) {
     this.config = config;
     this.rules = new AlertRules();
     this.router = new AlertRouter();
   }
-  
+
   async processAlert(
     alert: Alert,
     options?: AlertOptions
@@ -197,14 +197,14 @@ class AlertManager {
     const validated = await this.validate(
       alert
     );
-    
+
     const routed = await this.route(
       validated
     );
-    
+
     return this.notify(routed);
   }
-  
+
   private async route(
     alert: ValidatedAlert
   ): Promise<RoutedAlert> {
@@ -228,13 +228,13 @@ class TraceManager {
   private config: TraceConfig;
   private samplers: TraceSampler[];
   private processors: TraceProcessor[];
-  
+
   constructor(config: TraceConfig) {
     this.config = config;
     this.samplers = this.initSamplers();
     this.processors = this.initProcessors();
   }
-  
+
   async captureTrace(
     trace: Trace,
     options?: TraceOptions
@@ -242,21 +242,21 @@ class TraceManager {
     const sampled = await this.sample(
       trace
     );
-    
+
     const processed = await this.process(
       sampled
     );
-    
+
     return this.export(processed);
   }
-  
+
   private async process(
     trace: SampledTrace
   ): Promise<ProcessedTrace> {
     for (const processor of this.processors) {
       trace = await processor.process(trace);
     }
-    
+
     return trace;
   }
 }
@@ -299,7 +299,7 @@ graph TB
             LogStore[Log Storage]
         end
 
-        subgraph "Processing"
+        subgraph "Data Processing"
             Filter[Filtering]
             Transform[Transform]
             Aggregate[Aggregation]
@@ -308,8 +308,8 @@ graph TB
 
     subgraph "Visualization"
         subgraph "Dashboards"
-            System[System View]
-            Business[Business View]
+            SystemView[System View]
+            BusinessView[Business View]
             Custom[Custom View]
         end
 
@@ -337,7 +337,7 @@ graph TB
     Correlation --> Aggregate
 
     %% Visualization Flow
-    Filter --> System
-    Transform --> Business
+    Filter --> SystemView
+    Transform --> BusinessView
     Aggregate --> Custom
 ```

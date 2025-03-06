@@ -29,7 +29,7 @@ sequenceDiagram
     participant Router
     participant Meta
     participant Shard
-    
+
     App->>Router: Query Request
     Router->>Meta: Get Shard Location
     Meta-->>Router: Shard Info
@@ -44,7 +44,7 @@ sequenceDiagram
     participant Manager
     participant Source
     participant Target
-    
+
     Monitor->>Manager: Detect Imbalance
     Manager->>Source: Begin Migration
     Source->>Target: Transfer Data
@@ -60,7 +60,7 @@ sequenceDiagram
     participant Shard1
     participant Shard2
     participant Aggregator
-    
+
     App->>Router: Cross-Shard Query
     Router->>Shard1: Partial Query
     Router->>Shard2: Partial Query
@@ -84,14 +84,14 @@ class ShardRouter {
   async routeQuery(query: Query, config: ShardConfig): Promise<QueryResult> {
     const shardKey = this.extractShardKey(query, config.shardKey);
     const shard = await this.locateShard(shardKey);
-    
+
     if (this.isCrossShardQuery(query)) {
       return this.handleCrossShardQuery(query, shard);
     }
-    
+
     return this.executeSingleShardQuery(query, shard);
   }
-  
+
   private async locateShard(shardKey: string): Promise<Shard> {
     const shardMap = await this.metadataStore.getShardMap();
     return this.calculateTargetShard(shardKey, shardMap);
@@ -112,20 +112,20 @@ class ShardRebalancer {
   async rebalanceShards(config: RebalanceConfig): Promise<void> {
     const shards = await this.getShardMetrics();
     const plan = this.createRebalancePlan(shards, config);
-    
+
     for (const migration of plan) {
       await this.executeMigration(migration, config);
       await this.updateMetadata(migration);
       await this.verifyMigration(migration);
     }
   }
-  
+
   private async executeMigration(
     migration: Migration,
     config: RebalanceConfig
   ): Promise<void> {
     const batches = this.createBatches(migration.data, config.batchSize);
-    
+
     for (const batch of batches) {
       await this.transferBatch(batch, migration.source, migration.target);
       await this.verifyBatch(batch, migration.target);
@@ -150,21 +150,22 @@ class CrossShardAggregator {
     const results = config.strategy === 'parallel'
       ? await this.executeParallel(queries, config)
       : await this.executeSequential(queries, config);
-      
+
     return this.mergeResults(results);
   }
-  
+
   private async executeParallel(
     queries: Query[],
     config: AggregationConfig
   ): Promise<QueryResult[]> {
-    const executions = queries.map(query => 
+    const executions = queries.map(query =>
       this.executeWithRetry(query, config.retryCount)
     );
-    
+
     return Promise.all(executions);
   }
 }
+```
 
 ## Components
 
@@ -233,3 +234,4 @@ graph TB
     Router --> S1
     Router --> S2
     Router --> S3
+```
