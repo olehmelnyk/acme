@@ -21,15 +21,16 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
       - name: Approve Dependabot PR
         env:
           GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT }}
-          PR_URL: ${{github.event.pull_request.html_url}}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          gh pr review --approve "$PR_URL"s
+          gh pr review --approve "$PR_URL"
+
+      - name: Enable auto-merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPENDABOT_PAT }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr merge --auto --merge "$PR_URL"
