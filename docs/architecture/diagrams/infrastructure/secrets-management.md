@@ -85,8 +85,8 @@ graph TB
             Alerts[Alerts]
         end
 
-        subgraph "Compliance"
-            Compliance[Compliance Rules]
+        subgraph "Compliance Requirements"
+            Rules[Compliance Rules]
             Standards[Security Standards]
             Reports[Compliance Reports]
         end
@@ -138,7 +138,7 @@ graph TB
     RBAC --> Monitoring
     Identity --> Alerts
 
-    AuditLog --> Compliance
+    AuditLog --> Rules
     Monitoring --> Standards
     Alerts --> Reports
 
@@ -180,7 +180,7 @@ sequenceDiagram
     participant A as Auth Method
     participant V as Vault
     participant S as Storage
-    
+
     C->>A: Authenticate
     A->>V: Validate
     V->>V: Generate Token

@@ -475,10 +475,10 @@ graph TB
             Audit[Audit Logs]
         end
 
-        subgraph "Compliance"
+        subgraph "Compliance Components"
             Retention[Retention Policy]
-            Compliance[Compliance Rules]
-            Documentation[Documentation]
+            Rules[Compliance Rules]
+            Docs[Documentation]
         end
     end
 
@@ -515,5 +515,10 @@ graph TB
     RecoveryMetrics --> Audit
 
     Encryption --> Retention
-    AccessControl --> Compliance
-    Audit --> Documentation
+    AccessControl --> Rules
+    Audit --> Docs
+
+    %% Compliance Flow (fixed to avoid cycle)
+    Retention --> Rules
+    Rules --> Docs
+```

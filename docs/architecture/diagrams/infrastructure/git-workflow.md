@@ -19,8 +19,8 @@ graph TB
             Hotfix[hotfix/*]
         end
 
-        subgraph "Release"
-            Release[release/*]
+        subgraph "Release Components"
+            Rel[release/*]
             Tag[tags]
             Version[versions]
         end
@@ -80,14 +80,14 @@ graph TB
         end
 
         subgraph "Documentation"
-            Commit[Commit Style]
+            CommitStyle[Commit Style]
             Change[Changelog]
-            Release[Release Notes]
+            RelNotes[Release Notes]
         end
     end
 
     %% Branch Flow
-    Main --> Release
+    Main --> Rel
     Dev --> Feature
     Stage --> Hotfix
 
@@ -118,9 +118,9 @@ graph TB
     Convention --> Checklist
     Patterns --> Labels
 
-    Template --> Commit
+    Template --> CommitStyle
     Checklist --> Change
-    Labels --> Release
+    Labels --> RelNotes
 ```
 
 ## Component Description
