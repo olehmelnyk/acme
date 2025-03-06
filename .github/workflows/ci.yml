@@ -191,8 +191,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Configure Git
-        run: |
-          git fetch origin "main:main" || git fetch origin "master:main"
+        run: git fetch origin main
 
       - uses: nrwl/nx-set-shas@v4
         with:
@@ -223,80 +222,28 @@ jobs:
           echo "${{ env.RETRY_COMMAND_SCRIPT }}" | sudo tee "/usr/local/bin/retry_command"
           sudo chmod +x "/usr/local/bin/retry_command"
 
-      - name: Install security tools
+      - name: Install Trivy
         run: |
-          echo "Installing required packages..."
           sudo apt-get update
-          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          sudo apt-get install -y trivy
 
-          # Install Trivy with version pinning
-          TRIVY_VERSION="0.47.0"
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --batch --yes --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
-            sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install -y trivy=${TRIVY_VERSION}
-
-          # Install Gitleaks with version pinning and checksum verification
-          GITLEAKS_VERSION="v8.18.1"
-
-          # Download Gitleaks binary and checksums
-          wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_linux_x64.tar.gz -O /tmp/gitleaks.tar.gz
-          wget -q https://github.com/zricethezav/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION#v}_checksums.txt -O /tmp/gitleaks_checksums.txt
-
-          # Verify checksum
-          cd /tmp
-          sha256sum --check --ignore-missing <(grep linux_x64.tar.gz gitleaks_checksums.txt)
-
-          # Install Gitleaks
-          tar -xzf gitleaks.tar.gz
-          sudo mv gitleaks /usr/local/bin/
-          sudo chmod +x /usr/local/bin/gitleaks
-
-          # Clean up
-          rm gitleaks.tar.gz gitleaks_checksums.txt
-
-          # Verify installations
-          echo "Verifying installations..."
-          trivy --version
-          gitleaks version
-
-      - name: Run security checks
+      - name: Run Trivy Scan
         run: |
-          # Run Trivy with configuration
-          trivy fs \
-            --security-checks vuln,config,secret \
-            --severity HIGH,CRITICAL \
-            --exit-code 1 \
-            --timeout 10m \
-            --ignorefile .trivyignore \
-            --format sarif \
-            --list-all-pkgs \
-            --vulnerability-threshold 5 \
-            --output trivy-results.sarif .
+          trivy fs --format sarif --output trivy-results.sarif .
 
-          # Run Gitleaks with configuration
-          gitleaks detect \
-            --verbose \
-            --report-format sarif \
-            --report-path gitleaks-results.sarif \
-            --redact \
-            --no-git \
-            --config .gitleaks.toml
-
-      - name: Upload Trivy SARIF results to Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v2
+      - name: Run Gitleaks Scan
+        uses: zricethezav/gitleaks-action@v2
         with:
-          sarif_file: trivy-results.sarif
-          category: trivy
+          config-path: .gitleaks.toml
+          report-format: sarif
+          output-file: gitleaks-results.sarif
 
-      - name: Upload Gitleaks SARIF results to Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v2
+      - name: Upload Security Reports
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: gitleaks-results.sarif
-          category: gitleaks
+          sarif_file: |
+            trivy-results.sarif
+            gitleaks-results.sarif
 
       - name: Upload Trivy results
         if: always()
@@ -357,8 +304,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Configure Git
-        run: |
-          git fetch origin "main:main" || git fetch origin "master:main"
+        run: git fetch origin main
 
       - uses: nrwl/nx-set-shas@v4
         with:
@@ -454,8 +400,7 @@ jobs:
           merge-multiple: true
 
       - name: Configure Git
-        run: |
-          git fetch origin "main:main" || git fetch origin "master:main"
+        run: git fetch origin main
 
       - uses: nrwl/nx-set-shas@v4
         with:
