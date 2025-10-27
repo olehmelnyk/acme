@@ -263,21 +263,21 @@ jobs:
 
       - name: Upload Trivy results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: trivy-results
           path: trivy-results.sarif
 
       - name: Upload Gitleaks results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gitleaks-results
           path: gitleaks-results.sarif
 
       - name: Archive security scan results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-scan-results
           path: |
@@ -372,7 +372,7 @@ jobs:
           ls -la "${BUILD_DIR}"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-${{ matrix.project }}
           path: artifacts/apps/${{ matrix.project }}
@@ -409,7 +409,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: build-*
           path: artifacts/apps
@@ -470,7 +470,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-results
           path: playwright-results/
