@@ -90,7 +90,7 @@ jobs:
           echo "value=${CACHE_KEY}" >> "$GITHUB_OUTPUT"
 
       - name: Cache Bun dependencies
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
@@ -128,7 +128,7 @@ jobs:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4.3.0
+        uses: actions/cache/restore@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
@@ -178,7 +178,7 @@ jobs:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4.3.0
+        uses: actions/cache/restore@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
@@ -263,21 +263,21 @@ jobs:
 
       - name: Upload Trivy results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: trivy-results
           path: trivy-results.sarif
 
       - name: Upload Gitleaks results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: gitleaks-results
           path: gitleaks-results.sarif
 
       - name: Archive security scan results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: security-scan-results
           path: |
@@ -307,7 +307,7 @@ jobs:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4.3.0
+        uses: actions/cache/restore@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
@@ -372,7 +372,7 @@ jobs:
           ls -la "${BUILD_DIR}"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.project }}
           path: artifacts/apps/${{ matrix.project }}
@@ -396,7 +396,7 @@ jobs:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4.3.0
+        uses: actions/cache/restore@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
@@ -409,7 +409,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: build-*
           path: artifacts/apps
@@ -470,7 +470,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-results
           path: playwright-results/
@@ -492,7 +492,7 @@ jobs:
           bun-version: 1.0.14
 
       - name: Restore cache
-        uses: actions/cache/restore@v4.3.0
+        uses: actions/cache/restore@v5.0.1
         with:
           path: |
             ~/.bun/install/cache
