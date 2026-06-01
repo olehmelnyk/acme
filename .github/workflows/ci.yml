@@ -236,7 +236,7 @@ jobs:
           trivy fs --format sarif --output trivy-results.sarif .
 
       - name: Run Gitleaks Scan
-        uses: zricethezav/gitleaks-action@v2
+        uses: zricethezav/gitleaks-action@v3
         with:
           config-path: .gitleaks.toml
           report-format: sarif
